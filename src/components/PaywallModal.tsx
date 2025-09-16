@@ -81,7 +81,7 @@ export function PaywallModal({
 
         {/* Pricing Cards */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {PRICING_TIERS.map((tier) => (
               <div
                 key={tier.id}
@@ -103,13 +103,38 @@ export function PaywallModal({
                   <div>
                     <h3 className="text-lg font-semibold text-white">{tier.name}</h3>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-bold text-white">
+                      <span className="text-2xl font-bold text-white">
                         ${tier.price}
                       </span>
                       {tier.price > 0 && (
-                        <span className="text-neutral-400">/{tier.interval}</span>
+                        <span className="text-neutral-400 text-sm">/{tier.interval}</span>
                       )}
                     </div>
+                    {tier.id === 'yearly' && (
+                      <div className="text-xs text-green-400 font-medium">
+                        Save 2 months vs monthly
+                      </div>
+                    )}
+                    {tier.id === 'two_years' && (
+                      <div className="text-xs text-green-400 font-medium">
+                        Save 4 months vs monthly
+                      </div>
+                    )}
+                    {tier.id === 'three_years' && (
+                      <div className="text-xs text-green-400 font-medium">
+                        Save 6 months vs monthly
+                      </div>
+                    )}
+                    {tier.id === 'four_years' && (
+                      <div className="text-xs text-green-400 font-medium">
+                        Save 8 months vs monthly
+                      </div>
+                    )}
+                    {tier.id === 'lifetime' && (
+                      <div className="text-xs text-yellow-400 font-medium">
+                        Best Value - Pay Once
+                      </div>
+                    )}
                   </div>
                 </div>
 

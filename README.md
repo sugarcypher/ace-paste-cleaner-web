@@ -29,6 +29,73 @@ A powerful text cleaner for removing invisible characters, markdown formatting, 
 - **Remove trailing spaces** - Clean end-of-line whitespace
 - **Remove leading spaces** - Strip beginning-of-line whitespace
 
+## Pricing Tiers
+
+### 🆓 Free Tier
+- 5 cleanings per day
+- Up to 10,000 characters per cleaning
+- Basic cleaning features
+- Community support
+
+### 💰 Flexible Pricing Options
+
+#### Daily - $1.23/day
+- Unlimited cleanings
+- Up to 50,000 characters
+- All cleaning features
+- Priority support
+- Advanced detection
+
+#### Weekly - $2.34/week
+- Unlimited cleanings
+- Up to 100,000 characters
+- All cleaning features
+- Priority support
+- Advanced detection
+- Bulk processing
+
+#### Monthly - $3.45/month
+- Unlimited cleanings
+- Unlimited text length
+- All cleaning features
+- Priority support
+- Advanced detection
+- Bulk processing
+- API access
+
+#### Yearly - $45.67/year
+- Everything in Monthly
+- 2 months free
+- Priority support
+- Custom integrations
+- Team management
+
+#### 2 Years - $56.78/year
+- Everything in Yearly
+- 4 months free
+- White-label options
+
+#### 3 Years - $67.89/year
+- Everything in 2 Years
+- 6 months free
+- Dedicated support
+
+#### 4 Years - $78.90/year
+- Everything in 3 Years
+- 8 months free
+- Custom branding
+
+#### 🏆 Lifetime - $99.99 (One-time)
+- Everything forever
+- Unlimited everything
+- Priority support
+- Custom integrations
+- Team management
+- White-label options
+- Dedicated support
+- Custom branding
+- Future updates included
+
 ## Getting Started
 
 ### Prerequisites

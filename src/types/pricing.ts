@@ -51,40 +51,62 @@ export const PRICING_TIERS: PricingTier[] = [
     }
   },
   {
-    id: 'pro',
-    name: 'Pro',
-    price: 9.99,
+    id: 'daily',
+    name: 'Daily',
+    price: 1.23,
     currency: 'USD',
-    interval: 'month',
+    interval: 'day',
+    features: [
+      'Unlimited cleanings',
+      'Up to 50,000 characters',
+      'All cleaning features',
+      'Priority support',
+      'Advanced detection'
+    ],
+    limits: {
+      dailyCleanings: -1, // unlimited
+      maxTextLength: 50000,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    stripePriceId: 'price_daily'
+  },
+  {
+    id: 'weekly',
+    name: 'Weekly',
+    price: 2.34,
+    currency: 'USD',
+    interval: 'week',
     features: [
       'Unlimited cleanings',
       'Up to 100,000 characters',
       'All cleaning features',
       'Priority support',
-      'Bulk processing',
-      'API access'
+      'Advanced detection',
+      'Bulk processing'
     ],
     limits: {
-      dailyCleanings: -1, // unlimited
+      dailyCleanings: -1,
       maxTextLength: 100000,
       advancedFeatures: true,
       prioritySupport: true
     },
-    stripePriceId: 'price_pro_monthly' // You'll need to create this in Stripe
+    stripePriceId: 'price_weekly'
   },
   {
-    id: 'enterprise',
-    name: 'Enterprise',
-    price: 29.99,
+    id: 'monthly',
+    name: 'Monthly',
+    price: 3.45,
     currency: 'USD',
     interval: 'month',
     features: [
-      'Everything in Pro',
+      'Unlimited cleanings',
       'Unlimited text length',
-      'Custom integrations',
-      'Dedicated support',
-      'Team management',
-      'White-label options'
+      'All cleaning features',
+      'Priority support',
+      'Advanced detection',
+      'Bulk processing',
+      'API access'
     ],
     limits: {
       dailyCleanings: -1,
@@ -92,6 +114,121 @@ export const PRICING_TIERS: PricingTier[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    stripePriceId: 'price_enterprise_monthly'
+    stripePriceId: 'price_monthly'
+  },
+  {
+    id: 'yearly',
+    name: 'Yearly',
+    price: 45.67,
+    currency: 'USD',
+    interval: 'year',
+    features: [
+      'Everything in Monthly',
+      '2 months free',
+      'Priority support',
+      'Custom integrations',
+      'Team management'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: -1,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    stripePriceId: 'price_yearly'
+  },
+  {
+    id: 'two_years',
+    name: '2 Years',
+    price: 56.78,
+    currency: 'USD',
+    interval: 'year',
+    features: [
+      'Everything in Yearly',
+      '4 months free',
+      'Priority support',
+      'Custom integrations',
+      'Team management',
+      'White-label options'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: -1,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    stripePriceId: 'price_two_years'
+  },
+  {
+    id: 'three_years',
+    name: '3 Years',
+    price: 67.89,
+    currency: 'USD',
+    interval: 'year',
+    features: [
+      'Everything in 2 Years',
+      '6 months free',
+      'Priority support',
+      'Custom integrations',
+      'Team management',
+      'White-label options',
+      'Dedicated support'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: -1,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    stripePriceId: 'price_three_years'
+  },
+  {
+    id: 'four_years',
+    name: '4 Years',
+    price: 78.90,
+    currency: 'USD',
+    interval: 'year',
+    features: [
+      'Everything in 3 Years',
+      '8 months free',
+      'Priority support',
+      'Custom integrations',
+      'Team management',
+      'White-label options',
+      'Dedicated support',
+      'Custom branding'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: -1,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    stripePriceId: 'price_four_years'
+  },
+  {
+    id: 'lifetime',
+    name: 'Lifetime',
+    price: 99.99,
+    currency: 'USD',
+    interval: 'lifetime',
+    features: [
+      'Everything forever',
+      'Unlimited everything',
+      'Priority support',
+      'Custom integrations',
+      'Team management',
+      'White-label options',
+      'Dedicated support',
+      'Custom branding',
+      'Future updates included'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: -1,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    stripePriceId: 'price_lifetime'
   }
 ];
