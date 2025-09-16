@@ -1,4 +1,7 @@
 import React, { useMemo, useState } from "react";
+import { useUsage } from "./hooks/useUsage";
+import { PaywallModal } from "./components/PaywallModal";
+import { UsageIndicator } from "./components/UsageIndicator";
 
 interface CleanOptions {
   removeInvisible: boolean;
@@ -45,6 +48,10 @@ interface MetricProps {
 
 export default function App() {
   const [input, setInput] = useState("");
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
+  const { user, usage, recordCleaning, canClean, getRemainingCleanings, upgradeUser } = useUsage();
+  
   const [opts, setOpts] = useState<CleanOptions>({
     removeInvisible: true,
     keepVS16Emoji: true,
@@ -73,7 +80,27 @@ export default function App() {
     setOpts((o) => ({ ...o, [key]: !o[key] }));
   }
 
-  const cleaned = useMemo(() => cleanText(input, opts), [input, opts]);
+  const cleaned = useMemo(() => {
+    if (!canClean(input.length)) {
+      return input; // Return original text if can't clean
+    }
+    return cleanText(input, opts);
+  }, [input, opts, canClean]);
+
+  const handleClean = () => {
+    if (!canClean(input.length)) {
+      if (input.length > 10000) {
+        setPaywallReason('text_length');
+      } else {
+        setPaywallReason('daily_limit');
+      }
+      setShowPaywall(true);
+      return;
+    }
+    
+    // Record the cleaning usage
+    recordCleaning(input.length);
+  };
 
   const copyToClipboard = async () => {
     try {
@@ -115,6 +142,13 @@ export default function App() {
             </button>
           </div>
         </header>
+
+        {/* Usage Indicator */}
+        <UsageIndicator 
+          user={user} 
+          usage={usage} 
+          onUpgrade={() => setShowPaywall(true)} 
+        />
 
         {/* Options Dropdowns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -232,6 +266,19 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* Paywall Modal */}
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onUpgrade={(tierId) => {
+          upgradeUser(tierId);
+          setShowPaywall(false);
+        }}
+        currentTier={user?.tier || 'free'}
+        reason={paywallReason}
+        currentTextLength={input.length}
+      />
     </div>
   );
 }
