@@ -2,6 +2,9 @@ import React, { useMemo, useState } from "react";
 import { useUsage } from "./hooks/useUsage";
 import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
+import { SecurityBadge } from "./components/SecurityBadge";
+import { PrivacyPolicy } from "./components/PrivacyPolicy";
+import { SecurityPolicy } from "./components/SecurityPolicy";
 
 interface CleanOptions {
   removeInvisible: boolean;
@@ -49,6 +52,8 @@ interface MetricProps {
 export default function App() {
   const [input, setInput] = useState("");
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showSecurity, setShowSecurity] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
   const { user, usage, recordCleaning, canClean, getRemainingCleanings, upgradeUser } = useUsage();
   
@@ -149,6 +154,9 @@ export default function App() {
           usage={usage} 
           onUpgrade={() => setShowPaywall(true)} 
         />
+
+        {/* Security Badge */}
+        <SecurityBadge />
 
         {/* Options Dropdowns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -265,9 +273,40 @@ export default function App() {
             />
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-neutral-800">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-neutral-400">
+              © 2025 Ace Paste Cleaner. All rights reserved.
+            </div>
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => setShowPrivacy(true)}
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => setShowSecurity(true)}
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                Security Policy
+              </button>
+              <a
+                href="https://github.com/sugarcypher/Ace-Paste-Cleaner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                GitHub
+              </a>
+            </div>
+          </div>
+        </footer>
       </div>
 
-      {/* Paywall Modal */}
+      {/* Modals */}
       <PaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
@@ -278,6 +317,16 @@ export default function App() {
         currentTier={user?.tier || 'free'}
         reason={paywallReason}
         currentTextLength={input.length}
+      />
+
+      <PrivacyPolicy
+        isOpen={showPrivacy}
+        onClose={() => setShowPrivacy(false)}
+      />
+
+      <SecurityPolicy
+        isOpen={showSecurity}
+        onClose={() => setShowSecurity(false)}
       />
     </div>
   );
