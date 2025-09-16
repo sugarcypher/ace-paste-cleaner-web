@@ -28,9 +28,9 @@ export function PaywallModal({
       case 'daily_limit':
         return 'You\'ve reached your daily cleaning limit. Upgrade to continue cleaning text!';
       case 'text_length':
-        return `Your text is ${currentTextLength.toLocaleString()} characters. Free tier supports up to 10,000 characters.`;
+        return `Your text is ${currentTextLength.toLocaleString()} characters. Free tier supports up to 2,000 characters.`;
       case 'feature_required':
-        return 'This feature requires a Pro or Enterprise subscription.';
+        return 'This feature requires a paid subscription.';
       default:
         return 'Upgrade to unlock more features!';
     }

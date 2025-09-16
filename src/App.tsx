@@ -105,7 +105,7 @@ function AppContent() {
 
   const handleClean = () => {
     if (!canClean(input.length)) {
-      if (input.length > 10000) {
+      if (input.length > 2000) {
         setPaywallReason('text_length');
       } else {
         setPaywallReason('daily_limit');

@@ -32,8 +32,8 @@ A powerful text cleaner for removing invisible characters, markdown formatting, 
 ## Pricing Tiers
 
 ### 🆓 Free Tier
-- 5 cleanings per day
-- Up to 10,000 characters per cleaning
+- 3 cleanings per day
+- Up to 2,000 characters per cleaning
 - Basic cleaning features
 - Community support
 
@@ -41,14 +41,14 @@ A powerful text cleaner for removing invisible characters, markdown formatting, 
 
 #### Daily - $1.23/day
 - Unlimited cleanings
-- Up to 50,000 characters
+- Up to 1,000,000 characters
 - All cleaning features
 - Priority support
 - Advanced detection
 
 #### Weekly - $2.34/week
 - Unlimited cleanings
-- Up to 100,000 characters
+- Up to 1,000,000 characters
 - All cleaning features
 - Priority support
 - Advanced detection
@@ -56,7 +56,7 @@ A powerful text cleaner for removing invisible characters, markdown formatting, 
 
 #### Monthly - $3.45/month
 - Unlimited cleanings
-- Unlimited text length
+- Up to 1,000,000 characters
 - All cleaning features
 - Priority support
 - Advanced detection

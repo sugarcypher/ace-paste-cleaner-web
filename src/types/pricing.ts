@@ -38,14 +38,14 @@ export const PRICING_TIERS: PricingTier[] = [
     currency: 'USD',
     interval: 'month',
     features: [
-      '5 cleanings per day',
-      'Up to 10,000 characters',
+      '3 cleanings per day',
+      'Up to 2,000 characters',
       'Basic cleaning features',
       'Community support'
     ],
     limits: {
-      dailyCleanings: 5,
-      maxTextLength: 10000,
+      dailyCleanings: 3,
+      maxTextLength: 2000,
       advancedFeatures: false,
       prioritySupport: false
     }
@@ -58,14 +58,14 @@ export const PRICING_TIERS: PricingTier[] = [
     interval: 'day',
     features: [
       'Unlimited cleanings',
-      'Up to 50,000 characters',
+      'Up to 1,000,000 characters',
       'All cleaning features',
       'Priority support',
       'Advanced detection'
     ],
     limits: {
       dailyCleanings: -1, // unlimited
-      maxTextLength: 50000,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -79,7 +79,7 @@ export const PRICING_TIERS: PricingTier[] = [
     interval: 'week',
     features: [
       'Unlimited cleanings',
-      'Up to 100,000 characters',
+      'Up to 1,000,000 characters',
       'All cleaning features',
       'Priority support',
       'Advanced detection',
@@ -87,7 +87,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 100000,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -101,7 +101,7 @@ export const PRICING_TIERS: PricingTier[] = [
     interval: 'month',
     features: [
       'Unlimited cleanings',
-      'Unlimited text length',
+      'Up to 1,000,000 characters',
       'All cleaning features',
       'Priority support',
       'Advanced detection',
@@ -110,7 +110,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: -1, // unlimited
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -131,7 +131,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: -1,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -153,7 +153,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: -1,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -176,7 +176,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: -1,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -200,7 +200,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: -1,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -225,7 +225,7 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: -1,
+      maxTextLength: 1000000,
       advancedFeatures: true,
       prioritySupport: true
     },
