@@ -1,0 +1,27 @@
+# GitHub App Configuration for Ace Paste Cleaner
+name: Ace Paste Cleaner
+description: A powerful text cleaner for removing invisible characters, markdown formatting, and other unwanted elements
+homepage_url: https://acepaste.xyz
+callback_url: https://acepaste.xyz/auth/callback
+webhook_url: https://acepaste.xyz/webhooks/github
+
+# Permissions
+permissions:
+  contents: read
+  metadata: read
+  pages: write
+  pull_requests: write
+  issues: write
+  actions: read
+
+# Events to subscribe to
+events:
+  - push
+  - pull_request
+  - release
+  - workflow_run
+
+# Installation settings
+installation:
+  target_type: organization
+  target_id: sugarcypher
