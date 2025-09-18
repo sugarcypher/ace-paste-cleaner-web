@@ -796,8 +796,8 @@ function cleanText(text: string, opts: CleanOptions): string {
     // Bold/italic markers; keep inner text
     t = t.replace(/\*\*(.*?)\*\*/gmsu, "$1");
     t = t.replace(/__(.*?)__/gmsu, "$1");
-    t = t.replace(/(?<!\*)\*(?!\*)(.*?)\*(?<!\*)/gmsu, "$1");
-    t = t.replace(/(?<!_)_(?!_)(.*?)_(?<!_)/gmsu, "$1");
+    t = t.replace(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/gmsu, "$1");
+    t = t.replace(/(?<!_)_(?!_)([^_\n]+)_(?<!_)/gmsu, "$1");
     t = t.replace(/~~(.*?)~~/gmsu, "$1");
   }
 
