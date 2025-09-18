@@ -51,6 +51,23 @@ export default function AcePasteFinalCleaner() {
     setOpts(o => ({ ...o, [key]: !o[key] }));
   }
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(cleaned);
+    } catch (err) {
+      console.error('Failed to copy text: ', err);
+    }
+  };
+
+  const pasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setInput(text);
+    } catch (err) {
+      console.error('Failed to paste text: ', err);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 p-6">
       <div className="mx-auto max-w-6xl grid gap-6">
@@ -72,94 +89,394 @@ export default function AcePasteFinalCleaner() {
           </div>
         </header>
 
-        <section className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6 items-start">
+        {/* Options Dropdowns */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <OptionGroup 
+            title="Text Formatting" 
+            options={[
+              { key: 'stripMarkdownHeaders', label: 'Markdown Headers' },
+              { key: 'stripBoldItalic', label: 'Bold/Italic Markers' },
+              { key: 'stripBackticks', label: 'Code Blocks' },
+              { key: 'stripListMarkers', label: 'List Markers' },
+              { key: 'stripBlockquotes', label: 'Blockquotes' },
+              { key: 'stripEmDashSeparators', label: 'Em-dash Separators' }
+            ]}
+            opts={opts}
+            toggle={toggle}
+          />
+          
+          <OptionGroup 
+            title="Whitespace & Invisible" 
+            options={[
+              { key: 'removeInvisible', label: 'Invisible Characters' },
+              { key: 'keepVS16Emoji', label: 'Keep Emoji VS16' },
+              { key: 'preserveEmoji', label: 'Preserve Emoji Sequences' },
+              { key: 'preserveIndicJoiners', label: 'Preserve Indic Joiners' },
+              { key: 'preserveArabicZWNJ', label: 'Preserve Arabic ZWNJ' },
+              { key: 'normalizeWhitespace', label: 'Normalize Whitespace' },
+              { key: 'collapseBlankLines', label: 'Collapse Blank Lines' },
+              { key: 'nukeAll', label: 'Remove ALL Invisibles' }
+            ]}
+            opts={opts}
+            toggle={toggle}
+          />
+        </div>
+
+        {/* Input and Output - Stacked Vertically */}
+        <div className="grid gap-6">
           <div className="grid gap-3">
-            <label className="text-sm uppercase tracking-wider text-neutral-400">Input</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm uppercase tracking-wider text-neutral-400">Input</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setInput(""); }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors text-sm font-medium animate-pulse"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear
+                </button>
+                <button
+                  onClick={pasteFromClipboard}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-500 text-yellow-950 hover:bg-yellow-400 transition-colors text-sm font-medium animate-pulse"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Paste
+                </button>
+              </div>
+            </div>
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste here"
-              className="h-[40vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              placeholder="Paste your text here..."
+              className="h-[30vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
-
-            <fieldset className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2 mt-1">
-              <Check label="Remove invisible characters" checked={opts.removeInvisible} onChange={() => toggle("removeInvisible")} />
-              <Check label="Keep emoji presentation selector (VS16)" checked={opts.keepVS16Emoji} onChange={() => toggle("keepVS16Emoji")} />
-              <Check label="Preserve emoji sequences (ZWJ in 👩‍💻, 🏳️‍🌈, etc.)" checked={opts.preserveEmoji} onChange={() => toggle("preserveEmoji")} />
-              <Check label="Preserve Indic joiners (ZWJ/ZWNJ in Devanagari–Malayalam)" checked={opts.preserveIndicJoiners} onChange={() => toggle("preserveIndicJoiners")} />
-              <Check label="Preserve ZWNJ in Arabic/Persian" checked={opts.preserveArabicZWNJ} onChange={() => toggle("preserveArabicZWNJ")} />
-              <Check label="Strip Markdown headers (#, ##, ###)" checked={opts.stripMarkdownHeaders} onChange={() => toggle("stripMarkdownHeaders")} />
-              <Check label="Strip bold/italic markers (** __ * _)" checked={opts.stripBoldItalic} onChange={() => toggle("stripBoldItalic")} />
-              <Check label="Strip backticks (inline & fenced)" checked={opts.stripBackticks} onChange={() => toggle("stripBackticks")} />
-              <Check label="Remove em-dash separator lines" checked={opts.stripEmDashSeparators} onChange={() => toggle("stripEmDashSeparators")} />
-              <Check label="Remove list markers (-, *, •, 1.)" checked={opts.stripListMarkers} onChange={() => toggle("stripListMarkers")} />
-              <Check label="Remove blockquote marks (>)" checked={opts.stripBlockquotes} onChange={() => toggle("stripBlockquotes")} />
-              <Check label="Normalize spaces (NBSP/EM/EN/Hair/Ideographic → space; trim)" checked={opts.normalizeWhitespace} onChange={() => toggle("normalizeWhitespace")} />
-              <Check label="Collapse multiple blank lines" checked={opts.collapseBlankLines} onChange={() => toggle("collapseBlankLines")} />
-              <Check label="Remove ALL invisibles (ignore preserves & remove VS16)" checked={opts.nukeAll} onChange={() => toggle("nukeAll")} />
-            </fieldset>
           </div>
 
+          {/* What was removed section - between input and output */}
+          <Stats input={input} output={cleaned} opts={eff} markersIn={markersIn} markersOut={markersOut} />
+
           <div className="grid gap-3">
-            <label className="text-sm uppercase tracking-wider text-neutral-400">Output</label>
+            <div className="flex items-center justify-between">
+              <label className="text-sm uppercase tracking-wider text-neutral-400">Output</label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { setInput(""); }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors text-sm font-medium animate-pulse"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear
+                </button>
+                <button
+                  onClick={copyToClipboard}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors text-sm font-medium animate-pulse"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Copy Clean
+                </button>
+              </div>
+            </div>
             <textarea
               value={cleaned}
               readOnly
-              className="h-[40vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm"
+              className="h-[30vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm"
             />
+          </div>
+        </div>
 
-            {/* Input counts */}
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 mt-1">
-              <Metric k="In → Out" v={`${stats.inLen} → ${stats.outLen}`} />
-              <Metric k="Removed" v={`${Math.max(0, stats.inLen - stats.outLen)}`} />
-              <Metric k="ZWSP (in)" v={`${markersIn.zwsp}`} />
-              <Metric k="WJ (in)" v={`${markersIn.wj}`} />
-              <Metric k="ZWNJ (in)" v={`${markersIn.zwnj}`} />
-              <Metric k="ZWJ (in)" v={`${markersIn.zwj}`} />
-              <Metric k="SHY (in)" v={`${markersIn.shy}`} />
-              <Metric k="VS16 (in)" v={`${markersIn.vs16}`} />
-              <Metric k="LRM/RLM/ALM (in)" v={`${markersIn.dirMarks}`} />
-              <Metric k="BOM (in)" v={`${markersIn.bom}`} />
-              <Metric k="# headers (in)" v={`${markersIn.headers}`} />
-              <Metric k="**/*** (in)" v={`${markersIn.boldItalics}`} />
-              <Metric k="` backticks (in)" v={`${markersIn.backticks}`} />
-              <Metric k="— separators (in)" v={`${markersIn.dashSeparators}`} />
-              <Metric k="> quotes (in)" v={`${markersIn.blockquotes}`} />
-              <Metric k="List markers (in)" v={`${markersIn.listMarkers}`} />
+        {/* Footer */}
+        <footer className="mt-12 pt-8 border-t border-neutral-800">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-neutral-400">
+              © 2025 Ace Paste Cleaner. All rights reserved.
             </div>
-
-            {/* Output counts */}
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-2 mt-3">
-              <Metric k="ZWSP (out)" v={`${markersOut.zwsp}`} />
-              <Metric k="WJ (out)" v={`${markersOut.wj}`} />
-              <Metric k="ZWNJ (out)" v={`${markersOut.zwnj}`} />
-              <Metric k="ZWJ (out)" v={`${markersOut.zwj}`} />
-              <Metric k="SHY (out)" v={`${markersOut.shy}`} />
-              <Metric k="VS16 (out)" v={`${markersOut.vs16}`} />
-              <Metric k="LRM/RLM/ALM (out)" v={`${markersOut.dirMarks}`} />
-              <Metric k="BOM (out)" v={`${markersOut.bom}`} />
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => {/* TODO: Add privacy modal */}}
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </button>
+              <button
+                onClick={() => {/* TODO: Add security modal */}}
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                Security Policy
+              </button>
+              <a
+                href="https://github.com/sugarcypher/Ace-Paste-Cleaner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                GitHub
+              </a>
             </div>
           </div>
-        </section>
+        </footer>
       </div>
     </div>
   );
 }
 
-function Check({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+interface OptionGroupProps {
+  title: string;
+  options: Array<{ key: keyof Options; label: string }>;
+  opts: Options;
+  toggle: (key: keyof Options) => void;
+}
+
+function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const enabledCount = options.filter(opt => opts[opt.key]).length;
+
   return (
-    <label className="flex items-center gap-3 p-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 cursor-pointer select-none">
-      <input type="checkbox" className="size-4 accent-emerald-500" checked={checked} onChange={onChange} />
-      <span className="text-sm text-neutral-200">{label}</span>
-    </label>
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-4 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-neutral-200">{title}</span>
+          {enabledCount > 0 && (
+            <span className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-300 rounded-full">
+              {enabledCount}
+            </span>
+          )}
+        </div>
+        <svg 
+          className={`w-4 h-4 text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      
+      {isOpen && (
+        <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
+          {options.map((option) => (
+            <label key={option.key} className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer select-none">
+              <input 
+                type="checkbox" 
+                className="size-4 accent-emerald-500" 
+                checked={opts[option.key]} 
+                onChange={() => toggle(option.key)} 
+              />
+              <span className="text-sm text-neutral-200">{option.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
-function Metric({ k, v }: { k: string; v: string }) {
+interface StatsProps {
+  input: string;
+  output: string;
+  opts: Options;
+  markersIn: any;
+  markersOut: any;
+}
+
+function Stats({ input, output, opts, markersIn, markersOut }: StatsProps) {
+  const removedChars = Math.max(0, input.length - output.length);
+  
+  // Calculate what was actually removed based on options
+  const removedItems = useMemo(() => {
+    const items = [];
+    
+    if (opts.removeInvisible) {
+      const totalInvisible = markersIn.zwsp + markersIn.wj + markersIn.zwnj + markersIn.zwj + markersIn.shy + markersIn.dirMarks + markersIn.bom;
+      if (totalInvisible > 0) {
+        const details = [];
+        if (markersIn.zwsp > 0) details.push(`${markersIn.zwsp} Zero Width Spaces`);
+        if (markersIn.wj > 0) details.push(`${markersIn.wj} Word Joiners`);
+        if (markersIn.zwnj > 0) details.push(`${markersIn.zwnj} Zero Width Non-Joiners`);
+        if (markersIn.zwj > 0) details.push(`${markersIn.zwj} Zero Width Joiners`);
+        if (markersIn.shy > 0) details.push(`${markersIn.shy} Soft Hyphens`);
+        if (markersIn.dirMarks > 0) details.push(`${markersIn.dirMarks} Direction Marks`);
+        if (markersIn.bom > 0) details.push(`${markersIn.bom} Byte Order Marks`);
+        items.push({ type: 'invisible', count: totalInvisible, label: 'Invisible Characters', details });
+      }
+    }
+    
+    if (opts.stripMarkdownHeaders) {
+      const headerMatches = input.match(/^\s{0,3}#{1,6}\s+/gmu) || [];
+      if (headerMatches.length > 0) {
+        const details = headerMatches.map(h => h.trim());
+        items.push({ type: 'markdown', count: headerMatches.length, label: 'Markdown Headers', details });
+      }
+    }
+    
+    if (opts.stripBoldItalic) {
+      const boldMatches = input.match(/\*\*.*?\*\*/gmsu) || [];
+      const italicMatches = input.match(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/gmsu) || [];
+      const underlineMatches = input.match(/__.*?__/gmsu) || [];
+      const strikeMatches = input.match(/~~.*?~~/gmsu) || [];
+      const totalFormatting = boldMatches.length + italicMatches.length + underlineMatches.length + strikeMatches.length;
+      
+      if (totalFormatting > 0) {
+        const details = [];
+        if (boldMatches.length > 0) details.push(`${boldMatches.length} Bold markers (**)`);
+        if (italicMatches.length > 0) details.push(`${italicMatches.length} Italic markers (*)`);
+        if (underlineMatches.length > 0) details.push(`${underlineMatches.length} Underline markers (__)`);
+        if (strikeMatches.length > 0) details.push(`${strikeMatches.length} Strikethrough markers (~~)`);
+        items.push({ type: 'formatting', count: totalFormatting, label: 'Text Formatting', details });
+      }
+    }
+    
+    return items;
+  }, [input, opts, markersIn]);
+
   return (
-    <div className="rounded-xl bg-neutral-900 border border-neutral-800 p-3">
-      <div className="text-[11px] uppercase tracking-wider text-neutral-400">{k}</div>
-      <div className="text-base">{v}</div>
+    <div className="space-y-3 mt-2">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <Metric 
+          k="Length (in → out)" 
+          v={`${input.length} → ${output.length}`} 
+          isActive={input.length > 0}
+        />
+        <Metric 
+          k="Removed (chars)" 
+          v={`${removedChars}`} 
+          isActive={removedChars > 0}
+        />
+        <Metric 
+          k="Removed Types" 
+          v={`${removedItems.length}`} 
+          isActive={removedItems.length > 0}
+        />
+      </div>
+      
+      {/* Detailed Removal Breakdown */}
+      {removedItems.length > 0 && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-neutral-300 mb-2">What was removed:</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {removedItems.map((item, index) => (
+              <RemovedItem key={index} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* No changes message */}
+      {removedItems.length === 0 && removedChars === 0 && input.length > 0 && (
+        <div className="text-center py-4 text-neutral-400">
+          <div className="text-2xl mb-2">✨</div>
+          <div className="text-sm">No changes needed - your text is already clean!</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface RemovedItemProps {
+  item: {
+    type: string;
+    count: number;
+    label: string;
+    details?: string[];
+  };
+}
+
+function RemovedItem({ item }: RemovedItemProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const getColorClasses = (type: string) => {
+    switch (type) {
+      case 'invisible':
+        return 'bg-purple-500/20 border-purple-500/30 text-purple-300';
+      case 'markdown':
+        return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
+      case 'formatting':
+        return 'bg-orange-500/20 border-orange-500/30 text-orange-300';
+      default:
+        return 'bg-neutral-500/20 border-neutral-500/30 text-neutral-300';
+    }
+  };
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'invisible':
+        return '👻';
+      case 'markdown':
+        return '📝';
+      case 'formatting':
+        return '🎨';
+      default:
+        return '🗑️';
+    }
+  };
+
+  return (
+    <div className={`rounded-xl border p-3 ${getColorClasses(item.type)} cursor-pointer hover:opacity-80 transition-opacity`}
+         onClick={() => setIsExpanded(!isExpanded)}>
+      <div className="flex items-center gap-2">
+        <span className="text-lg">{getIcon(item.type)}</span>
+        <div className="flex-1">
+          <div className="text-sm font-medium">{item.label}</div>
+          <div className="text-xs opacity-75">{item.count} {item.count === 1 ? 'item' : 'items'} removed</div>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="text-lg font-bold">{item.count}</div>
+          <svg 
+            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </div>
+      
+      {isExpanded && item.details && item.details.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-current/20">
+          <div className="text-xs font-medium mb-2 opacity-90">Details:</div>
+          <div className="space-y-1">
+            {item.details.map((detail, index) => (
+              <div key={index} className="text-xs opacity-75 bg-black/10 rounded px-2 py-1 font-mono">
+                {detail}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Metric({ k, v, isActive = false }: { k: string; v: string; isActive?: boolean }) {
+  const getActiveClasses = () => {
+    if (!isActive) return 'bg-neutral-900 border-neutral-800';
+    
+    // Determine color based on metric type
+    if (k.includes('Length')) {
+      return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
+    } else if (k.includes('Removed (chars)')) {
+      return 'bg-red-500/20 border-red-500/30 text-red-300';
+    } else if (k.includes('Removed Types')) {
+      return 'bg-green-500/20 border-green-500/30 text-green-300';
+    }
+    return 'bg-neutral-900 border-neutral-800';
+  };
+
+  return (
+    <div className={`rounded-xl border p-3 transition-all duration-300 ${getActiveClasses()}`}>
+      <div className={`text-[11px] uppercase tracking-wider ${isActive ? 'text-current/80' : 'text-neutral-400'}`}>{k}</div>
+      <div className={`text-base font-medium ${isActive ? 'text-current' : ''}`}>{v}</div>
     </div>
   );
 }
