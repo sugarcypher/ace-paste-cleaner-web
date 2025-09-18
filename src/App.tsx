@@ -457,7 +457,7 @@ function Stats({ input, output, opts }: StatsProps) {
     }
     
     if (opts.stripMarkdownHeaders) {
-      const headerMatches = input.match(/^\s{0,3}(#{1,6})\s+/gmu) || [];
+      const headerMatches = input.match(/^\s{0,3}#{1,6}\s+/gmu) || [];
       if (headerMatches.length > 0) {
         const details = headerMatches.map(h => h.trim());
         items.push({ type: 'markdown', count: headerMatches.length, label: 'Markdown Headers', details });
@@ -789,7 +789,7 @@ function cleanText(text: string, opts: CleanOptions): string {
   }
 
   if (opts.stripMarkdownHeaders) {
-    t = t.replace(/^\s{0,3}(#{1,6})\s+/gmu, "");
+    t = t.replace(/^\s{0,3}#{1,6}\s+/gmu, "");
   }
 
   if (opts.stripBoldItalic) {
