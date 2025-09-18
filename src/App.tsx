@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
-import { useUsage } from "./hooks/useUsage";
+import { useAuth } from "./hooks/useAuth";
+import { AuthModal } from "./components/AuthModal";
 import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
 import { SecurityBadge } from "./components/SecurityBadge";
@@ -54,12 +55,13 @@ interface MetricProps {
 
 function AppContent() {
   const [input, setInput] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showSecurity, setShowSecurity] = useState(false);
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
-  const { user, usage, recordCleaning, canClean, getRemainingCleanings, upgradeUser } = useUsage();
+  const { user, usage, recordCleaning, canClean, getRemainingCleanings, isAuthenticated, isLoading, signOut } = useAuth();
   const { hasAcceptedTerms, securitySettings } = useSecurity();
   
   const [opts, setOpts] = useState<CleanOptions>({
@@ -103,7 +105,12 @@ function AppContent() {
     return cleanText(input, opts);
   }, [input, opts, canClean, securitySettings]);
 
-  const handleClean = () => {
+  const handleClean = async () => {
+    if (!isAuthenticated) {
+      setShowAuth(true);
+      return;
+    }
+
     if (!canClean(input.length)) {
       if (input.length > 2000) {
         setPaywallReason('text_length');
@@ -115,7 +122,7 @@ function AppContent() {
     }
     
     // Record the cleaning usage
-    recordCleaning(input.length);
+    await recordCleaning();
   };
 
   const copyToClipboard = async () => {
@@ -135,6 +142,17 @@ function AppContent() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-neutral-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 p-6">
       <div className="mx-auto max-w-5xl grid gap-6">
@@ -150,6 +168,26 @@ function AppContent() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 Privacy Agreement
+              </button>
+            )}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-neutral-400">
+                  {user?.email}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm hover:bg-red-400 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuth(true)}
+                className="px-4 py-2 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-400 active:translate-y-[1px]"
+              >
+                Sign In
               </button>
             )}
             <button
@@ -171,11 +209,29 @@ function AppContent() {
         </header>
 
         {/* Usage Indicator */}
-        <UsageIndicator 
-          user={user} 
-          usage={usage} 
-          onUpgrade={() => setShowPaywall(true)} 
-        />
+        {isAuthenticated ? (
+          <UsageIndicator 
+            user={user} 
+            usage={usage} 
+            onUpgrade={() => setShowPaywall(true)} 
+          />
+        ) : (
+          <div className="p-4 rounded-xl bg-blue-500/20 border border-blue-500/30">
+            <div className="flex items-center gap-3">
+              <div className="text-blue-400 text-lg">🔐</div>
+              <div>
+                <p className="text-blue-300 font-medium">Sign in required</p>
+                <p className="text-blue-300/80 text-sm">Create a free account to start cleaning text. No credit card required!</p>
+              </div>
+              <button
+                onClick={() => setShowAuth(true)}
+                className="ml-auto px-4 py-2 rounded-lg bg-blue-500 text-white text-sm hover:bg-blue-400 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Security Badge */}
         <SecurityBadge />
@@ -329,11 +385,20 @@ function AppContent() {
       </div>
 
       {/* Modals */}
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        onSuccess={() => {
+          // Refresh usage data after successful auth
+          window.location.reload();
+        }}
+      />
+      
       <PaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
         onUpgrade={(tierId) => {
-          upgradeUser(tierId);
+          // upgradeUser(tierId); // TODO: Implement upgrade
           setShowPaywall(false);
         }}
         currentTier={user?.tier || 'free'}
