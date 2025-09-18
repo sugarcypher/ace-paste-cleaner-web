@@ -119,3 +119,7 @@ export function UsageIndicator({ user, usage, onUpgrade }: UsageIndicatorProps) 
     </div>
   );
 }
+
+
+
+

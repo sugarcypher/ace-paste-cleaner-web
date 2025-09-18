@@ -318,3 +318,7 @@ export function PrivacyAgreement({ isOpen, onClose }: PrivacyAgreementProps) {
     </div>
   );
 }
+
+
+
+

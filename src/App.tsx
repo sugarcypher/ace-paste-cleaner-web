@@ -756,7 +756,7 @@ function cleanText(text: string, opts: CleanOptions): string {
   const SENTINEL_ZWJ = ""; // private-use marker
   if (opts.preserveEmoji) {
     try {
-      const EP = "\p{Extended_Pictographic}";
+      const EP = "\\p{Extended_Pictographic}";
       const reZWJ = new RegExp(`(${EP})\u200D(${EP})`, "gu");
       t = t.replace(reZWJ, `$1${SENTINEL_ZWJ}$2`);
     } catch {

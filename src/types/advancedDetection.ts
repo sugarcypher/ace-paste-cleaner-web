@@ -34,3 +34,7 @@ export interface SecuritySettings {
   autoLockEnabled: boolean;
   autoLockTimeout: number;
 }
+
+
+
+

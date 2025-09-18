@@ -98,3 +98,7 @@ export function PrivacyPolicy({ isOpen, onClose }: PrivacyPolicyProps) {
     </div>
   );
 }
+
+
+
+
