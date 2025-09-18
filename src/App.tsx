@@ -1,4 +1,8 @@
 import React, { useMemo, useState } from "react";
+import { useAuth } from "./hooks/useAuth";
+import { AuthModal } from "./components/AuthModal";
+import { PaywallModal } from "./components/PaywallModal";
+import { UsageIndicator } from "./components/UsageIndicator";
 
 type Options = {
   removeInvisible: boolean;
@@ -23,6 +27,11 @@ const SENTINEL_ZWNJ = "\uE001"; // Private Use; restore → U+200C
 
 export default function AcePasteFinalCleaner() {
   const [input, setInput] = useState("");
+  const [showAuth, setShowAuth] = useState(false);
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
+  const { user, usage, recordCleaning, canClean, getRemainingCleanings, isAuthenticated, isLoading, signOut } = useAuth();
+  
   const [opts, setOpts] = useState<Options>({
     removeInvisible: true,
     keepVS16Emoji: true,
@@ -41,7 +50,12 @@ export default function AcePasteFinalCleaner() {
   });
 
   const eff = useMemo(() => effectiveOptions(opts), [opts]);
-  const cleaned = useMemo(() => cleanText(input, eff), [input, eff]);
+  const cleaned = useMemo(() => {
+    if (!isAuthenticated || !canClean(input.length)) {
+      return input; // Return original text if can't clean
+    }
+    return cleanText(input, eff);
+  }, [input, eff, isAuthenticated, canClean]);
 
   const stats = useMemo(() => ({ inLen: input.length, outLen: cleaned.length }), [input, cleaned]);
   const markersIn = useMemo(() => countMarkers(input), [input]);
@@ -68,26 +82,102 @@ export default function AcePasteFinalCleaner() {
     }
   };
 
+  const handleClean = async () => {
+    if (!isAuthenticated) {
+      setShowAuth(true);
+      return;
+    }
+
+    if (!canClean(input.length)) {
+      if (input.length > 2000) {
+        setPaywallReason('text_length');
+      } else {
+        setPaywallReason('daily_limit');
+      }
+      setShowPaywall(true);
+      return;
+    }
+    
+    // Record the cleaning usage
+    await recordCleaning();
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+          <p className="text-neutral-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 p-6">
       <div className="mx-auto max-w-6xl grid gap-6">
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Ace Paste — Cleaner</h1>
           <div className="flex gap-2">
+            {isAuthenticated ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-neutral-400">
+                  {user?.email}
+                </span>
+                <button
+                  onClick={signOut}
+                  className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm hover:bg-red-400 transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuth(true)}
+                className="px-4 py-2 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-400 active:translate-y-[1px]"
+              >
+                Sign In
+              </button>
+            )}
             <button
-              onClick={() => navigator.clipboard.writeText(cleaned)}
+              onClick={copyToClipboard}
               className="px-4 py-2 rounded-xl bg-emerald-500 text-neutral-950 font-medium hover:bg-emerald-400 active:translate-y-[1px]"
             >Copy cleaned</button>
             <button
-              onClick={() => navigator.clipboard.writeText(input)}
-              className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700"
-            >Copy input</button>
+              onClick={pasteFromClipboard}
+              className="px-4 py-2 rounded-xl bg-yellow-500 text-yellow-950 font-medium hover:bg-yellow-400 active:translate-y-[1px]"
+            >Paste</button>
             <button
               onClick={() => setInput("")}
               className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700"
             >Clear</button>
           </div>
         </header>
+
+        {/* Usage Indicator */}
+        {isAuthenticated ? (
+          <UsageIndicator 
+            user={user} 
+            usage={usage} 
+            onUpgrade={() => setShowPaywall(true)} 
+          />
+        ) : (
+          <div className="p-4 rounded-xl bg-blue-500/20 border border-blue-500/30">
+            <div className="flex items-center gap-3">
+              <div className="text-blue-400 text-lg">🔐</div>
+              <div>
+                <p className="text-blue-300 font-medium">Sign in required</p>
+                <p className="text-blue-300/80 text-sm">Create a free account to start cleaning text. No credit card required!</p>
+              </div>
+              <button
+                onClick={() => setShowAuth(true)}
+                className="ml-auto px-4 py-2 rounded-lg bg-blue-500 text-white text-sm hover:bg-blue-400 transition-colors"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Options Dropdowns */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -222,6 +312,28 @@ export default function AcePasteFinalCleaner() {
           </div>
         </footer>
       </div>
+
+      {/* Modals */}
+      <AuthModal
+        isOpen={showAuth}
+        onClose={() => setShowAuth(false)}
+        onSuccess={() => {
+          // Refresh usage data after successful auth
+          window.location.reload();
+        }}
+      />
+      
+      <PaywallModal
+        isOpen={showPaywall}
+        onClose={() => setShowPaywall(false)}
+        onUpgrade={(tierId) => {
+          // upgradeUser(tierId); // TODO: Implement upgrade
+          setShowPaywall(false);
+        }}
+        currentTier={user?.tier || 'free'}
+        reason={paywallReason}
+        currentTextLength={input.length}
+      />
     </div>
   );
 }
