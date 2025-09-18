@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react";
 
-interface CleanOptions {
+type Options = {
   removeInvisible: boolean;
   keepVS16Emoji: boolean;
   preserveEmoji: boolean;
+  preserveIndicJoiners: boolean;
+  preserveArabicZWNJ: boolean;
   stripMarkdownHeaders: boolean;
   stripBoldItalic: boolean;
   stripBackticks: boolean;
@@ -12,14 +14,16 @@ interface CleanOptions {
   stripBlockquotes: boolean;
   normalizeWhitespace: boolean;
   collapseBlankLines: boolean;
-}
+};
 
-export default function App() {
+export default function AcePasteFinalCleaner() {
   const [input, setInput] = useState("");
-  const [opts, setOpts] = useState<CleanOptions>({
+  const [opts, setOpts] = useState<Options>({
     removeInvisible: true,
     keepVS16Emoji: true,
     preserveEmoji: true,
+    preserveIndicJoiners: true,
+    preserveArabicZWNJ: true,
     stripMarkdownHeaders: true,
     stripBoldItalic: true,
     stripBackticks: true,
@@ -34,7 +38,7 @@ export default function App() {
   const stats = useMemo(() => getStats(input, cleaned), [input, cleaned]);
   const markers = useMemo(() => countMarkers(input), [input]);
 
-  function toggle(key: keyof CleanOptions) {
+  function toggle(key: keyof Options) {
     setOpts((o) => ({ ...o, [key]: !o[key] }));
   }
 
@@ -73,6 +77,8 @@ export default function App() {
               <Check label="Remove invisible characters" checked={opts.removeInvisible} onChange={() => toggle("removeInvisible")} />
               <Check label="Keep emoji presentation selector (VS16)" checked={opts.keepVS16Emoji} onChange={() => toggle("keepVS16Emoji")} />
               <Check label="Preserve emoji sequences (ZWJ in 👩‍💻, 🏳️‍🌈, etc.)" checked={opts.preserveEmoji} onChange={() => toggle("preserveEmoji")} />
+              <Check label="Preserve Indic joiners (ZWJ/ZWNJ in Devanagari–Malayalam)" checked={opts.preserveIndicJoiners} onChange={() => toggle("preserveIndicJoiners")} />
+              <Check label="Preserve ZWNJ in Arabic/Persian" checked={opts.preserveArabicZWNJ} onChange={() => toggle("preserveArabicZWNJ")} />
               <Check label="Strip Markdown headers (#, ##, ###)" checked={opts.stripMarkdownHeaders} onChange={() => toggle("stripMarkdownHeaders")} />
               <Check label="Strip bold/italic markers (** __ * _)" checked={opts.stripBoldItalic} onChange={() => toggle("stripBoldItalic")} />
               <Check label="Strip backticks (inline & fenced)" checked={opts.stripBackticks} onChange={() => toggle("stripBackticks")} />
@@ -138,8 +144,9 @@ function Metric({ k, v }: { k: string; v: string }) {
 // ————— Cleaning core —————
 
 const SENTINEL_ZWJ = "\uE000"; // private-use for protected ZWJ
+const SENTINEL_ZWNJ = "\uE001"; // private-use for protected ZWNJ
 
-function cleanText(text: string, opts: CleanOptions): string {
+function cleanText(text: string, opts: Options): string {
   let t = text;
 
   // Protect emoji ZWJ between Extended_Pictographic
@@ -156,6 +163,22 @@ function cleanText(text: string, opts: CleanOptions): string {
       t = t.replace(reFallback, ($, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
       t = t.replace(reFallback, ($, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
     }
+  }
+
+  // Protect Indic joiners between Indic letters (Devanagari–Sinhala)
+  if (opts.preserveIndicJoiners) {
+    const INDIC = "\\u0900-\\u0DFF"; // broad range covering most Indic scripts
+    const reZWJ = new RegExp(`([${INDIC}])\\u200D([${INDIC}])`, "gu");
+    const reZWNJ = new RegExp(`([${INDIC}])\\u200C([${INDIC}])`, "gu");
+    t = t.replace(reZWJ, ($, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
+    t = t.replace(reZWNJ, ($, a, b) => `${a}${SENTINEL_ZWNJ}${b}`);
+  }
+
+  // Protect Arabic/Persian ZWNJ between Arabic letters
+  if (opts.preserveArabicZWNJ) {
+    const AR = "\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF";
+    const reZWNJ_AR = new RegExp(`([${AR}])\\u200C([${AR}])`, "gu");
+    t = t.replace(reZWNJ_AR, ($, a, b) => `${a}${SENTINEL_ZWNJ}${b}`);
   }
 
   if (opts.removeInvisible) {
@@ -182,12 +205,13 @@ function cleanText(text: string, opts: CleanOptions): string {
   }
 
   // Restore protected joiners
-  if (opts.preserveEmoji) {
+  if (opts.preserveEmoji || opts.preserveIndicJoiners || opts.preserveArabicZWNJ) {
     t = t.replace(/\uE000/gu, "\u200D");
+    t = t.replace(/\uE001/gu, "\u200C");
   }
 
   if (opts.stripMarkdownHeaders) {
-    t = t.replace(/^\s{0,3}#{1,6}\s+/gmu, "");
+    t = t.replace(/^\s{0,3}(#{1,6})\s+/gmu, "");
   }
 
   if (opts.stripBoldItalic) {
