@@ -12,6 +12,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const { signUp, signIn } = useAuth();
 
   if (!isOpen) return null;
@@ -22,6 +23,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     setIsLoading(true);
     setError('');
+    setSuccessMessage('');
 
     try {
       const result = isSignUp 
@@ -29,9 +31,21 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         : await signIn(email.trim());
 
       if (result.success) {
-        onSuccess();
-        onClose();
-        setEmail('');
+        if (isSignUp) {
+          // For signup, show success message and switch to sign in
+          setSuccessMessage('Account created successfully! You can now sign in.');
+          setIsSignUp(false);
+          setEmail('');
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            setSuccessMessage('');
+          }, 3000);
+        } else {
+          // For signin, proceed normally
+          onSuccess();
+          onClose();
+          setEmail('');
+        }
       } else {
         setError(result.error || 'Something went wrong');
       }
@@ -76,6 +90,18 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             />
           </div>
 
+          {successMessage && (
+            <div className="p-3 rounded-xl bg-green-500/20 border border-green-500/30 text-green-300 text-sm">
+              <div className="flex items-start gap-2">
+                <div className="text-green-400 text-lg">✅</div>
+                <div className="flex-1">
+                  <div className="font-medium">Success!</div>
+                  <div className="text-sm opacity-90">{successMessage}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {error && (
             <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
               <div className="flex items-start gap-2">
@@ -118,6 +144,7 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
             onClick={() => {
               setIsSignUp(!isSignUp);
               setError('');
+              setSuccessMessage('');
             }}
             className="text-emerald-400 hover:text-emerald-300 text-sm font-medium mt-1"
           >
