@@ -33,12 +33,12 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
 
     try {
       // Verify the code using the email service
-      const isValid = verifyCode(email, verificationCode);
+      const result = await verifyCode(email, verificationCode);
       
-      if (isValid) {
+      if (result.success) {
         onVerified();
       } else {
-        setError('Invalid or expired verification code. Please try again.');
+        setError(result.error || 'Invalid or expired verification code. Please try again.');
       }
     } catch (error) {
       console.error('Verification error:', error);

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { mockAuthAPI } from '../utils/mockAuth';
+import { authService } from '../utils/authService';
 
 interface User {
   id: string;
   email: string;
   tier: 'free' | 'pro' | 'enterprise';
+  isVerified: boolean;
 }
 
 interface UsageStats {
@@ -39,26 +40,26 @@ export function useAuth() {
         return;
       }
 
-      try {
-        // Use mock API for GitHub Pages deployment (client-side only)
-        const result = await mockAuthAPI.verify(token);
-        
-        if (result.success && result.user) {
-          setUser(result.user);
-          setIsAuthenticated(true);
-          
-          // Get current usage
-          await fetchUsage(token);
-        } else {
-          // Invalid token, clear it
+        try {
+          // Use production auth service
+          const result = await authService.verify(token);
+
+          if (result.success && result.user) {
+            setUser(result.user);
+            setIsAuthenticated(true);
+
+            // Get current usage
+            await fetchUsage(token);
+          } else {
+            // Invalid token, clear it
+            localStorage.removeItem('acepaste_token');
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
           localStorage.removeItem('acepaste_token');
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        localStorage.removeItem('acepaste_token');
-      } finally {
-        setIsLoading(false);
-      }
     };
 
     checkAuth();
@@ -66,8 +67,8 @@ export function useAuth() {
 
   const fetchUsage = async (token: string) => {
     try {
-      // Use mock API for GitHub Pages deployment (client-side only)
-      const result = await mockAuthAPI.getUsage(token);
+      // Use production auth service
+      const result = await authService.getUsage(token);
       if (result.success && result.usage) {
         setUsage(result.usage);
       }
@@ -78,8 +79,8 @@ export function useAuth() {
 
   const signUp = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Use mock API for GitHub Pages deployment (client-side only)
-      const result = await mockAuthAPI.signup(email, password);
+      // Use production auth service
+      const result = await authService.signup(email, password);
       return result;
     } catch (error) {
       console.error('Signup error:', error);
@@ -89,8 +90,8 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // Use mock API for GitHub Pages deployment (client-side only)
-      const result = await mockAuthAPI.signin(email, password);
+      // Use production auth service
+      const result = await authService.signin(email, password);
       if (result.success && result.token && result.user) {
         localStorage.setItem('acepaste_token', result.token);
         setUser(result.user);
@@ -118,8 +119,8 @@ export function useAuth() {
     }
 
     try {
-      // Use mock API for GitHub Pages deployment (client-side only)
-      const result = await mockAuthAPI.recordUsage(token);
+      // Use production auth service
+      const result = await authService.recordUsage(token);
       if (result.success && result.usage) {
         setUsage(result.usage);
       }

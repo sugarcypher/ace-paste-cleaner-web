@@ -2,6 +2,7 @@
 // Production-ready email verification system
 
 import { MAILGUN_CONFIG } from '../config/mailgun';
+import { authService } from './authService';
 
 // Generate a random 6-digit verification code
 function generateVerificationCode(): string {
@@ -78,40 +79,14 @@ export async function sendVerificationEmail(
   }
 }
 
-// Store verification codes temporarily (in production, use a database)
-const verificationCodes = new Map<string, { code: string; expires: number }>();
-
 export function generateAndStoreVerificationCode(email: string): string {
   const code = generateVerificationCode();
-  const expires = Date.now() + (10 * 60 * 1000); // 10 minutes
-  
-  verificationCodes.set(email, { code, expires });
-  
-  // Clean up expired codes
-  for (const [key, value] of verificationCodes.entries()) {
-    if (value.expires < Date.now()) {
-      verificationCodes.delete(key);
-    }
-  }
-  
+  // Get user ID for this email (assuming user exists from signup)
+  const userId = 'temp-user-id'; // In real app, get from user lookup
+  authService.storeVerificationCode(email, code, userId);
   return code;
 }
 
-export function verifyCode(email: string, code: string): boolean {
-  const stored = verificationCodes.get(email);
-  if (!stored) {
-    return false;
-  }
-  
-  if (stored.expires < Date.now()) {
-    verificationCodes.delete(email);
-    return false;
-  }
-  
-  if (stored.code === code) {
-    verificationCodes.delete(email);
-    return true;
-  }
-  
-  return false;
+export async function verifyCode(email: string, code: string): Promise<{ success: boolean; error?: string }> {
+  return await authService.verifyEmail(email, code);
 }

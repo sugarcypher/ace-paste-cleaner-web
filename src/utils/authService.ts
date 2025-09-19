@@ -1,8 +1,11 @@
-// Mock authentication service for local development
+// Production Authentication Service
+// Requires real email verification to work
+
 interface User {
   id: string;
   email: string;
   tier: 'free' | 'pro' | 'enterprise';
+  isVerified: boolean;
 }
 
 interface UsageStats {
@@ -19,9 +22,10 @@ interface AuthResponse {
   error?: string;
 }
 
-// Simple in-memory storage
+// In-memory storage for production (in real app, use a database)
 const users = new Map<string, any>();
 const sessions = new Map<string, any>();
+const verificationCodes = new Map<string, { code: string; expires: number; userId: string }>();
 
 function generateToken(): string {
   return Math.random().toString(36).substring(2) + Date.now().toString(36);
@@ -32,7 +36,11 @@ function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-export const mockAuthAPI = {
+function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+export const authService = {
   async signup(email: string, password: string): Promise<{ success: boolean; error?: string }> {
     if (!email || !isValidEmail(email)) {
       return { success: false, error: 'Valid email required' };
@@ -52,6 +60,7 @@ export const mockAuthAPI = {
       email,
       password: password, // In real app, this would be hashed
       tier: 'free',
+      isVerified: false, // Must verify email before using
       createdAt: new Date().toISOString(),
       usage: {
         dailyCleanings: 0,
@@ -64,7 +73,7 @@ export const mockAuthAPI = {
     
     return {
       success: true,
-      message: 'Account created successfully. You can now use the app!'
+      message: 'Account created. Please verify your email to continue.'
     };
   },
   
@@ -85,6 +94,10 @@ export const mockAuthAPI = {
     if (user.password !== password) {
       return { success: false, error: 'Invalid password' };
     }
+
+    if (!user.isVerified) {
+      return { success: false, error: 'Please verify your email before signing in.' };
+    }
     
     const token = generateToken();
     sessions.set(token, {
@@ -99,9 +112,44 @@ export const mockAuthAPI = {
       user: {
         id: user.id,
         email: user.email,
-        tier: user.tier
+        tier: user.tier,
+        isVerified: user.isVerified
       }
     };
+  },
+  
+  async verifyEmail(email: string, code: string): Promise<{ success: boolean; error?: string }> {
+    if (!email || !isValidEmail(email)) {
+      return { success: false, error: 'Valid email required' };
+    }
+    
+    if (!code) {
+      return { success: false, error: 'Verification code required' };
+    }
+    
+    const stored = verificationCodes.get(email);
+    if (!stored) {
+      return { success: false, error: 'No verification code found for this email' };
+    }
+    
+    if (stored.expires < Date.now()) {
+      verificationCodes.delete(email);
+      return { success: false, error: 'Verification code has expired' };
+    }
+    
+    if (stored.code !== code) {
+      return { success: false, error: 'Invalid verification code' };
+    }
+    
+    // Mark user as verified
+    const user = users.get(email);
+    if (user) {
+      user.isVerified = true;
+      users.set(email, user);
+    }
+    
+    verificationCodes.delete(email);
+    return { success: true, message: 'Email verified successfully!' };
   },
   
   async verify(token: string): Promise<{ success: boolean; user?: User; error?: string }> {
@@ -119,12 +167,17 @@ export const mockAuthAPI = {
       return { success: false, error: 'User not found' };
     }
     
+    if (!user.isVerified) {
+      return { success: false, error: 'Email not verified' };
+    }
+    
     return {
       success: true,
       user: {
         id: user.id,
         email: user.email,
-        tier: user.tier
+        tier: user.tier,
+        isVerified: user.isVerified
       }
     };
   },
@@ -142,6 +195,10 @@ export const mockAuthAPI = {
     const user = Array.from(users.values()).find(u => u.id === session.userId);
     if (!user) {
       return { success: false, error: 'User not found' };
+    }
+    
+    if (!user.isVerified) {
+      return { success: false, error: 'Email not verified' };
     }
     
     // Reset daily usage if it's a new day
@@ -172,6 +229,10 @@ export const mockAuthAPI = {
       return { success: false, error: 'User not found' };
     }
     
+    if (!user.isVerified) {
+      return { success: false, error: 'Email not verified' };
+    }
+    
     // Reset daily usage if it's a new day
     const today = new Date().toISOString().split('T')[0];
     if (user.usage.lastResetDate !== today) {
@@ -196,5 +257,18 @@ export const mockAuthAPI = {
       success: true,
       usage: user.usage
     };
+  },
+
+  // Store verification code for email verification
+  storeVerificationCode(email: string, code: string, userId: string): void {
+    const expires = Date.now() + (10 * 60 * 1000); // 10 minutes
+    verificationCodes.set(email, { code, expires, userId });
+    
+    // Clean up expired codes
+    for (const [key, value] of verificationCodes.entries()) {
+      if (value.expires < Date.now()) {
+        verificationCodes.delete(key);
+      }
+    }
   }
 };
