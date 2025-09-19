@@ -21,10 +21,8 @@ interface AuthResponse {
   error?: string;
 }
 
-// Use different endpoints for local vs production
-const API_BASE = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:8888/.netlify/functions/auth' 
-  : '/api/auth';
+// For GitHub Pages deployment, we'll use client-side only authentication
+// No server-side API needed
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -42,16 +40,11 @@ export function useAuth() {
       }
 
       try {
-        const response = await fetch(API_BASE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'verify', token })
-        });
-
-        const data: AuthResponse = await response.json();
+        // Use mock API for GitHub Pages deployment (client-side only)
+        const result = await mockAuthAPI.verify(token);
         
-        if (data.success && data.user) {
-          setUser(data.user);
+        if (result.success && result.user) {
+          setUser(result.user);
           setIsAuthenticated(true);
           
           // Get current usage
@@ -73,164 +66,41 @@ export function useAuth() {
 
   const fetchUsage = async (token: string) => {
     try {
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'getUsage', token })
-      });
-
-      const data: AuthResponse = await response.json();
-      if (data.success && data.usage) {
-        setUsage(data.usage);
+      // Use mock API for GitHub Pages deployment (client-side only)
+      const result = await mockAuthAPI.getUsage(token);
+      if (result.success && result.usage) {
+        setUsage(result.usage);
       }
     } catch (error) {
       console.error('Failed to fetch usage:', error);
-      
-      // Fallback to mock API for local development
-      if (process.env.NODE_ENV === 'development') {
-        try {
-          const result = await mockAuthAPI.getUsage(token);
-          if (result.success && result.usage) {
-            setUsage(result.usage);
-          }
-        } catch (mockError) {
-          console.error('Mock API usage error:', mockError);
-        }
-      }
     }
   };
 
   const signUp = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ action: 'signup', email }),
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = 'Signup failed';
-        
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error || errorMessage;
-        } catch {
-          errorMessage = `Server error: ${response.status} ${response.statusText}`;
-        }
-        
-        return { success: false, error: errorMessage };
-      }
-
-      const data: AuthResponse = await response.json();
-      
-      if (data.success) {
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Signup failed' };
-      }
+      // Use mock API for GitHub Pages deployment (client-side only)
+      const result = await mockAuthAPI.signup(email);
+      return result;
     } catch (error) {
-      console.error('Signup network error:', error);
-      
-      // Fallback to mock API for local development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Falling back to mock API for local development');
-        try {
-          const result = await mockAuthAPI.signup(email);
-          return result;
-        } catch (mockError) {
-          console.error('Mock API error:', mockError);
-        }
-      }
-      
-      if (error instanceof Error && error.name === 'AbortError') {
-        return { success: false, error: 'Request timed out. Please try again.' };
-      }
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        return { success: false, error: 'Network connection failed. Please check your internet connection and try again.' };
-      }
-      return { success: false, error: 'Network error. Please try again.' };
+      console.error('Signup error:', error);
+      return { success: false, error: 'Signup failed. Please try again.' };
     }
   };
 
   const signIn = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ action: 'signin', email }),
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage = 'Sign in failed';
-        
-        try {
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.error || errorMessage;
-        } catch {
-          errorMessage = `Server error: ${response.status} ${response.statusText}`;
-        }
-        
-        return { success: false, error: errorMessage };
-      }
-
-      const data: AuthResponse = await response.json();
-      
-      if (data.success && data.token && data.user) {
-        localStorage.setItem('acepaste_token', data.token);
-        setUser(data.user);
+      // Use mock API for GitHub Pages deployment (client-side only)
+      const result = await mockAuthAPI.signin(email);
+      if (result.success && result.token && result.user) {
+        localStorage.setItem('acepaste_token', result.token);
+        setUser(result.user);
         setIsAuthenticated(true);
-        await fetchUsage(data.token);
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Sign in failed' };
+        await fetchUsage(result.token);
       }
+      return { success: result.success, error: result.error };
     } catch (error) {
-      console.error('Sign in network error:', error);
-      
-      // Fallback to mock API for local development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Falling back to mock API for local development');
-        try {
-          const result = await mockAuthAPI.signin(email);
-          if (result.success && result.token && result.user) {
-            localStorage.setItem('acepaste_token', result.token);
-            setUser(result.user);
-            setIsAuthenticated(true);
-            await fetchUsage(result.token);
-          }
-          return { success: result.success, error: result.error };
-        } catch (mockError) {
-          console.error('Mock API error:', mockError);
-        }
-      }
-      
-      if (error instanceof Error && error.name === 'AbortError') {
-        return { success: false, error: 'Request timed out. Please try again.' };
-      }
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        return { success: false, error: 'Network connection failed. Please check your internet connection and try again.' };
-      }
-      return { success: false, error: 'Network error. Please try again.' };
+      console.error('Sign in error:', error);
+      return { success: false, error: 'Sign in failed. Please try again.' };
     }
   };
 
@@ -248,37 +118,15 @@ export function useAuth() {
     }
 
     try {
-      const response = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'recordUsage', token })
-      });
-
-      const data: AuthResponse = await response.json();
-      
-      if (data.success && data.usage) {
-        setUsage(data.usage);
-        return { success: true };
-      } else {
-        return { success: false, error: data.error || 'Failed to record usage' };
+      // Use mock API for GitHub Pages deployment (client-side only)
+      const result = await mockAuthAPI.recordUsage(token);
+      if (result.success && result.usage) {
+        setUsage(result.usage);
       }
+      return { success: result.success, error: result.error };
     } catch (error) {
       console.error('Record cleaning error:', error);
-      
-      // Fallback to mock API for local development
-      if (process.env.NODE_ENV === 'development') {
-        try {
-          const result = await mockAuthAPI.recordUsage(token);
-          if (result.success && result.usage) {
-            setUsage(result.usage);
-          }
-          return { success: result.success, error: result.error };
-        } catch (mockError) {
-          console.error('Mock API record error:', mockError);
-        }
-      }
-      
-      return { success: false, error: 'Network error' };
+      return { success: false, error: 'Failed to record usage' };
     }
   };
 
