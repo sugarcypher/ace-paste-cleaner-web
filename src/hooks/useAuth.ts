@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { mockAuthAPI } from '../utils/mockAuth';
 
 interface User {
   id: string;
@@ -20,7 +21,10 @@ interface AuthResponse {
   error?: string;
 }
 
-const API_BASE = '/.netlify/functions/auth';
+// Use different endpoints for local vs production
+const API_BASE = process.env.NODE_ENV === 'development' 
+  ? 'http://localhost:8888/.netlify/functions/auth' 
+  : '/api/auth';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
@@ -81,16 +85,51 @@ export function useAuth() {
       }
     } catch (error) {
       console.error('Failed to fetch usage:', error);
+      
+      // Fallback to mock API for local development
+      if (process.env.NODE_ENV === 'development') {
+        try {
+          const result = await mockAuthAPI.getUsage(token);
+          if (result.success && result.usage) {
+            setUsage(result.usage);
+          }
+        } catch (mockError) {
+          console.error('Mock API usage error:', mockError);
+        }
+      }
     }
   };
 
   const signUp = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'signup', email })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ action: 'signup', email }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = 'Signup failed';
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        
+        return { success: false, error: errorMessage };
+      }
 
       const data: AuthResponse = await response.json();
       
@@ -100,17 +139,59 @@ export function useAuth() {
         return { success: false, error: data.error || 'Signup failed' };
       }
     } catch (error) {
-      return { success: false, error: 'Network error' };
+      console.error('Signup network error:', error);
+      
+      // Fallback to mock API for local development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Falling back to mock API for local development');
+        try {
+          const result = await mockAuthAPI.signup(email);
+          return result;
+        } catch (mockError) {
+          console.error('Mock API error:', mockError);
+        }
+      }
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        return { success: false, error: 'Request timed out. Please try again.' };
+      }
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return { success: false, error: 'Network connection failed. Please check your internet connection and try again.' };
+      }
+      return { success: false, error: 'Network error. Please try again.' };
     }
   };
 
   const signIn = async (email: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(API_BASE, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'signin', email })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ action: 'signin', email }),
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = 'Sign in failed';
+        
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+        
+        return { success: false, error: errorMessage };
+      }
 
       const data: AuthResponse = await response.json();
       
@@ -124,7 +205,32 @@ export function useAuth() {
         return { success: false, error: data.error || 'Sign in failed' };
       }
     } catch (error) {
-      return { success: false, error: 'Network error' };
+      console.error('Sign in network error:', error);
+      
+      // Fallback to mock API for local development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Falling back to mock API for local development');
+        try {
+          const result = await mockAuthAPI.signin(email);
+          if (result.success && result.token && result.user) {
+            localStorage.setItem('acepaste_token', result.token);
+            setUser(result.user);
+            setIsAuthenticated(true);
+            await fetchUsage(result.token);
+          }
+          return { success: result.success, error: result.error };
+        } catch (mockError) {
+          console.error('Mock API error:', mockError);
+        }
+      }
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        return { success: false, error: 'Request timed out. Please try again.' };
+      }
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        return { success: false, error: 'Network connection failed. Please check your internet connection and try again.' };
+      }
+      return { success: false, error: 'Network error. Please try again.' };
     }
   };
 
@@ -157,6 +263,21 @@ export function useAuth() {
         return { success: false, error: data.error || 'Failed to record usage' };
       }
     } catch (error) {
+      console.error('Record cleaning error:', error);
+      
+      // Fallback to mock API for local development
+      if (process.env.NODE_ENV === 'development') {
+        try {
+          const result = await mockAuthAPI.recordUsage(token);
+          if (result.success && result.usage) {
+            setUsage(result.usage);
+          }
+          return { success: result.success, error: result.error };
+        } catch (mockError) {
+          console.error('Mock API record error:', mockError);
+        }
+      }
+      
       return { success: false, error: 'Network error' };
     }
   };

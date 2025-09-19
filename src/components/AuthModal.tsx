@@ -36,7 +36,8 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
         setError(result.error || 'Something went wrong');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      console.error('Auth modal error:', err);
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -77,15 +78,34 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
           {error && (
             <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-300 text-sm">
-              {error}
+              <div className="flex items-start gap-2">
+                <div className="text-red-400 text-lg">⚠️</div>
+                <div className="flex-1">
+                  <div className="font-medium">Error</div>
+                  <div className="text-sm opacity-90">{error}</div>
+                </div>
+                <button
+                  onClick={() => {
+                    setError('');
+                    handleSubmit(new Event('submit') as any);
+                  }}
+                  className="px-2 py-1 text-xs bg-red-500/30 hover:bg-red-500/50 rounded transition-colors"
+                  disabled={isLoading}
+                >
+                  Retry
+                </button>
+              </div>
             </div>
           )}
 
           <button
             type="submit"
             disabled={isLoading || !email.trim()}
-            className="w-full py-3 px-4 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full py-3 px-4 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
           >
+            {isLoading && (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+            )}
             {isLoading ? 'Please wait...' : (isSignUp ? 'Create Account' : 'Sign In')}
           </button>
         </form>
