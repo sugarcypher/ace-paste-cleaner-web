@@ -32,9 +32,9 @@ This application uses Mailgun to send real verification emails. **This is requir
 
 1. Create a `.env` file in the project root:
 ```bash
-REACT_APP_MAILGUN_API_KEY=key-your-actual-api-key-here
-REACT_APP_MAILGUN_DOMAIN=mg.yourdomain.com
-REACT_APP_MAILGUN_FROM_EMAIL=noreply@yourdomain.com
+REACT_APP_MAILGUN_API_KEY=your-mailgun-api-key-here
+REACT_APP_MAILGUN_DOMAIN=your-mailgun-domain-here
+REACT_APP_MAILGUN_FROM_EMAIL=your-from-email-here
 ```
 
 ### Option 2: Direct Configuration

@@ -10,14 +10,14 @@ const getRequiredEnvVar = (name: string, fallback?: string): string => {
 };
 
 export const MAILGUN_CONFIG = {
-  // Get your API key from: https://app.mailgun.com/app/account/security/api_keys
-  apiKey: getRequiredEnvVar('REACT_APP_MAILGUN_API_KEY'),
+  // Your actual Mailgun API key - set via environment variable
+  apiKey: process.env.REACT_APP_MAILGUN_API_KEY || 'YOUR_MAILGUN_API_KEY',
   
-  // Get your domain from: https://app.mailgun.com/app/domains
-  domain: getRequiredEnvVar('REACT_APP_MAILGUN_DOMAIN'),
+  // Your actual Mailgun domain - set via environment variable  
+  domain: process.env.REACT_APP_MAILGUN_DOMAIN || 'YOUR_MAILGUN_DOMAIN',
   
   // The email address that will appear as the sender
-  fromEmail: getRequiredEnvVar('REACT_APP_MAILGUN_FROM_EMAIL')
+  fromEmail: process.env.REACT_APP_MAILGUN_FROM_EMAIL || 'YOUR_FROM_EMAIL'
 };
 
 // Instructions for setup:
