@@ -53,9 +53,18 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
         <div className="text-center mb-6">
           <div className="text-4xl mb-4">📧</div>
           <h2 className="text-xl font-semibold text-white mb-2">Verify Your Email</h2>
-          <p className="text-neutral-400 text-sm">
+          <p className="text-neutral-400 text-sm mb-3">
             We've sent a verification code to <span className="text-emerald-400 font-medium">{email}</span>
           </p>
+          <div className="p-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-sm">
+            <div className="flex items-start gap-2">
+              <div className="text-yellow-400 text-lg">⚠️</div>
+              <div>
+                <div className="font-medium">Demo Mode</div>
+                <div className="text-xs opacity-90">No actual email sent. Use demo code below.</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <form onSubmit={handleVerify} className="space-y-4">
@@ -102,17 +111,34 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-neutral-400 text-sm mb-2">
-            Didn't receive the code?
-          </p>
-          <button
-            onClick={handleResend}
-            disabled={timeLeft > 0}
-            className="text-emerald-400 hover:text-emerald-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {timeLeft > 0 ? `Resend in ${timeLeft}s` : 'Resend Code'}
-          </button>
+        <div className="mt-6 text-center space-y-3">
+          <div>
+            <p className="text-neutral-400 text-sm mb-2">
+              Didn't receive the code?
+            </p>
+            <button
+              onClick={handleResend}
+              disabled={timeLeft > 0}
+              className="text-emerald-400 hover:text-emerald-300 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {timeLeft > 0 ? `Resend in ${timeLeft}s` : 'Resend Code'}
+            </button>
+          </div>
+          
+          <div className="border-t border-neutral-700 pt-3">
+            <p className="text-neutral-500 text-xs mb-2">
+              Demo Mode - Skip verification
+            </p>
+            <button
+              onClick={() => {
+                // Skip verification for demo
+                onVerified();
+              }}
+              className="text-neutral-400 hover:text-white text-sm font-medium underline"
+            >
+              Skip Email Verification
+            </button>
+          </div>
         </div>
       </div>
     </div>
