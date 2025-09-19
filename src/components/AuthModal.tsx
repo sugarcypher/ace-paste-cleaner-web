@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
+import { EmailVerification } from './EmailVerification';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -10,16 +11,55 @@ interface AuthModalProps {
 export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showVerification, setShowVerification] = useState(false);
   const { signUp, signIn } = useAuth();
 
   if (!isOpen) return null;
 
+  if (showVerification) {
+    return (
+      <EmailVerification
+        email={email}
+        onVerified={() => {
+          setShowVerification(false);
+          setSuccessMessage('Email verified! You can now sign in.');
+          setIsSignUp(false);
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+          setTimeout(() => {
+            setSuccessMessage('');
+          }, 3000);
+        }}
+        onResend={() => {
+          // In real app, this would resend verification email
+          console.log('Resending verification email to:', email);
+        }}
+      />
+    );
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) return;
+    if (!email.trim() || !password.trim()) {
+      setError('Please fill in all fields');
+      return;
+    }
+
+    if (isSignUp && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
 
     setIsLoading(true);
     setError('');
@@ -27,19 +67,13 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
     try {
       const result = isSignUp 
-        ? await signUp(email.trim())
-        : await signIn(email.trim());
+        ? await signUp(email.trim(), password.trim())
+        : await signIn(email.trim(), password.trim());
 
       if (result.success) {
         if (isSignUp) {
-          // For signup, show success message and switch to sign in
-          setSuccessMessage('Account created successfully! You can now sign in.');
-          setIsSignUp(false);
-          setEmail('');
-          // Clear success message after 3 seconds
-          setTimeout(() => {
-            setSuccessMessage('');
-          }, 3000);
+          // For signup, show email verification
+          setShowVerification(true);
         } else {
           // For signin, proceed normally
           onSuccess();
@@ -89,6 +123,40 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               disabled={isLoading}
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
+              Password
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="w-full px-4 py-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+              required
+              disabled={isLoading}
+              minLength={6}
+            />
+          </div>
+
+          {isSignUp && (
+            <div>
+              <label className="block text-sm font-medium text-neutral-300 mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                className="w-full px-4 py-3 rounded-xl bg-neutral-800 border border-neutral-700 text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+                required
+                disabled={isLoading}
+                minLength={6}
+              />
+            </div>
+          )}
 
           {successMessage && (
             <div className="p-3 rounded-xl bg-green-500/20 border border-green-500/30 text-green-300 text-sm">
@@ -145,6 +213,9 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
               setIsSignUp(!isSignUp);
               setError('');
               setSuccessMessage('');
+              setEmail('');
+              setPassword('');
+              setConfirmPassword('');
             }}
             className="text-emerald-400 hover:text-emerald-300 text-sm font-medium mt-1"
           >

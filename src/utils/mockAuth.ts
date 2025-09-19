@@ -33,9 +33,13 @@ function isValidEmail(email: string): boolean {
 }
 
 export const mockAuthAPI = {
-  async signup(email: string): Promise<{ success: boolean; error?: string }> {
+  async signup(email: string, password: string): Promise<{ success: boolean; error?: string }> {
     if (!email || !isValidEmail(email)) {
       return { success: false, error: 'Valid email required' };
+    }
+    
+    if (!password || password.length < 6) {
+      return { success: false, error: 'Password must be at least 6 characters long' };
     }
     
     if (users.has(email)) {
@@ -46,6 +50,7 @@ export const mockAuthAPI = {
     const user = {
       id: userId,
       email,
+      password: password, // In real app, this would be hashed
       tier: 'free',
       createdAt: new Date().toISOString(),
       usage: {
@@ -63,14 +68,22 @@ export const mockAuthAPI = {
     };
   },
   
-  async signin(email: string): Promise<{ success: boolean; error?: string; token?: string; user?: User }> {
+  async signin(email: string, password: string): Promise<{ success: boolean; error?: string; token?: string; user?: User }> {
     if (!email || !isValidEmail(email)) {
       return { success: false, error: 'Valid email required' };
+    }
+    
+    if (!password) {
+      return { success: false, error: 'Password required' };
     }
     
     const user = users.get(email);
     if (!user) {
       return { success: false, error: 'Email not found. Please sign up first.' };
+    }
+    
+    if (user.password !== password) {
+      return { success: false, error: 'Invalid password' };
     }
     
     const token = generateToken();

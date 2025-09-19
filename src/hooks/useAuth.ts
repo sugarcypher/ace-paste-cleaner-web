@@ -76,10 +76,10 @@ export function useAuth() {
     }
   };
 
-  const signUp = async (email: string): Promise<{ success: boolean; error?: string }> => {
+  const signUp = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       // Use mock API for GitHub Pages deployment (client-side only)
-      const result = await mockAuthAPI.signup(email);
+      const result = await mockAuthAPI.signup(email, password);
       return result;
     } catch (error) {
       console.error('Signup error:', error);
@@ -87,10 +87,10 @@ export function useAuth() {
     }
   };
 
-  const signIn = async (email: string): Promise<{ success: boolean; error?: string }> => {
+  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
       // Use mock API for GitHub Pages deployment (client-side only)
-      const result = await mockAuthAPI.signin(email);
+      const result = await mockAuthAPI.signin(email, password);
       if (result.success && result.token && result.user) {
         localStorage.setItem('acepaste_token', result.token);
         setUser(result.user);
