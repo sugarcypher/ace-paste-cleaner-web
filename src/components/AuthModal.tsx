@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { EmailVerification } from './EmailVerification';
+import { sendVerificationEmail, generateAndStoreVerificationCode } from '../utils/emailService';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -72,8 +73,15 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
 
       if (result.success) {
         if (isSignUp) {
-          // For signup, show email verification
-          setShowVerification(true);
+          // For signup, generate verification code and send email
+          const verificationCode = generateAndStoreVerificationCode(email.trim());
+          const emailResult = await sendVerificationEmail(email.trim(), verificationCode);
+          
+          if (emailResult.success) {
+            setShowVerification(true);
+          } else {
+            setError(`Account created but failed to send verification email: ${emailResult.error}. Please try again or contact support.`);
+          }
         } else {
           // For signin, proceed normally
           onSuccess();
@@ -238,18 +246,6 @@ export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
           </div>
         </div>
 
-        <div className="mt-4 p-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30">
-          <div className="flex items-start gap-2">
-            <div className="text-yellow-400 text-lg">⚠️</div>
-            <div className="text-xs text-yellow-300">
-              <div className="font-medium mb-1">Demo Mode</div>
-              <div className="opacity-90">
-                This is a demo version. No real emails are sent. 
-                Use verification code <span className="font-mono bg-yellow-500/30 px-1 rounded">123456</span> or skip verification.
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

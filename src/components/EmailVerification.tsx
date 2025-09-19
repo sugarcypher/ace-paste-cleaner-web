@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { sendVerificationEmail, verifyCode, generateAndStoreVerificationCode } from '../utils/emailService';
 
 interface EmailVerificationProps {
   email: string;
@@ -30,20 +31,39 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
     setIsLoading(true);
     setError('');
 
-    // Simulate verification (in real app, this would call an API)
-    setTimeout(() => {
-      if (verificationCode === '123456') { // Mock verification code
+    try {
+      // Verify the code using the email service
+      const isValid = verifyCode(email, verificationCode);
+      
+      if (isValid) {
         onVerified();
       } else {
-        setError('Invalid verification code. Please try again.');
+        setError('Invalid or expired verification code. Please try again.');
       }
+    } catch (error) {
+      console.error('Verification error:', error);
+      setError('Verification failed. Please try again.');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     setTimeLeft(60);
     setError('');
+    
+    try {
+      // Generate new verification code and resend email
+      const newCode = generateAndStoreVerificationCode(email);
+      const result = await sendVerificationEmail(email, newCode);
+      if (!result.success) {
+        setError('Failed to resend email. Please try again.');
+      }
+    } catch (error) {
+      console.error('Resend error:', error);
+      setError('Failed to resend email. Please try again.');
+    }
+    
     onResend();
   };
 
@@ -56,12 +76,12 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
           <p className="text-neutral-400 text-sm mb-3">
             We've sent a verification code to <span className="text-emerald-400 font-medium">{email}</span>
           </p>
-          <div className="p-3 rounded-xl bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-sm">
+          <div className="p-3 rounded-xl bg-blue-500/20 border border-blue-500/30 text-blue-300 text-sm">
             <div className="flex items-start gap-2">
-              <div className="text-yellow-400 text-lg">⚠️</div>
+              <div className="text-blue-400 text-lg">ℹ️</div>
               <div>
-                <div className="font-medium">Demo Mode</div>
-                <div className="text-xs opacity-90">No actual email sent. Use demo code below.</div>
+                <div className="font-medium">Check Your Email</div>
+                <div className="text-xs opacity-90">The verification code will expire in 10 minutes</div>
               </div>
             </div>
           </div>
@@ -83,7 +103,7 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
               disabled={isLoading}
             />
             <p className="text-xs text-neutral-500 mt-1">
-              Demo: Use code <span className="text-emerald-400 font-mono">123456</span>
+              Enter the 6-digit code from your email
             </p>
           </div>
 
@@ -125,20 +145,6 @@ export function EmailVerification({ email, onVerified, onResend }: EmailVerifica
             </button>
           </div>
           
-          <div className="border-t border-neutral-700 pt-3">
-            <p className="text-neutral-500 text-xs mb-2">
-              Demo Mode - Skip verification
-            </p>
-            <button
-              onClick={() => {
-                // Skip verification for demo
-                onVerified();
-              }}
-              className="text-neutral-400 hover:text-white text-sm font-medium underline"
-            >
-              Skip Email Verification
-            </button>
-          </div>
         </div>
       </div>
     </div>
