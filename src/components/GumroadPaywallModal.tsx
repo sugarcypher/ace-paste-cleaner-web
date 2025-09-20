@@ -108,13 +108,36 @@ export function GumroadPaywallModal({
       <div className="bg-neutral-900 rounded-2xl border border-neutral-800 max-w-5xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-neutral-800">
-          <div>
+          <div className="flex-1">
             <h2 className="text-2xl font-bold text-white">Upgrade Your Plan</h2>
             <p className="text-neutral-400 mt-1">{getReasonMessage()}</p>
+            
+            {/* Value Proposition */}
+            <div className="mt-4 p-4 bg-gradient-to-r from-blue-500/10 to-green-500/10 border border-blue-500/20 rounded-lg">
+              <h3 className="text-lg font-semibold text-white mb-2">💡 Why Ace Paste Cleaner is Worth Every Penny</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-blue-300 font-medium mb-1">⏱️ Time Savings:</p>
+                  <p className="text-neutral-300">Save 20-400+ hours per year by eliminating manual text cleaning. What takes you hours, we do in seconds.</p>
+                </div>
+                <div>
+                  <p className="text-green-300 font-medium mb-1">💰 Value:</p>
+                  <p className="text-neutral-300">At $25/hour, you save $500-$10,000+ annually. Our $6.99-$49.99 plans pay for themselves in minutes.</p>
+                </div>
+                <div>
+                  <p className="text-purple-300 font-medium mb-1">🎯 Professional Results:</p>
+                  <p className="text-neutral-300">Perfect for writers, developers, content creators, and anyone who works with text daily.</p>
+                </div>
+                <div>
+                  <p className="text-yellow-300 font-medium mb-1">🚀 Instant ROI:</p>
+                  <p className="text-neutral-300">Break-even in 3 minutes of use. Every cleaning after that is pure time savings.</p>
+                </div>
+              </div>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
+            className="p-2 hover:bg-neutral-800 rounded-lg transition-colors ml-4"
           >
             <X className="w-5 h-5 text-neutral-400" />
           </button>
@@ -236,18 +259,47 @@ export function GumroadPaywallModal({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-6 border-t border-neutral-800 bg-neutral-800/50">
-          <div className="text-center">
-            <p className="text-sm text-neutral-400 mb-4">
-              Secure checkout powered by Gumroad. All plans include instant access.
-            </p>
-            <div className="flex items-center justify-center gap-6 text-xs text-neutral-500">
-              <span>🔒 Secure payments</span>
-              <span>💳 All major cards</span>
-              <span>🔄 Cancel anytime</span>
-              <span>⚡ Instant access</span>
+        {/* Value Summary */}
+        <div className="p-6 border-t border-neutral-800 bg-gradient-to-r from-green-500/5 to-blue-500/5">
+          <div className="text-center mb-4">
+            <h3 className="text-xl font-bold text-white mb-2">🎯 Choose Your Time-Saving Level</h3>
+            <p className="text-neutral-300">Every plan saves you massive time and money. Pick the one that fits your usage:</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-400">$6.99</div>
+              <div className="text-sm text-neutral-400 mb-2">Monthly</div>
+              <div className="text-xs text-green-400">Save 20+ hours</div>
+              <div className="text-xs text-neutral-500">$500+ value</div>
             </div>
+            <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
+              <div className="text-2xl font-bold text-green-400">$19.99</div>
+              <div className="text-sm text-neutral-400 mb-2">Quarterly</div>
+              <div className="text-xs text-green-400">Save 80+ hours</div>
+              <div className="text-xs text-neutral-500">$2,000+ value</div>
+            </div>
+            <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-400">$39.99</div>
+              <div className="text-sm text-neutral-400 mb-2">6 Months</div>
+              <div className="text-xs text-green-400">Save 200+ hours</div>
+              <div className="text-xs text-neutral-500">$5,000+ value</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-400">$49.99</div>
+              <div className="text-sm text-yellow-300 mb-2">Yearly - BEST VALUE</div>
+              <div className="text-xs text-yellow-400 font-bold">Save 400+ hours</div>
+              <div className="text-xs text-yellow-300 font-bold">$10,000+ value</div>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <p className="text-sm text-neutral-400 mb-2">
+              <span className="text-green-400 font-semibold">💡 Pro Tip:</span> Most users save more in their first week than the entire yearly cost!
+            </p>
+            <p className="text-xs text-neutral-500">
+              Secure checkout powered by Gumroad • Instant access • Cancel anytime
+            </p>
           </div>
         </div>
       </div>
