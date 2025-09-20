@@ -68,14 +68,14 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
   {
     id: 'six-months',
     name: 'Pro 6 Months',
-    price: 39.99,
+    price: 34.99,
     currency: 'USD',
     interval: 'month',
     features: [
       'Everything in Quarterly',
       'Up to 500,000 characters per cleaning',
       'Save 200+ hours per 6 months',
-      'Save $2 (5% off)',
+      'Save $7 (17% off)',
       'Priority support',
       'Custom integrations',
       'Team management',
@@ -88,7 +88,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-6months', // Replace with your actual Gumroad URL
-    description: 'Save 200+ hours per 6 months - massive time savings!'
+    description: 'Save 200+ hours per 6 months - ⭐ 17% off!'
   },
   {
     id: 'yearly',
@@ -100,7 +100,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       'Everything in 6 Months',
       'Up to 1,000,000 characters per cleaning',
       'Save 400+ hours per year',
-      'Save $34 (41% off)',
+      'Save $34 (40% off)',
       'Priority support',
       'Custom integrations',
       'Team management',
@@ -115,7 +115,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-yearly', // Replace with your actual Gumroad URL
-    description: 'Save 400+ hours per year - NO BRAINER at $49.99!'
+    description: 'Save 400+ hours per year - 🔥 40% off!'
   },
   {
     id: 'two-years',
@@ -125,9 +125,9 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     interval: 'year',
     features: [
       'Everything in Yearly',
-      'Up to 1,000,000 characters per cleaning',
+      'Up to 2,000,000 characters per cleaning',
       'Save 800+ hours over 2 years',
-      'Save $44 (36% off vs yearly)',
+      'Save $60 (52% off)',
       'Priority support',
       'Custom integrations',
       'Team management',
@@ -139,12 +139,12 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 1000000,
+      maxTextLength: 2000000,
       advancedFeatures: true,
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-2years', // Replace with your actual Gumroad URL
-    description: 'Save 800+ hours over 2 years - ULTIMATE VALUE at $79.99!'
+    description: 'Save 800+ hours over 2 years - 💎 52% off!'
   }
 ];
 

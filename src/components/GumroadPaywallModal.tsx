@@ -74,11 +74,11 @@ export function GumroadPaywallModal({
       case 'quarterly':
         return 'Save 5% vs monthly';
       case 'six-months':
-        return 'Save 5% vs monthly';
+        return '⭐ Save 17% vs monthly';
       case 'yearly':
-        return 'Save 41% vs monthly';
+        return '🔥 Save 40% vs monthly';
       case 'two-years':
-        return 'Save 36% vs yearly';
+        return '💎 Save 52% vs monthly';
       default:
         return null;
     }
@@ -89,11 +89,11 @@ export function GumroadPaywallModal({
       case 'quarterly':
         return '$1';
       case 'six-months':
-        return '$2';
+        return '$7';
       case 'yearly':
         return '$34';
       case 'two-years':
-        return '$44';
+        return '$60';
       default:
         return null;
     }
@@ -278,33 +278,33 @@ export function GumroadPaywallModal({
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
               <div className="text-2xl font-bold text-blue-400">$6.99</div>
-              <div className="text-sm text-neutral-400 mb-2">Monthly</div>
+              <div className="text-sm text-neutral-400 mb-2">🟦 Monthly</div>
               <div className="text-xs text-green-400">Save 20+ hours</div>
               <div className="text-xs text-neutral-500">$500+ value</div>
             </div>
             <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
               <div className="text-2xl font-bold text-green-400">$19.99</div>
-              <div className="text-sm text-neutral-400 mb-2">Quarterly</div>
+              <div className="text-sm text-neutral-400 mb-2">🟩 Quarterly</div>
               <div className="text-xs text-green-400">Save 80+ hours</div>
               <div className="text-xs text-neutral-500">$2,000+ value</div>
             </div>
-            <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-400">$39.99</div>
-              <div className="text-sm text-neutral-400 mb-2">6 Months</div>
-              <div className="text-xs text-green-400">Save 200+ hours</div>
-              <div className="text-xs text-neutral-500">$5,000+ value</div>
-            </div>
             <div className="text-center p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
-              <div className="text-2xl font-bold text-yellow-400">$49.99</div>
-              <div className="text-sm text-yellow-300 mb-2">Yearly</div>
-              <div className="text-xs text-yellow-400 font-bold">Save 400+ hours</div>
-              <div className="text-xs text-yellow-300 font-bold">$10,000+ value</div>
+              <div className="text-2xl font-bold text-yellow-400">$34.99</div>
+              <div className="text-sm text-yellow-300 mb-2">🟨 6 Months ⭐</div>
+              <div className="text-xs text-yellow-400 font-bold">Save 200+ hours</div>
+              <div className="text-xs text-yellow-300 font-bold">$5,000+ value</div>
             </div>
-            <div className="text-center p-4 bg-purple-500/20 border border-purple-500/50 rounded-lg">
-              <div className="text-2xl font-bold text-purple-400">$79.99</div>
-              <div className="text-sm text-purple-300 mb-2">2 Years - ULTIMATE</div>
-              <div className="text-xs text-purple-400 font-bold">Save 800+ hours</div>
-              <div className="text-xs text-purple-300 font-bold">$20,000+ value</div>
+            <div className="text-center p-4 bg-orange-500/20 border border-orange-500/50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-400">$49.99</div>
+              <div className="text-sm text-orange-300 mb-2">🟧 Yearly 🔥</div>
+              <div className="text-xs text-orange-400 font-bold">Save 400+ hours</div>
+              <div className="text-xs text-orange-300 font-bold">$10,000+ value</div>
+            </div>
+            <div className="text-center p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
+              <div className="text-2xl font-bold text-red-400">$79.99</div>
+              <div className="text-sm text-red-300 mb-2">🟥 2 Years 💎</div>
+              <div className="text-xs text-red-400 font-bold">Save 800+ hours</div>
+              <div className="text-xs text-red-300 font-bold">$20,000+ value</div>
             </div>
           </div>
           
