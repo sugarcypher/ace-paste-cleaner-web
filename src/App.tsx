@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { useAuth } from "./hooks/useAuth0";
 import { AuthModal } from "./components/AuthModal";
-import { PaywallModal } from "./components/PaywallModal";
+import { GumroadPaywallModal } from "./components/GumroadPaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
 
 type Options = {
@@ -330,13 +330,9 @@ export default function AcePasteFinalCleaner() {
         }}
       />
       
-      <PaywallModal
+      <GumroadPaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
-        onUpgrade={(tierId) => {
-          // upgradeUser(tierId); // TODO: Implement upgrade
-          setShowPaywall(false);
-        }}
         currentTier={user?.tier || 'free'}
         reason={paywallReason}
         currentTextLength={input.length}
