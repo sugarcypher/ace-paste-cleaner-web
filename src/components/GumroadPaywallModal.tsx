@@ -72,11 +72,11 @@ export function GumroadPaywallModal({
   const getSavingsText = (product: GumroadProduct) => {
     switch (product.id) {
       case 'quarterly':
-        return 'Save 10% vs monthly';
+        return 'Save 5% vs monthly';
       case 'six-months':
-        return 'Save 17% vs monthly';
+        return 'Save 5% vs monthly';
       case 'yearly':
-        return 'Save 42% vs monthly';
+        return 'Save 41% vs monthly';
       default:
         return null;
     }
@@ -85,11 +85,11 @@ export function GumroadPaywallModal({
   const getSavingsAmount = (product: GumroadProduct) => {
     switch (product.id) {
       case 'quarterly':
-        return '$3';
+        return '$1';
       case 'six-months':
-        return '$10';
+        return '$2';
       case 'yearly':
-        return '$50';
+        return '$34';
       default:
         return null;
     }
@@ -209,29 +209,29 @@ export function GumroadPaywallModal({
           </div>
         </div>
 
-        {/* Savings Comparison */}
+        {/* Time Savings Comparison */}
         <div className="p-6 border-t border-neutral-800 bg-neutral-800/30">
-          <h3 className="text-lg font-semibold text-white mb-4 text-center">Compare Savings vs Monthly</h3>
+          <h3 className="text-lg font-semibold text-white mb-4 text-center">Time Savings & Value</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-neutral-900 rounded-lg">
+              <div className="text-sm text-neutral-400">Monthly</div>
+              <div className="text-lg font-bold text-blue-400">20+ hours</div>
+              <div className="text-xs text-neutral-500">$500+ value</div>
+            </div>
+            <div className="text-center p-3 bg-neutral-900 rounded-lg">
               <div className="text-sm text-neutral-400">Quarterly</div>
-              <div className="text-lg font-bold text-green-400">Save $5</div>
-              <div className="text-xs text-neutral-500">17% off</div>
+              <div className="text-lg font-bold text-green-400">80+ hours</div>
+              <div className="text-xs text-neutral-500">$2,000+ value</div>
             </div>
             <div className="text-center p-3 bg-neutral-900 rounded-lg">
               <div className="text-sm text-neutral-400">6 Months</div>
-              <div className="text-lg font-bold text-green-400">Save $15</div>
-              <div className="text-xs text-neutral-500">25% off</div>
+              <div className="text-lg font-bold text-green-400">200+ hours</div>
+              <div className="text-xs text-neutral-500">$5,000+ value</div>
             </div>
             <div className="text-center p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
               <div className="text-sm text-yellow-300">Yearly</div>
-              <div className="text-lg font-bold text-yellow-400">Save $40</div>
-              <div className="text-xs text-yellow-300 font-bold">33% off - BEST VALUE</div>
-            </div>
-            <div className="text-center p-3 bg-neutral-900 rounded-lg">
-              <div className="text-sm text-neutral-400">Monthly</div>
-              <div className="text-lg font-bold text-neutral-500">$0 saved</div>
-              <div className="text-xs text-neutral-500">Base price</div>
+              <div className="text-lg font-bold text-yellow-400">400+ hours</div>
+              <div className="text-xs text-yellow-300 font-bold">$10,000+ value - NO BRAINER!</div>
             </div>
           </div>
         </div>
