@@ -119,7 +119,7 @@ export default function AcePasteFinalCleaner() {
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-4">
             <img 
-              src="/logo.svg" 
+              src="/logo.jpg" 
               alt="Ace Paste Cleaner Logo" 
               className="h-12 w-auto"
             />
