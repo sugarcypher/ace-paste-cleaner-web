@@ -17,7 +17,7 @@ export function GumroadPaywallModal({
   reason,
   currentTextLength = 0 
 }: GumroadPaywallModalProps) {
-  const [selectedTier, setSelectedTier] = useState<string>('pro');
+  const [selectedTier, setSelectedTier] = useState<string>('yearly');
 
   if (!isOpen) return null;
 
@@ -70,13 +70,37 @@ export function GumroadPaywallModal({
   };
 
   const getSavingsText = (product: GumroadProduct) => {
-    if (product.id === 'pro-yearly') {
-      return 'Save 17% vs monthly';
+    switch (product.id) {
+      case 'quarterly':
+        return 'Save 17% vs monthly';
+      case 'six-months':
+        return 'Save 25% vs monthly';
+      case 'yearly':
+        return 'Save 33% vs monthly';
+      default:
+        return null;
     }
-    if (product.id === 'lifetime') {
-      return 'Best Value - Pay Once';
+  };
+
+  const getSavingsAmount = (product: GumroadProduct) => {
+    switch (product.id) {
+      case 'quarterly':
+        return '$5';
+      case 'six-months':
+        return '$15';
+      case 'yearly':
+        return '$40';
+      default:
+        return null;
     }
-    return null;
+  };
+
+  const isMostPopular = (product: GumroadProduct) => {
+    return product.id === 'yearly';
+  };
+
+  const isBestValue = (product: GumroadProduct) => {
+    return product.id === 'yearly';
   };
 
   return (
@@ -98,7 +122,7 @@ export function GumroadPaywallModal({
 
         {/* Pricing Cards */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             {GUMROAD_PRODUCTS.map((product) => (
               <div
                 key={product.id}
@@ -106,7 +130,9 @@ export function GumroadPaywallModal({
                   selectedTier === product.id
                     ? getTierColor(product.id) + ' ring-2 ring-current'
                     : getTierColor(product.id) + ' hover:opacity-80'
-                } ${product.id === currentTier ? 'opacity-50 cursor-not-allowed' : ''}`}
+                } ${product.id === currentTier ? 'opacity-50 cursor-not-allowed' : ''} ${
+                  isMostPopular(product) ? 'ring-2 ring-yellow-500 scale-105' : ''
+                }`}
                 onClick={() => product.id !== currentTier && setSelectedTier(product.id)}
               >
                 {product.id === currentTier && (
@@ -115,9 +141,15 @@ export function GumroadPaywallModal({
                   </div>
                 )}
                 
+                {isMostPopular(product) && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">
+                    MOST POPULAR
+                  </div>
+                )}
+                
                 <div className="flex items-center gap-3 mb-4">
                   {getTierIcon(product.id)}
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-lg font-semibold text-white">{product.name}</h3>
                     <div className="flex items-baseline gap-1">
                       <span className="text-2xl font-bold text-white">
@@ -130,8 +162,15 @@ export function GumroadPaywallModal({
                       )}
                     </div>
                     {getSavingsText(product) && (
-                      <div className="text-xs text-green-400 font-medium">
-                        {getSavingsText(product)}
+                      <div className="flex items-center gap-1 mt-1">
+                        <div className="text-xs text-green-400 font-bold bg-green-500/20 px-2 py-1 rounded">
+                          {getSavingsText(product)}
+                        </div>
+                        {getSavingsAmount(product) && (
+                          <div className="text-xs text-green-300 font-medium">
+                            ({getSavingsAmount(product)} saved)
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -167,6 +206,33 @@ export function GumroadPaywallModal({
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Savings Comparison */}
+        <div className="p-6 border-t border-neutral-800 bg-neutral-800/30">
+          <h3 className="text-lg font-semibold text-white mb-4 text-center">Compare Savings vs Monthly</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-3 bg-neutral-900 rounded-lg">
+              <div className="text-sm text-neutral-400">Quarterly</div>
+              <div className="text-lg font-bold text-green-400">Save $5</div>
+              <div className="text-xs text-neutral-500">17% off</div>
+            </div>
+            <div className="text-center p-3 bg-neutral-900 rounded-lg">
+              <div className="text-sm text-neutral-400">6 Months</div>
+              <div className="text-lg font-bold text-green-400">Save $15</div>
+              <div className="text-xs text-neutral-500">25% off</div>
+            </div>
+            <div className="text-center p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
+              <div className="text-sm text-yellow-300">Yearly</div>
+              <div className="text-lg font-bold text-yellow-400">Save $40</div>
+              <div className="text-xs text-yellow-300 font-bold">33% off - BEST VALUE</div>
+            </div>
+            <div className="text-center p-3 bg-neutral-900 rounded-lg">
+              <div className="text-sm text-neutral-400">Monthly</div>
+              <div className="text-lg font-bold text-neutral-500">$0 saved</div>
+              <div className="text-xs text-neutral-500">Base price</div>
+            </div>
           </div>
         </div>
 
