@@ -116,6 +116,35 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-yearly', // Replace with your actual Gumroad URL
     description: 'Save 400+ hours per year - NO BRAINER at $49.99!'
+  },
+  {
+    id: 'two-years',
+    name: 'Pro 2 Years',
+    price: 79.99,
+    currency: 'USD',
+    interval: 'year',
+    features: [
+      'Everything in Yearly',
+      'Up to 1,000,000 characters per cleaning',
+      'Save 800+ hours over 2 years',
+      'Save $44 (36% off vs yearly)',
+      'Priority support',
+      'Custom integrations',
+      'Team management',
+      'White-label options',
+      'Dedicated support',
+      'Custom branding',
+      'Future updates included',
+      'Lifetime support'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: 1000000,
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-2years', // Replace with your actual Gumroad URL
+    description: 'Save 800+ hours over 2 years - ULTIMATE VALUE at $79.99!'
   }
 ];
 

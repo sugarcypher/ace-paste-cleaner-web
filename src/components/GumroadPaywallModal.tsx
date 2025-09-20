@@ -77,6 +77,8 @@ export function GumroadPaywallModal({
         return 'Save 5% vs monthly';
       case 'yearly':
         return 'Save 41% vs monthly';
+      case 'two-years':
+        return 'Save 36% vs yearly';
       default:
         return null;
     }
@@ -90,6 +92,8 @@ export function GumroadPaywallModal({
         return '$2';
       case 'yearly':
         return '$34';
+      case 'two-years':
+        return '$44';
       default:
         return null;
     }
@@ -235,7 +239,7 @@ export function GumroadPaywallModal({
         {/* Time Savings Comparison */}
         <div className="p-6 border-t border-neutral-800 bg-neutral-800/30">
           <h3 className="text-lg font-semibold text-white mb-4 text-center">Time Savings & Value</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div className="text-center p-3 bg-neutral-900 rounded-lg">
               <div className="text-sm text-neutral-400">Monthly</div>
               <div className="text-lg font-bold text-blue-400">20+ hours</div>
@@ -254,7 +258,12 @@ export function GumroadPaywallModal({
             <div className="text-center p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
               <div className="text-sm text-yellow-300">Yearly</div>
               <div className="text-lg font-bold text-yellow-400">400+ hours</div>
-              <div className="text-xs text-yellow-300 font-bold">$10,000+ value - NO BRAINER!</div>
+              <div className="text-xs text-yellow-300 font-bold">$10,000+ value</div>
+            </div>
+            <div className="text-center p-3 bg-purple-500/20 border border-purple-500/50 rounded-lg">
+              <div className="text-sm text-purple-300">2 Years</div>
+              <div className="text-lg font-bold text-purple-400">800+ hours</div>
+              <div className="text-xs text-purple-300 font-bold">$20,000+ value - ULTIMATE!</div>
             </div>
           </div>
         </div>
@@ -266,7 +275,7 @@ export function GumroadPaywallModal({
             <p className="text-neutral-300">Every plan saves you massive time and money. Pick the one that fits your usage:</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
             <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
               <div className="text-2xl font-bold text-blue-400">$6.99</div>
               <div className="text-sm text-neutral-400 mb-2">Monthly</div>
@@ -287,9 +296,15 @@ export function GumroadPaywallModal({
             </div>
             <div className="text-center p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
               <div className="text-2xl font-bold text-yellow-400">$49.99</div>
-              <div className="text-sm text-yellow-300 mb-2">Yearly - BEST VALUE</div>
+              <div className="text-sm text-yellow-300 mb-2">Yearly</div>
               <div className="text-xs text-yellow-400 font-bold">Save 400+ hours</div>
               <div className="text-xs text-yellow-300 font-bold">$10,000+ value</div>
+            </div>
+            <div className="text-center p-4 bg-purple-500/20 border border-purple-500/50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-400">$79.99</div>
+              <div className="text-sm text-purple-300 mb-2">2 Years - ULTIMATE</div>
+              <div className="text-xs text-purple-400 font-bold">Save 800+ hours</div>
+              <div className="text-xs text-purple-300 font-bold">$20,000+ value</div>
             </div>
           </div>
           
