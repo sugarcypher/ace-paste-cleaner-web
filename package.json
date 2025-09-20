@@ -30,6 +30,7 @@
     "vite": "^7.1.5"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.5.0",
     "@emailjs/browser": "^4.4.1",
     "@stripe/stripe-js": "^7.9.0",
     "lucide-react": "^0.544.0",

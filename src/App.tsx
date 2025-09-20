@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useAuth } from "./hooks/useAuth";
+import { useAuth } from "./hooks/useAuth0";
 import { AuthModal } from "./components/AuthModal";
 import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
