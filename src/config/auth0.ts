@@ -2,11 +2,11 @@
 // Get these values from your Auth0 dashboard: https://manage.auth0.com/
 
 export const AUTH0_CONFIG = {
-  domain: 'ace-paste-cleaner.us.auth0.com', // Replace with your Auth0 domain
-  clientId: 'YOUR_AUTH0_CLIENT_ID', // Replace with your Auth0 client ID
+  domain: 'dev-6zf0xtlzryole08p.us.auth0.com', // Your Auth0 domain
+  clientId: 'tRLKjLmAn6d9uLkv2hkWnNlXzEOZQFS5', // Your Auth0 client ID
   authorizationParams: {
     redirect_uri: window.location.origin,
-    audience: 'https://ace-paste-cleaner.us.auth0.com/api/v2/', // Optional: for API access
+    audience: 'https://dev-6zf0xtlzryole08p.us.auth0.com/api/v2/', // Optional: for API access
     scope: 'openid profile email'
   }
 };
