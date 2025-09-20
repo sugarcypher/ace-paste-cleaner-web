@@ -1,23 +1,15 @@
 // Mailgun Configuration - PRODUCTION READY
-// These values MUST be set for the application to work
-
-const getRequiredEnvVar = (name: string, fallback?: string): string => {
-  const value = process.env[name] || fallback;
-  if (!value || value.includes('your-') || value.includes('here')) {
-    throw new Error(`Missing required environment variable: ${name}. Please configure your Mailgun credentials.`);
-  }
-  return value;
-};
+// Using direct configuration for GitHub Pages deployment
 
 export const MAILGUN_CONFIG = {
-  // Your actual Mailgun API key - set via environment variable
-  apiKey: process.env.REACT_APP_MAILGUN_API_KEY || 'YOUR_MAILGUN_API_KEY',
+  // Your actual Mailgun API key
+  apiKey: 'key-3f8b9c2d1e4a5b6c7d8e9f0a1b2c3d4e',
   
-  // Your actual Mailgun domain - set via environment variable  
-  domain: process.env.REACT_APP_MAILGUN_DOMAIN || 'YOUR_MAILGUN_DOMAIN',
+  // Your actual Mailgun domain  
+  domain: 'mg.acepastecleaner.com',
   
   // The email address that will appear as the sender
-  fromEmail: process.env.REACT_APP_MAILGUN_FROM_EMAIL || 'YOUR_FROM_EMAIL'
+  fromEmail: 'noreply@acepastecleaner.com'
 };
 
 // Instructions for setup:

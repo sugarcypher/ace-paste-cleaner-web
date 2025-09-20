@@ -67,11 +67,24 @@ export async function sendVerificationEmail(
     });
 
     if (response.ok) {
+      console.log('Email sent successfully to:', toEmail);
       return { success: true };
     } else {
       const errorData = await response.text();
-      console.error('Mailgun error:', errorData);
-      return { success: false, error: 'Failed to send verification email. Please check your Mailgun configuration.' };
+      console.error('Mailgun API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData,
+        config: {
+          domain: MAILGUN_CONFIG.domain,
+          fromEmail: MAILGUN_CONFIG.fromEmail,
+          apiKeyLength: MAILGUN_CONFIG.apiKey.length
+        }
+      });
+      return { 
+        success: false, 
+        error: `Failed to send verification email. Status: ${response.status} - ${response.statusText}. Check Mailgun configuration.` 
+      };
     }
   } catch (error) {
     console.error('Email service error:', error);
