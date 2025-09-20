@@ -1,0 +1,56 @@
+<svg width="300" height="200" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient background -->
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A148C;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7B1FA2;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Eraser gradient -->
+    <linearGradient id="eraserGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0097A7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#006064;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Eraser highlight -->
+    <linearGradient id="eraserHighlight" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#B2EBF2;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#E0F2F1;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="300" height="200" fill="url(#backgroundGradient)" />
+  
+  <!-- Hashtag symbols being erased -->
+  <g opacity="0.6">
+    <text x="80" y="140" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="95" y="140" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="110" y="140" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="80" y="155" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="95" y="155" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="110" y="155" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="80" y="170" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="95" y="170" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+    <text x="110" y="170" font-family="Arial, sans-serif" font-size="16" fill="#424242">#</text>
+  </g>
+  
+  <!-- Eraser shadow -->
+  <ellipse cx="150" cy="160" rx="25" ry="8" fill="#000000" opacity="0.3" />
+  
+  <!-- Eraser body -->
+  <rect x="120" y="120" width="60" height="30" rx="4" ry="4" fill="url(#eraserGradient)" />
+  
+  <!-- Eraser highlight -->
+  <rect x="120" y="120" width="60" height="8" rx="4" ry="4" fill="url(#eraserHighlight)" />
+  
+  <!-- Eraser top edge -->
+  <rect x="120" y="120" width="60" height="2" rx="4" ry="4" fill="#E0F2F1" />
+  
+  <!-- ACE PASTE text -->
+  <text x="150" y="50" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white" text-anchor="middle" stroke="#000000" stroke-width="0.5">ACE PASTE</text>
+  
+  <!-- CLEANER text -->
+  <text x="200" y="180" font-family="Arial, sans-serif" font-size="18" font-weight="normal" fill="white" text-anchor="middle" stroke="#000000" stroke-width="0.3">CLEANER</text>
+</svg>

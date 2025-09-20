@@ -95,3 +95,5 @@ http://localhost:5173,https://yourdomain.com
 - Auth0 Documentation: [https://auth0.com/docs](https://auth0.com/docs)
 - Auth0 Community: [https://community.auth0.com/](https://community.auth0.com/)
 - Free tier includes email support
+
+

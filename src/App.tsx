@@ -117,7 +117,14 @@ export default function AcePasteFinalCleaner() {
     <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 p-6">
       <div className="mx-auto max-w-6xl grid gap-6">
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Ace Paste — Cleaner</h1>
+          <div className="flex items-center gap-4">
+            <img 
+              src="/logo.svg" 
+              alt="Ace Paste Cleaner Logo" 
+              className="h-12 w-auto"
+            />
+            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Ace Paste — Cleaner</h1>
+          </div>
           <div className="flex gap-2">
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
