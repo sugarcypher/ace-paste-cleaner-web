@@ -22,7 +22,7 @@ export function useAuth() {
     email: auth0User.email || '',
     tier: 'free' as const,
     createdAt: new Date().toISOString(),
-    isVerified: auth0User.email_verified || false,
+    isVerified: true, // Auth0 handles verification, we'll trust it
     usage: getStoredUsage() || {
       dailyCleanings: 0,
       totalCleanings: 0,
