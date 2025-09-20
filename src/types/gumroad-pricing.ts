@@ -24,7 +24,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     interval: 'month',
     features: [
       '3 cleanings per day',
-      'Up to 2,000 characters',
+      'Up to 2,000 characters per cleaning',
       'Basic cleaning features',
       'Community support'
     ],
@@ -45,7 +45,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     interval: 'month',
     features: [
       'Unlimited cleanings',
-      'Up to 1,000,000 characters',
+      'Up to 50,000 characters per cleaning',
       'All cleaning features',
       'Priority support',
       'Advanced detection',
@@ -54,7 +54,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     ],
     limits: {
       dailyCleanings: -1, // unlimited
-      maxTextLength: 1000000,
+      maxTextLength: 50000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -69,6 +69,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     interval: 'month',
     features: [
       'Everything in Monthly',
+      'Up to 100,000 characters per cleaning',
       'Save $5 (17% off)',
       'Priority support',
       'Custom integrations',
@@ -76,7 +77,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 1000000,
+      maxTextLength: 100000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -91,6 +92,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     interval: 'month',
     features: [
       'Everything in Quarterly',
+      'Up to 250,000 characters per cleaning',
       'Save $15 (25% off)',
       'Priority support',
       'Custom integrations',
@@ -99,7 +101,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 1000000,
+      maxTextLength: 250000,
       advancedFeatures: true,
       prioritySupport: true
     },
@@ -114,6 +116,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     interval: 'year',
     features: [
       'Everything in 6 Months',
+      'Up to 1,000,000 characters per cleaning',
       'Save $40 (33% off)',
       'Priority support',
       'Custom integrations',
