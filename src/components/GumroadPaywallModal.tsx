@@ -72,11 +72,11 @@ export function GumroadPaywallModal({
   const getSavingsText = (product: GumroadProduct) => {
     switch (product.id) {
       case 'quarterly':
-        return 'Save 17% vs monthly';
+        return 'Save 10% vs monthly';
       case 'six-months':
-        return 'Save 25% vs monthly';
+        return 'Save 17% vs monthly';
       case 'yearly':
-        return 'Save 33% vs monthly';
+        return 'Save 42% vs monthly';
       default:
         return null;
     }
@@ -85,11 +85,11 @@ export function GumroadPaywallModal({
   const getSavingsAmount = (product: GumroadProduct) => {
     switch (product.id) {
       case 'quarterly':
-        return '$5';
+        return '$3';
       case 'six-months':
-        return '$15';
+        return '$10';
       case 'yearly':
-        return '$40';
+        return '$50';
       default:
         return null;
     }

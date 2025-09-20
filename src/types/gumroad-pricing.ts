@@ -17,27 +17,6 @@ export interface GumroadProduct {
 
 export const GUMROAD_PRODUCTS: GumroadProduct[] = [
   {
-    id: 'free',
-    name: 'Free',
-    price: 0,
-    currency: 'USD',
-    interval: 'month',
-    features: [
-      '3 cleanings per day',
-      'Up to 2,000 characters per cleaning',
-      'Basic cleaning features',
-      'Community support'
-    ],
-    limits: {
-      dailyCleanings: 3,
-      maxTextLength: 2000,
-      advancedFeatures: false,
-      prioritySupport: false
-    },
-    gumroadUrl: '', // No URL for free tier
-    description: 'Perfect for occasional use'
-  },
-  {
     id: 'monthly',
     name: 'Pro Monthly',
     price: 9.99,
@@ -59,41 +38,41 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-monthly', // Replace with your actual Gumroad URL
-    description: 'Perfect for trying out Pro features'
+    description: 'Perfect for regular users'
   },
   {
     id: 'quarterly',
     name: 'Pro Quarterly',
-    price: 24.99,
+    price: 29.99,
     currency: 'USD',
     interval: 'month',
     features: [
       'Everything in Monthly',
-      'Up to 100,000 characters per cleaning',
-      'Save $5 (17% off)',
+      'Up to 200,000 characters per cleaning',
+      'Save $3 (10% off)',
       'Priority support',
       'Custom integrations',
       'Team management'
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 100000,
+      maxTextLength: 200000,
       advancedFeatures: true,
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-quarterly', // Replace with your actual Gumroad URL
-    description: 'Great value - save 17% vs monthly'
+    description: 'Great value - save 10% vs monthly'
   },
   {
     id: 'six-months',
     name: 'Pro 6 Months',
-    price: 44.99,
+    price: 49.99,
     currency: 'USD',
     interval: 'month',
     features: [
       'Everything in Quarterly',
-      'Up to 250,000 characters per cleaning',
-      'Save $15 (25% off)',
+      'Up to 500,000 characters per cleaning',
+      'Save $10 (17% off)',
       'Priority support',
       'Custom integrations',
       'Team management',
@@ -101,23 +80,23 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 250000,
+      maxTextLength: 500000,
       advancedFeatures: true,
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-6months', // Replace with your actual Gumroad URL
-    description: 'Excellent value - save 25% vs monthly'
+    description: 'Excellent value - save 17% vs monthly'
   },
   {
     id: 'yearly',
     name: 'Pro Yearly',
-    price: 79.99,
+    price: 69.99,
     currency: 'USD',
     interval: 'year',
     features: [
       'Everything in 6 Months',
       'Up to 1,000,000 characters per cleaning',
-      'Save $40 (33% off)',
+      'Save $50 (42% off)',
       'Priority support',
       'Custom integrations',
       'Team management',
@@ -132,7 +111,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       prioritySupport: true
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-yearly', // Replace with your actual Gumroad URL
-    description: 'Best value - save 33% vs monthly'
+    description: 'Best value - save 42% vs monthly'
   }
 ];
 
