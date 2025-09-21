@@ -36,13 +36,18 @@ export function GumroadPaywallModal({
 
   const getTierIcon = (tierId: string) => {
     switch (tierId) {
-      case 'free':
-        return <Zap className="w-6 h-6 text-gray-400" />;
-      case 'pro':
-      case 'pro-yearly':
-        return <Crown className="w-6 h-6 text-yellow-500" />;
+      case 'monthly':
+        return <Zap className="w-6 h-6 text-blue-400" />;
+      case 'quarterly':
+        return <Zap className="w-6 h-6 text-green-400" />;
+      case 'six-months':
+        return <Crown className="w-6 h-6 text-yellow-400" />;
+      case 'yearly':
+        return <Crown className="w-6 h-6 text-orange-400" />;
+      case 'two-years':
+        return <Crown className="w-6 h-6 text-red-400" />;
       case 'lifetime':
-        return <Building className="w-6 h-6 text-purple-500" />;
+        return <Building className="w-6 h-6 text-yellow-400" />;
       default:
         return <Zap className="w-6 h-6" />;
     }
@@ -50,13 +55,18 @@ export function GumroadPaywallModal({
 
   const getTierColor = (tierId: string) => {
     switch (tierId) {
-      case 'free':
-        return 'border-gray-600 bg-gray-800/50';
-      case 'pro':
-      case 'pro-yearly':
+      case 'monthly':
+        return 'border-blue-500/50 bg-blue-500/10';
+      case 'quarterly':
+        return 'border-green-500/50 bg-green-500/10';
+      case 'six-months':
         return 'border-yellow-500/50 bg-yellow-500/10';
+      case 'yearly':
+        return 'border-orange-500/50 bg-orange-500/10';
+      case 'two-years':
+        return 'border-red-500/50 bg-red-500/10';
       case 'lifetime':
-        return 'border-purple-500/50 bg-purple-500/10';
+        return 'border-yellow-500/70 bg-gradient-to-br from-yellow-500/20 to-orange-500/20';
       default:
         return 'border-gray-600 bg-gray-800/50';
     }
@@ -79,6 +89,8 @@ export function GumroadPaywallModal({
         return '🔥 Save 40% vs monthly';
       case 'two-years':
         return '💎 Save 52% vs monthly';
+      case 'lifetime':
+        return '🏆 Save 1000+ vs yearly plans';
       default:
         return null;
     }
@@ -94,6 +106,8 @@ export function GumroadPaywallModal({
         return '$34';
       case 'two-years':
         return '$60';
+      case 'lifetime':
+        return '$1000+';
       default:
         return null;
     }
@@ -149,7 +163,7 @@ export function GumroadPaywallModal({
 
         {/* Pricing Cards */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
             {GUMROAD_PRODUCTS.map((product) => (
               <div
                 key={product.id}
@@ -171,6 +185,12 @@ export function GumroadPaywallModal({
                 {isMostPopular(product) && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold">
                     MOST POPULAR
+                  </div>
+                )}
+                
+                {product.id === 'lifetime' && (
+                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-500 to-orange-500 text-black px-3 py-1 rounded-full text-xs font-bold">
+                    LIMITED - 50 ONLY
                   </div>
                 )}
                 
@@ -239,7 +259,7 @@ export function GumroadPaywallModal({
         {/* Time Savings Comparison */}
         <div className="p-6 border-t border-neutral-800 bg-neutral-800/30">
           <h3 className="text-lg font-semibold text-white mb-4 text-center">Time Savings & Value</h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             <div className="text-center p-3 bg-neutral-900 rounded-lg">
               <div className="text-sm text-neutral-400">Monthly</div>
               <div className="text-lg font-bold text-blue-400">20+ hours</div>
@@ -263,7 +283,12 @@ export function GumroadPaywallModal({
             <div className="text-center p-3 bg-purple-500/20 border border-purple-500/50 rounded-lg">
               <div className="text-sm text-purple-300">2 Years</div>
               <div className="text-lg font-bold text-purple-400">800+ hours</div>
-              <div className="text-xs text-purple-300 font-bold">$20,000+ value - ULTIMATE!</div>
+              <div className="text-xs text-purple-300 font-bold">$20,000+ value</div>
+            </div>
+            <div className="text-center p-3 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-2 border-yellow-400/50 rounded-lg">
+              <div className="text-sm text-yellow-300 font-bold">🏆 LIFETIME</div>
+              <div className="text-lg font-bold text-yellow-400">1000+ hours</div>
+              <div className="text-xs text-yellow-300 font-bold">$25,000+ value - LIMITED!</div>
             </div>
           </div>
         </div>
@@ -275,7 +300,7 @@ export function GumroadPaywallModal({
             <p className="text-neutral-300">Every plan saves you massive time and money. Pick the one that fits your usage:</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
             <div className="text-center p-4 bg-neutral-800/50 rounded-lg">
               <div className="text-2xl font-bold text-blue-400">$6.99</div>
               <div className="text-sm text-neutral-400 mb-2">🟦 Monthly</div>
@@ -305,6 +330,16 @@ export function GumroadPaywallModal({
               <div className="text-sm text-red-300 mb-2">🟥 2 Years 💎</div>
               <div className="text-xs text-red-400 font-bold">Save 800+ hours</div>
               <div className="text-xs text-red-300 font-bold">$20,000+ value</div>
+            </div>
+            <div className="text-center p-4 bg-gradient-to-br from-yellow-500/30 to-orange-500/30 border-2 border-yellow-400/70 rounded-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-yellow-400 text-black text-xs px-2 py-1 font-bold rounded-bl-lg">
+                LIMITED
+              </div>
+              <div className="text-2xl font-bold text-yellow-400">$123</div>
+              <div className="text-sm text-yellow-300 mb-2 font-bold">🏆 LIFETIME</div>
+              <div className="text-xs text-yellow-400 font-bold">Save 1000+ hours</div>
+              <div className="text-xs text-yellow-300 font-bold">$25,000+ value</div>
+              <div className="text-xs text-yellow-400 font-bold mt-1">Only 50 available!</div>
             </div>
           </div>
           

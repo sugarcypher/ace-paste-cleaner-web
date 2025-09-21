@@ -145,6 +145,38 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
     },
     gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-2years', // Replace with your actual Gumroad URL
     description: 'Save 800+ hours over 2 years - 💎 52% off!'
+  },
+  {
+    id: 'lifetime',
+    name: 'Lifetime Pro',
+    price: 123.00,
+    currency: 'USD',
+    interval: 'lifetime',
+    features: [
+      'Everything in 2 Years',
+      'Unlimited characters per cleaning',
+      'Save 1000+ hours forever',
+      'Save $1000+ vs yearly plans',
+      'Priority support',
+      'Custom integrations',
+      'Team management',
+      'White-label options',
+      'Dedicated support',
+      'Custom branding',
+      'All future updates included',
+      'Lifetime support',
+      'Exclusive lifetime community',
+      'Early access to new features',
+      'Limited to 50 people only'
+    ],
+    limits: {
+      dailyCleanings: -1,
+      maxTextLength: -1, // unlimited
+      advancedFeatures: true,
+      prioritySupport: true
+    },
+    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-lifetime', // Replace with your actual Gumroad URL
+    description: 'LIMITED: Only 50 available - 🏆 LIFETIME ACCESS!'
   }
 ];
 
