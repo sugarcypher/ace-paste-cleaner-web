@@ -1,0 +1,27 @@
+name: "CodeQL Config"
+
+# This configuration file specifies the queries to run as part of your CodeQL
+# analysis. You can modify it to customize the queries included in your analysis.
+
+# The queries to run for each language
+queries:
+  # Use these to specify which queries to run:
+  - name: security-and-quality
+  - name: security-extended
+  - name: javascript-security-and-quality
+
+# Paths to exclude from analysis
+paths-ignore:
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/.git/**"
+  - "**/coverage/**"
+
+# Paths to include in analysis
+paths:
+  - "src/**"
+  - "*.ts"
+  - "*.tsx"
+  - "*.js"
+  - "*.jsx"
