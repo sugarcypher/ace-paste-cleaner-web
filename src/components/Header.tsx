@@ -1,33 +1,16 @@
 import { useState } from 'react';
 import { User, LogOut, Settings, Crown } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { AuthModal } from './AuthModal';
+import { useAuth } from '../hooks/useAuth0';
 
 export function Header() {
-  const { user, signOut, isAuthenticated } = useAuth();
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
-
-  const handleAuth = async (email: string, password: string, isSignUp: boolean) => {
-    if (isSignUp) {
-      await useAuth().signUp(email, password);
-    } else {
-      await useAuth().signIn(email, password);
-    }
-  };
+  const { user, signOut, signIn, isAuthenticated } = useAuth();
 
   const handleSignOut = () => {
     signOut();
   };
 
-  const openSignIn = () => {
-    setAuthMode('signin');
-    setShowAuthModal(true);
-  };
-
-  const openSignUp = () => {
-    setAuthMode('signup');
-    setShowAuthModal(true);
+  const handleSignIn = () => {
+    signIn();
   };
 
   return (
@@ -78,7 +61,7 @@ export function Header() {
                 <div className="flex items-center gap-2">
                   {/* Get Started for Free Button */}
                   <button
-                    onClick={openSignUp}
+                    onClick={handleSignIn}
                     className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 transition-colors font-medium text-sm"
                   >
                     Get Started for Free
@@ -86,7 +69,7 @@ export function Header() {
 
                   {/* Sign In Button */}
                   <button
-                    onClick={openSignIn}
+                    onClick={handleSignIn}
                     className="flex items-center gap-2 px-3 py-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
                   >
                     <User className="w-4 h-4" />
@@ -99,14 +82,6 @@ export function Header() {
         </div>
       </header>
 
-      {/* Auth Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onAuth={handleAuth}
-        mode={authMode}
-        onModeChange={setAuthMode}
-      />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useUsage } from "./hooks/useUsage";
+import { useAuth } from "./hooks/useAuth0";
 import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
 import { SecurityBadge } from "./components/SecurityBadge";
@@ -9,7 +9,6 @@ import { PrivacyAgreement } from "./components/PrivacyAgreement";
 import { SecurityProvider, useSecurity } from "./contexts/SecurityContext";
 import { stripInvisibleCharacters } from "./utils/advancedInvisibleCharacters";
 import { GumroadWebhookHandler } from "./components/GumroadWebhookHandler";
-import { AuthProvider } from "./contexts/AuthContext";
 import { Header } from "./components/Header";
 
 interface CleanOptions {
@@ -64,7 +63,7 @@ function AppContent() {
   const [showSecurity, setShowSecurity] = useState(false);
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
-  const { user, usage, recordCleaning, canClean, upgradeUser } = useUsage();
+  const { user, usage, recordCleaning, canClean, upgradeUser } = useAuth();
   const { hasAcceptedTerms, securitySettings } = useSecurity();
   
   const [opts, setOpts] = useState<CleanOptions>({
@@ -1041,17 +1040,15 @@ function countInvisibles(text: string) {
 
 function App() {
   return (
-    <AuthProvider>
-      <SecurityProvider>
-        <div className="min-h-screen bg-neutral-900 text-white">
-          <GumroadWebhookHandler />
-          <Header />
-          <div className="container mx-auto px-4 py-8 max-w-6xl">
-            <AppContent />
-          </div>
+    <SecurityProvider>
+      <div className="min-h-screen bg-neutral-900 text-white">
+        <GumroadWebhookHandler />
+        <Header />
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <AppContent />
         </div>
-      </SecurityProvider>
-    </AuthProvider>
+      </div>
+    </SecurityProvider>
   );
 }
 

@@ -101,7 +101,7 @@ export function SecurityProvider({ children }: { children: React.ReactNode }) {
     acceptTerms,
     updateSecuritySettings,
     resetToDefaults,
-  }), [hasAcceptedTerms, securitySettings, isLoading, acceptTerms, updateSecuritySettings, resetToDefaults]);
+  }), [hasAcceptedTerms, securitySettings, isLoading]);
 
   return (
     <SecurityContext.Provider value={value}>

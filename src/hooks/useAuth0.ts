@@ -16,18 +16,23 @@ export function useAuth() {
     logout 
   } = useAuth0();
 
+  // Admin users with unlimited access
+  const ADMIN_USERS = [
+    'b@twl.today'
+  ];
+
   // Convert Auth0 user to our User type
   const user: User | null = auth0User ? {
     id: auth0User.sub || '',
     email: auth0User.email || '',
-    tier: 'free' as const,
+    tier: ADMIN_USERS.includes(auth0User.email?.toLowerCase() || '') ? 'admin' : 'free',
     createdAt: new Date().toISOString(),
     isVerified: true, // Auth0 handles verification, we'll trust it
     usage: getStoredUsage() || {
       dailyCleanings: 0,
       totalCleanings: 0,
       lastResetDate: new Date().toISOString().split('T')[0],
-      currentTier: 'free'
+      currentTier: ADMIN_USERS.includes(auth0User.email?.toLowerCase() || '') ? 'admin' : 'free'
     }
   } : null;
 
@@ -67,6 +72,11 @@ export function useAuth() {
   const canClean = (textLength: number): boolean => {
     if (!user || !usage) return false;
 
+    // Admin has unlimited access
+    if (user.tier === 'admin') {
+      return true;
+    }
+
     const currentTier = PRICING_TIERS.find(tier => tier.id === user.tier) || PRICING_TIERS[0];
     
     // Check daily limit
@@ -85,6 +95,30 @@ export function useAuth() {
   // Record a cleaning usage
   const recordCleaning = async (): Promise<boolean> => {
     if (!user || !usage) return false;
+
+    // Admin has unlimited access - always allow
+    if (user.tier === 'admin') {
+      const updatedUsage = {
+        ...usage,
+        dailyCleanings: usage.dailyCleanings + 1,
+        totalCleanings: usage.totalCleanings + 1
+      };
+      
+      storeUsage(updatedUsage);
+
+      const updatedUser = {
+        ...user,
+        usage: updatedUsage
+      };
+      
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+      } catch (error) {
+        console.error('Failed to store user data:', error);
+      }
+
+      return true;
+    }
 
     const currentTier = PRICING_TIERS.find(tier => tier.id === user.tier) || PRICING_TIERS[0];
     
@@ -120,6 +154,11 @@ export function useAuth() {
   // Get remaining cleanings
   const getRemainingCleanings = (): number => {
     if (!user || !usage) return 0;
+
+    // Admin has unlimited access
+    if (user.tier === 'admin') {
+      return -1; // unlimited
+    }
 
     const currentTier = PRICING_TIERS.find(tier => tier.id === user.tier) || PRICING_TIERS[0];
     
