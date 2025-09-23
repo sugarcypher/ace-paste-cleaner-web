@@ -1,15 +1,57 @@
-import { Shield, Lock, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { Shield, Lock, Eye, ChevronDown, ChevronUp, Save } from 'lucide-react';
 import { useSecurity } from '../contexts/SecurityContext';
+import { useAuth } from '../hooks/useAuth0';
 
 export function SecurityOptions() {
   const { securitySettings, updateSecuritySettings } = useSecurity();
+  const { user, isAuthenticated } = useAuth();
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    dataProtection: false,
+    privacyControls: false,
+    accessSecurity: false
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleToggle = async (key: keyof typeof securitySettings, value: any) => {
     await updateSecuritySettings({ [key]: value });
   };
 
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const saveConfiguration = async () => {
+    if (!isAuthenticated) return;
+    
+    setIsSaving(true);
+    try {
+      // Save to user's profile or backend
+      const config = {
+        securitySettings,
+        timestamp: new Date().toISOString(),
+        userId: user?.id
+      };
+      
+      // Store in localStorage for now (can be extended to backend)
+      localStorage.setItem(`acepaste_config_${user?.id}`, JSON.stringify(config));
+      
+      // Show success message
+      alert('Configuration saved successfully!');
+    } catch (error) {
+      console.error('Failed to save configuration:', error);
+      alert('Failed to save configuration. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const securityFeatures = [
     {
+      key: 'dataProtection',
       title: "Data Protection",
       icon: Shield,
       options: [
@@ -37,6 +79,7 @@ export function SecurityOptions() {
       ]
     },
     {
+      key: 'privacyControls',
       title: "Privacy Controls",
       icon: Eye,
       options: [
@@ -64,6 +107,7 @@ export function SecurityOptions() {
       ]
     },
     {
+      key: 'accessSecurity',
       title: "Access Security",
       icon: Lock,
       options: [
@@ -91,15 +135,27 @@ export function SecurityOptions() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {securityFeatures.map((section, index) => {
           const IconComponent = section.icon;
+          const isExpanded = expandedSections[section.key];
           return (
             <div key={index} className="bg-neutral-800/50 border border-neutral-700 rounded-xl p-4">
-              <div className="flex items-center gap-2 mb-4">
-                <IconComponent className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-sm font-semibold text-white">{section.title}</h3>
-              </div>
+              <button
+                onClick={() => toggleSection(section.key)}
+                className="flex items-center justify-between w-full mb-4 hover:bg-neutral-700/50 rounded-lg p-2 -m-2 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <IconComponent className="w-5 h-5 text-emerald-400" />
+                  <h3 className="text-sm font-semibold text-white">{section.title}</h3>
+                </div>
+                {isExpanded ? (
+                  <ChevronUp className="w-4 h-4 text-neutral-400" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-neutral-400" />
+                )}
+              </button>
               
-              <div className="space-y-3">
-                {section.options.map((option) => (
+              {isExpanded && (
+                <div className="space-y-3">
+                  {section.options.map((option) => (
                   <div key={option.key} className="space-y-1">
                     <div className="flex items-center justify-between">
                       <label className="text-sm text-neutral-300">{option.label}</label>
@@ -138,11 +194,26 @@ export function SecurityOptions() {
                     )}
                   </div>
                 ))}
-              </div>
+                </div>
+              )}
             </div>
           );
         })}
       </div>
+      
+      {/* Save Configuration Button */}
+      {isAuthenticated && (
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={saveConfiguration}
+            disabled={isSaving}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Save className="w-4 h-4" />
+            {isSaving ? 'Saving...' : 'Save Configuration'}
+          </button>
+        </div>
+      )}
       
       {/* Security Status */}
       <div className="mt-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">

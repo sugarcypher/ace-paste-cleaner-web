@@ -20,9 +20,7 @@ export function useAuth() {
         id: 'debug-user', 
         email: 'debug@example.com', 
         tier: 'free',
-        createdAt: new Date().toISOString(),
-        isVerified: true,
-        isAdmin: false
+        usage: { dailyCleanings: 0, totalCleanings: 0, lastResetDate: new Date().toISOString().split('T')[0], currentTier: 'free' }
       },
       isAuthenticated: true, // Mock as authenticated
       isLoading: false,

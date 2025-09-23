@@ -64,8 +64,9 @@ function AppContent() {
   const [showSecurity, setShowSecurity] = useState(false);
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
+  const [isSavingFeatures, setIsSavingFeatures] = useState(false);
   // Get auth data - will be mock data in debug mode
-  const { user, usage, recordCleaning, canClean, upgradeUser } = useAuth();
+  const { user, usage, recordCleaning, canClean } = useAuth();
   const { hasAcceptedTerms, securitySettings } = useSecurity();
   
   const [opts, setOpts] = useState<CleanOptions>({
@@ -159,6 +160,31 @@ function AppContent() {
     
     // The cleaning is already done by the cleaned useMemo, so we don't need to do anything else
     // The cleaned text will automatically update in the UI
+  };
+
+  const saveFeaturesConfiguration = async () => {
+    if (!user) return;
+    
+    setIsSavingFeatures(true);
+    try {
+      // Save features configuration
+      const config = {
+        features: opts,
+        timestamp: new Date().toISOString(),
+        userId: user.id
+      };
+      
+      // Store in localStorage for now (can be extended to backend)
+      localStorage.setItem(`acepaste_features_${user.id}`, JSON.stringify(config));
+      
+      // Show success message
+      alert('Features configuration saved successfully!');
+    } catch (error) {
+      console.error('Failed to save features configuration:', error);
+      alert('Failed to save features configuration. Please try again.');
+    } finally {
+      setIsSavingFeatures(false);
+    }
   };
 
   const copyToClipboard = async () => {
@@ -284,6 +310,22 @@ function AppContent() {
             toggle={toggle}
           />
           </div>
+          
+          {/* Save Features Configuration Button */}
+          {user && (
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={saveFeaturesConfiguration}
+                disabled={isSavingFeatures}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+                {isSavingFeatures ? 'Saving...' : 'Save Features'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Case Conversion Dropdown */}
