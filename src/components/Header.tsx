@@ -3,14 +3,31 @@ import { User, LogOut, Settings, Crown } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth0';
 
 export function Header() {
-  const { user, signOut, signIn, isAuthenticated } = useAuth();
+  // Handle debug mode when Auth0 is not available
+  const authData = useAuth();
+  const { user, signOut, signIn, isAuthenticated } = authData || {
+    user: null,
+    signOut: () => console.log('Debug: Sign out clicked'),
+    signIn: () => console.log('Debug: Sign in clicked'),
+    isAuthenticated: false
+  };
 
   const handleSignOut = () => {
-    signOut();
+    if (signOut) {
+      signOut();
+    } else {
+      console.log('Debug: Sign out clicked - Auth0 not available');
+    }
   };
 
   const handleSignIn = () => {
-    signIn();
+    if (signIn) {
+      signIn();
+    } else {
+      console.log('Debug: Sign in clicked - Auth0 not available');
+      // In debug mode, we could simulate a login
+      alert('Debug Mode: Authentication is disabled. The app works without signing in.');
+    }
   };
 
   return (

@@ -355,16 +355,16 @@ function AppContent() {
               </div>
             </div>
             {!user && (
-              <div className="mb-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-                <p className="text-yellow-400 text-sm text-center">
-                  🔒 Please sign in to use the text cleaning features
+              <div className="mb-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                <p className="text-blue-400 text-sm text-center">
+                  🚀 Debug Mode: App is running without authentication. All features are available for testing.
                 </p>
               </div>
             )}
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={user ? "Paste your text here..." : "Sign in to clean your text..."}
+              placeholder="Paste your text here to clean it..."
               className="h-[15vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
             <div className="mt-4 flex justify-center gap-3">
