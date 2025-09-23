@@ -5,7 +5,7 @@ export const AUTH0_CONFIG = {
   domain: 'dev-6zf0xtlzryole08p.us.auth0.com', // Your Auth0 domain
   clientId: 'tRLKjLmAn6d9uLkv2hkWnNlXzEOZQFS5', // Your Auth0 client ID
   authorizationParams: {
-    redirect_uri: window.location.origin,
+    redirect_uri: typeof window !== 'undefined' ? window.location.origin : 'https://acepaste.xyz',
     audience: 'https://dev-6zf0xtlzryole08p.us.auth0.com/api/v2/', // Optional: for API access
     scope: 'openid profile email'
   }

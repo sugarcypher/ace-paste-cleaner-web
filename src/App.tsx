@@ -1040,15 +1040,12 @@ function countInvisibles(text: string) {
 
 function App() {
   return (
-    <SecurityProvider>
-      <div className="min-h-screen bg-neutral-900 text-white">
-        <GumroadWebhookHandler />
-        <Header />
-        <div className="container mx-auto px-4 py-8 max-w-6xl">
-          <AppContent />
-        </div>
+    <div className="min-h-screen bg-neutral-900 text-white">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <h1 className="text-2xl font-bold text-white">Ace Paste Cleaner</h1>
+        <p className="text-gray-300">Loading...</p>
       </div>
-    </SecurityProvider>
+    </div>
   );
 }
 
