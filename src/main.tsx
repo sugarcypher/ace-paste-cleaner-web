@@ -4,6 +4,7 @@ import { Auth0Provider } from '@auth0/auth0-react'
 import App from './App.tsx'
 import './index.css'
 import { AUTH0_CONFIG } from './config/auth0'
+import { AuthWrapper } from './components/AuthWrapper'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         );
       }}
     >
-      <App />
+      <AuthWrapper>
+        <App />
+      </AuthWrapper>
     </Auth0Provider>
   </React.StrictMode>,
 )
