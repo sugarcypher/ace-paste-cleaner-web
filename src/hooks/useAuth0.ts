@@ -16,14 +16,21 @@ export function useAuth() {
 
   // Return debug data if in debug mode
   if (isDebugMode) {
-    console.log('Debug mode detected - returning mock auth data');
+    console.log('Debug mode detected - returning mock authenticated user');
     return {
-      user: null, // No user in debug mode
-      isAuthenticated: false,
+      user: { 
+        id: 'debug-user', 
+        email: 'debug@example.com', 
+        tier: 'free',
+        createdAt: new Date().toISOString(),
+        isVerified: true,
+        isAdmin: false
+      },
+      isAuthenticated: true, // Mock as authenticated
       isLoading: false,
       signIn: () => {
         console.log('Debug: Sign in clicked - Auth0 not available');
-        alert('Debug Mode: Authentication is disabled. The app works without signing in.');
+        alert('Debug Mode: You are already signed in as debug@example.com');
       },
       signOut: () => {
         console.log('Debug: Sign out clicked - Auth0 not available');
