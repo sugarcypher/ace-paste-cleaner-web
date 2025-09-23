@@ -1,4 +1,3 @@
-import React from 'react';
 import { Zap, Crown, Building, AlertCircle } from 'lucide-react';
 import { User, UsageStats, PRICING_TIERS } from '../types/pricing';
 
@@ -104,6 +103,13 @@ export function UsageIndicator({ user, usage, onUpgrade }: UsageIndicatorProps) 
           <span>Total: {usage.totalCleanings.toLocaleString()}</span>
           <span>Max: {currentTier.limits.maxTextLength === -1 ? '∞' : currentTier.limits.maxTextLength.toLocaleString()} chars</span>
         </div>
+        
+        {/* Character limit warning for free tier */}
+        {user.tier === 'free' && (
+          <div className="text-xs text-neutral-500">
+            Free tier: 2,000 character limit per cleaning
+          </div>
+        )}
       </div>
 
       {remainingCleanings === 0 && user.tier === 'free' && (

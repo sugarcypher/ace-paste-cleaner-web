@@ -1,0 +1,74 @@
+# Gumroad API Configuration for Ace Paste Cleaner
+# Copy this file to gumroad_config_local.yml and fill in your actual values
+
+gumroad:
+  access_token: "your_gumroad_access_token_here"
+  custom_domain: "acepaste.xyz"  # Your custom domain
+  
+  # Product IDs - You'll need to create these products in Gumroad first
+  products:
+    monthly:
+      id: "your_monthly_product_id"
+      name: "Ace Paste Cleaner - Monthly"
+      price: 6.99
+      description: "Monthly access to Ace Paste Cleaner with 50K character limit"
+    
+    quarterly:
+      id: "your_quarterly_product_id"
+      name: "Ace Paste Cleaner - Quarterly"
+      price: 19.99
+      description: "Quarterly access to Ace Paste Cleaner with 200K character limit (5% off)"
+    
+    six_months:
+      id: "your_six_months_product_id"
+      name: "Ace Paste Cleaner - 6 Months"
+      price: 34.99
+      description: "6-month access to Ace Paste Cleaner with 500K character limit (17% off)"
+    
+    yearly:
+      id: "your_yearly_product_id"
+      name: "Ace Paste Cleaner - Yearly"
+      price: 49.99
+      description: "Yearly access to Ace Paste Cleaner with 1M character limit (40% off)"
+    
+    two_years:
+      id: "your_two_years_product_id"
+      name: "Ace Paste Cleaner - 2 Years"
+      price: 79.99
+      description: "2-year access to Ace Paste Cleaner with 2M character limit (52% off)"
+
+  # Upsell Features - Add-on products
+  upsells:
+    team_license:
+      id: "your_team_license_product_id"
+      name: "Team License - Ace Paste Cleaner"
+      price: 9.99
+      description: "Shared preset pack + priority support for teams"
+    
+    pro_preset_pack:
+      id: "your_pro_preset_pack_product_id"
+      name: "Pro Preset Pack - Ace Paste Cleaner"
+      price: 4.99
+      description: "CMS-focused presets: WordPress, Notion, Substack, HubSpot"
+    
+    writers_toolkit:
+      id: "your_writers_toolkit_product_id"
+      name: "Writers' Toolkit - Ace Paste Cleaner"
+      price: 7.99
+      description: "Sentence-case rules + style-safe cleaning for writers"
+    
+    dev_mode:
+      id: "your_dev_mode_product_id"
+      name: "Dev Mode - Ace Paste Cleaner"
+      price: 5.99
+      description: "Preserve code fences, tabs/spaces, escape sequences for developers"
+
+# Webhook configuration for payment verification
+webhooks:
+  endpoint: "https://acepaste.xyz/api/webhooks/gumroad"
+  secret: "your_webhook_secret_here"
+
+# Database configuration for storing user subscriptions
+database:
+  # Add your database configuration here if needed
+  # For now, we'll use localStorage in the frontend

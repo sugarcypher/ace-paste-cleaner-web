@@ -3,7 +3,7 @@ export interface PricingTier {
   name: string;
   price: number;
   currency: string;
-  interval: 'month' | 'year';
+  interval: 'month' | 'quarter' | 'year' | 'lifetime';
   features: string[];
   limits: {
     dailyCleanings: number;
@@ -11,7 +11,19 @@ export interface PricingTier {
     advancedFeatures: boolean;
     prioritySupport: boolean;
   };
+  savings?: string;
   stripePriceId?: string;
+}
+
+export interface UpsellFeature {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  currency: string;
+  interval: 'month' | 'year' | 'lifetime';
+  features: string[];
+  category: 'team' | 'presets' | 'writing' | 'development';
 }
 
 export interface UsageStats {
@@ -51,58 +63,82 @@ export const PRICING_TIERS: PricingTier[] = [
     }
   },
   {
-    id: 'daily',
-    name: 'Daily',
-    price: 1.23,
+    id: 'admin',
+    name: 'Admin',
+    price: 0,
     currency: 'USD',
-    interval: 'day',
+    interval: 'forever',
     features: [
       'Unlimited cleanings',
-      'Up to 1,000,000 characters',
+      'Unlimited character limit',
+      'All premium features',
+      'Priority support',
+      'Admin access'
+    ],
+    limits: {
+      dailyCleanings: -1, // unlimited
+      maxTextLength: -1, // unlimited
+      advancedFeatures: true,
+      prioritySupport: true
+    }
+  },
+  {
+    id: 'monthly',
+    name: 'Monthly',
+    price: 6.99,
+    currency: 'USD',
+    interval: 'month',
+    features: [
+      'Unlimited cleanings',
+      'Up to 50,000 characters',
+      '20+ hours of processing',
       'All cleaning features',
       'Priority support',
       'Advanced detection'
     ],
     limits: {
       dailyCleanings: -1, // unlimited
-      maxTextLength: 1000000,
+      maxTextLength: 50000,
       advancedFeatures: true,
       prioritySupport: true
     },
-    stripePriceId: 'price_daily'
+    stripePriceId: 'price_monthly'
   },
   {
-    id: 'weekly',
-    name: 'Weekly',
-    price: 2.34,
+    id: 'quarterly',
+    name: 'Quarterly',
+    price: 19.99,
     currency: 'USD',
-    interval: 'week',
+    interval: 'quarter',
     features: [
-      'Unlimited cleanings',
-      'Up to 1,000,000 characters',
-      'All cleaning features',
+      'Everything in Monthly',
+      'Up to 200,000 characters',
+      '80+ hours of processing',
+      '5% savings',
       'Priority support',
       'Advanced detection',
       'Bulk processing'
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 1000000,
+      maxTextLength: 200000,
       advancedFeatures: true,
       prioritySupport: true
     },
-    stripePriceId: 'price_weekly'
+    savings: '5% off',
+    stripePriceId: 'price_quarterly'
   },
   {
-    id: 'monthly',
-    name: 'Monthly',
-    price: 3.45,
+    id: 'six_months',
+    name: '6 Months',
+    price: 34.99,
     currency: 'USD',
     interval: 'month',
     features: [
-      'Unlimited cleanings',
-      'Up to 1,000,000 characters',
-      'All cleaning features',
+      'Everything in Quarterly',
+      'Up to 500,000 characters',
+      '200+ hours of processing',
+      '17% savings',
       'Priority support',
       'Advanced detection',
       'Bulk processing',
@@ -110,21 +146,24 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 1000000,
+      maxTextLength: 500000,
       advancedFeatures: true,
       prioritySupport: true
     },
-    stripePriceId: 'price_monthly'
+    savings: '⭐ 17% off',
+    stripePriceId: 'price_six_months'
   },
   {
     id: 'yearly',
     name: 'Yearly',
-    price: 45.67,
+    price: 49.99,
     currency: 'USD',
     interval: 'year',
     features: [
-      'Everything in Monthly',
-      '2 months free',
+      'Everything in 6 Months',
+      'Up to 1,000,000 characters',
+      '400+ hours of processing',
+      '40% savings',
       'Priority support',
       'Custom integrations',
       'Team management'
@@ -135,17 +174,20 @@ export const PRICING_TIERS: PricingTier[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
+    savings: '🔥 40% off',
     stripePriceId: 'price_yearly'
   },
   {
     id: 'two_years',
     name: '2 Years',
-    price: 56.78,
+    price: 79.99,
     currency: 'USD',
     interval: 'year',
     features: [
       'Everything in Yearly',
-      '4 months free',
+      'Up to 2,000,000 characters',
+      '800+ hours of processing',
+      '52% savings',
       'Priority support',
       'Custom integrations',
       'Team management',
@@ -153,82 +195,78 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
     limits: {
       dailyCleanings: -1,
-      maxTextLength: 1000000,
+      maxTextLength: 2000000,
       advancedFeatures: true,
       prioritySupport: true
     },
+    savings: '💎 52% off',
     stripePriceId: 'price_two_years'
+  }
+];
+
+export const UPSELL_FEATURES: UpsellFeature[] = [
+  {
+    id: 'team_license',
+    name: 'Team License',
+    description: 'Shared preset pack + priority support',
+    price: 9.99,
+    currency: 'USD',
+    interval: 'month',
+    features: [
+      'Shared preset library',
+      'Team collaboration tools',
+      'Priority support',
+      'Team usage analytics',
+      'Custom team branding'
+    ],
+    category: 'team'
   },
   {
-    id: 'three_years',
-    name: '3 Years',
-    price: 67.89,
+    id: 'pro_preset_pack',
+    name: 'Pro Preset Pack',
+    description: 'CMS-focused: WordPress, Notion, Substack, HubSpot',
+    price: 4.99,
     currency: 'USD',
-    interval: 'year',
+    interval: 'month',
     features: [
-      'Everything in 2 Years',
-      '6 months free',
-      'Priority support',
-      'Custom integrations',
-      'Team management',
-      'White-label options',
-      'Dedicated support'
+      'WordPress optimization',
+      'Notion formatting',
+      'Substack styling',
+      'HubSpot integration',
+      'One-click CMS cleaning'
     ],
-    limits: {
-      dailyCleanings: -1,
-      maxTextLength: 1000000,
-      advancedFeatures: true,
-      prioritySupport: true
-    },
-    stripePriceId: 'price_three_years'
+    category: 'presets'
   },
   {
-    id: 'four_years',
-    name: '4 Years',
-    price: 78.90,
+    id: 'writers_toolkit',
+    name: 'Writers\' Toolkit',
+    description: 'Sentence-case rules + style-safe clean',
+    price: 7.99,
     currency: 'USD',
-    interval: 'year',
+    interval: 'month',
     features: [
-      'Everything in 3 Years',
-      '8 months free',
-      'Priority support',
-      'Custom integrations',
-      'Team management',
-      'White-label options',
-      'Dedicated support',
-      'Custom branding'
+      'Style-safe cleaning',
+      'Sentence case rules',
+      'Writing style preservation',
+      'Author-specific presets',
+      'Publishing optimization'
     ],
-    limits: {
-      dailyCleanings: -1,
-      maxTextLength: 1000000,
-      advancedFeatures: true,
-      prioritySupport: true
-    },
-    stripePriceId: 'price_four_years'
+    category: 'writing'
   },
   {
-    id: 'lifetime',
-    name: 'Lifetime',
-    price: 99.99,
+    id: 'dev_mode',
+    name: 'Dev Mode',
+    description: 'Preserve code fences, tabs/spaces, escape sequences',
+    price: 5.99,
     currency: 'USD',
-    interval: 'lifetime',
+    interval: 'month',
     features: [
-      'Everything forever',
-      'Unlimited everything',
-      'Priority support',
-      'Custom integrations',
-      'Team management',
-      'White-label options',
-      'Dedicated support',
-      'Custom branding',
-      'Future updates included'
+      'Code fence preservation',
+      'Tab/space handling',
+      'Escape sequence support',
+      'Syntax highlighting safe',
+      'Developer presets'
     ],
-    limits: {
-      dailyCleanings: -1,
-      maxTextLength: 1000000,
-      advancedFeatures: true,
-      prioritySupport: true
-    },
-    stripePriceId: 'price_lifetime'
+    category: 'development'
   }
 ];

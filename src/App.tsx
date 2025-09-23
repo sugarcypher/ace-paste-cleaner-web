@@ -1,15 +1,21 @@
-import React, { useMemo, useState } from "react";
-import { useAuth } from "./hooks/useAuth0";
-import { AuthModal } from "./components/AuthModal";
-import { GumroadPaywallModal } from "./components/GumroadPaywallModal";
+import { useMemo, useState } from "react";
+import { useUsage } from "./hooks/useUsage";
+import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
+import { SecurityBadge } from "./components/SecurityBadge";
+import { PrivacyPolicy } from "./components/PrivacyPolicy";
+import { SecurityPolicy } from "./components/SecurityPolicy";
+import { PrivacyAgreement } from "./components/PrivacyAgreement";
+import { SecurityProvider, useSecurity } from "./contexts/SecurityContext";
+import { stripInvisibleCharacters } from "./utils/advancedInvisibleCharacters";
+import { GumroadWebhookHandler } from "./components/GumroadWebhookHandler";
+import { AuthProvider } from "./contexts/AuthContext";
+import { Header } from "./components/Header";
 
-type Options = {
+interface CleanOptions {
   removeInvisible: boolean;
   keepVS16Emoji: boolean;
   preserveEmoji: boolean;
-  preserveIndicJoiners: boolean;
-  preserveArabicZWNJ: boolean;
   stripMarkdownHeaders: boolean;
   stripBoldItalic: boolean;
   stripBackticks: boolean;
@@ -18,26 +24,53 @@ type Options = {
   stripBlockquotes: boolean;
   normalizeWhitespace: boolean;
   collapseBlankLines: boolean;
-  // new:
-  nukeAll: boolean; // ignore all preserves + remove VS16
-};
+  // Additional options for removing other things
+  removeUrls: boolean;
+  removeEmailAddresses: boolean;
+  removePhoneNumbers: boolean;
+  removeTimestamps: boolean;
+  removeSpecialCharacters: boolean;
+  removeExtraPunctuation: boolean;
+  removeRepeatedWords: boolean;
+  removeEmptyLines: boolean;
+  removeTrailingSpaces: boolean;
+  removeLeadingSpaces: boolean;
+  // New features from README
+  caseConversion: 'none' | 'lowercase' | 'uppercase' | 'titlecase' | 'sentencecase';
+  removeUTMParameters: boolean;
+  markdownSafeMode: boolean;
+  preserveCodeFences: boolean;
+  preserveTabsSpaces: boolean;
+  preserveEscapeSequences: boolean;
+}
 
-const SENTINEL_ZWJ = "\uE000"; // Private Use; restore → U+200D
-const SENTINEL_ZWNJ = "\uE001"; // Private Use; restore → U+200C
 
-export default function AcePasteFinalCleaner() {
+interface StatsProps {
+  input: string;
+  output: string;
+  opts: CleanOptions;
+}
+
+interface MetricProps {
+  k: string;
+  v: string;
+  isActive?: boolean;
+}
+
+function AppContent() {
   const [input, setInput] = useState("");
-  const [showAuth, setShowAuth] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showSecurity, setShowSecurity] = useState(false);
+  const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
-  const { user, usage, recordCleaning, canClean, getRemainingCleanings, isAuthenticated, isLoading, signOut } = useAuth();
+  const { user, usage, recordCleaning, canClean, upgradeUser } = useUsage();
+  const { hasAcceptedTerms, securitySettings } = useSecurity();
   
-  const [opts, setOpts] = useState<Options>({
+  const [opts, setOpts] = useState<CleanOptions>({
     removeInvisible: true,
     keepVS16Emoji: true,
     preserveEmoji: true,
-    preserveIndicJoiners: true,
-    preserveArabicZWNJ: true,
     stripMarkdownHeaders: true,
     stripBoldItalic: true,
     stripBackticks: true,
@@ -46,24 +79,71 @@ export default function AcePasteFinalCleaner() {
     stripBlockquotes: true,
     normalizeWhitespace: true,
     collapseBlankLines: true,
-    nukeAll: false,
+    removeUrls: false,
+    removeEmailAddresses: false,
+    removePhoneNumbers: false,
+    removeTimestamps: false,
+    removeSpecialCharacters: false,
+    removeExtraPunctuation: false,
+    removeRepeatedWords: false,
+    removeEmptyLines: false,
+    removeTrailingSpaces: false,
+    removeLeadingSpaces: false,
+    // New features
+    caseConversion: 'none',
+    removeUTMParameters: false,
+    markdownSafeMode: false,
+    preserveCodeFences: false,
+    preserveTabsSpaces: false,
+    preserveEscapeSequences: false,
   });
 
-  const eff = useMemo(() => effectiveOptions(opts), [opts]);
-  const cleaned = useMemo(() => {
-    if (!isAuthenticated || !canClean(input.length)) {
-      return input; // Return original text if can't clean
-    }
-    return cleanText(input, eff);
-  }, [input, eff, isAuthenticated, canClean]);
-
-  const stats = useMemo(() => ({ inLen: input.length, outLen: cleaned.length }), [input, cleaned]);
-  const markersIn = useMemo(() => countMarkers(input), [input]);
-  const markersOut = useMemo(() => countMarkers(cleaned), [cleaned]);
-
-  function toggle<K extends keyof Options>(key: K) {
-    setOpts(o => ({ ...o, [key]: !o[key] }));
+  function toggle(key: keyof CleanOptions) {
+    setOpts((o) => {
+      const currentValue = o[key];
+      if (typeof currentValue === 'boolean') {
+        return { ...o, [key]: !currentValue };
+      }
+      return o;
+    });
   }
+
+  const cleaned = useMemo(() => {
+    // Always clean the text - don't check limits here
+    // Use advanced invisible character detection if enabled
+    if (opts.removeInvisible && securitySettings.encryptionLevel === 'enhanced') {
+      return stripInvisibleCharacters(cleanText(input, opts));
+    }
+    
+    return cleanText(input, opts);
+  }, [input, opts, securitySettings]);
+
+  const handleClean = () => {
+    if (!canClean(input.length)) {
+      // Check character limits based on tier
+      const maxLength = user?.tier === 'free' ? 2000 :
+                       user?.tier === 'monthly' ? 50000 :
+                       user?.tier === 'quarterly' ? 200000 :
+                       user?.tier === 'six_months' ? 500000 :
+                       user?.tier === 'yearly' ? 1000000 :
+                       user?.tier === 'two_years' ? 2000000 : 2000000;
+      
+      if (input.length > maxLength) {
+        setPaywallReason('text_length');
+      } else {
+        setPaywallReason('daily_limit');
+      }
+      setShowPaywall(true);
+      return;
+    }
+    
+    // Record the cleaning usage
+    const success = recordCleaning(input.length);
+    if (!success) {
+      setPaywallReason('daily_limit');
+      setShowPaywall(true);
+    }
+  };
 
   const copyToClipboard = async () => {
     try {
@@ -82,112 +162,53 @@ export default function AcePasteFinalCleaner() {
     }
   };
 
-  const handleClean = async () => {
-    if (!isAuthenticated) {
-      setShowAuth(true);
-      return;
-    }
-
-    if (!canClean(input.length)) {
-      if (input.length > 2000) {
-        setPaywallReason('text_length');
-      } else {
-        setPaywallReason('daily_limit');
-      }
-      setShowPaywall(true);
-      return;
-    }
-    
-    // Record the cleaning usage
-    await recordCleaning();
-  };
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4"></div>
-          <p className="text-neutral-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 p-6">
-      <div className="mx-auto max-w-6xl grid gap-6">
-        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-4">
-            <img 
-              src="/logo.jpg" 
-              alt="Ace Paste Cleaner Logo" 
-              className="h-12 w-auto"
-            />
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Ace Paste — Cleaner</h1>
-          </div>
+      <div className="mx-auto max-w-5xl grid gap-6">
+        <header className="flex items-center justify-between">
+          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Ace Paste — Cleaner</h1>
           <div className="flex gap-2">
-            {isAuthenticated ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-neutral-400">
-                  {user?.email}
-                </span>
-                <button
-                  onClick={signOut}
-                  className="px-3 py-1.5 rounded-lg bg-red-500 text-white text-sm hover:bg-red-400 transition-colors"
-                >
-                  Sign Out
-                </button>
-              </div>
-            ) : (
+            {!hasAcceptedTerms && (
               <button
-                onClick={() => setShowAuth(true)}
-                className="px-4 py-2 rounded-xl bg-emerald-500 text-white font-medium hover:bg-emerald-400 active:translate-y-[1px]"
+                onClick={() => setShowPrivacyAgreement(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-400 active:translate-y-[1px]"
               >
-                Sign In
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Privacy Agreement
               </button>
             )}
             <button
-              onClick={copyToClipboard}
-              className="px-4 py-2 rounded-xl bg-emerald-500 text-neutral-950 font-medium hover:bg-emerald-400 active:translate-y-[1px]"
-            >Copy cleaned</button>
-            <button
               onClick={pasteFromClipboard}
-              className="px-4 py-2 rounded-xl bg-yellow-500 text-yellow-950 font-medium hover:bg-yellow-400 active:translate-y-[1px]"
-            >Paste</button>
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500 text-yellow-950 font-medium hover:bg-yellow-400 active:translate-y-[1px] animate-pulse"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              Paste
+            </button>
             <button
-              onClick={() => setInput("")}
-              className="px-4 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700"
-            >Clear</button>
+              onClick={copyToClipboard}
+              className="px-4 py-2 rounded-xl bg-emerald-500 text-neutral-950 font-medium hover:bg-emerald-400 active:translate-y-[1px] animate-pulse"
+            >
+              Copy cleaned
+            </button>
           </div>
         </header>
 
         {/* Usage Indicator */}
-        {isAuthenticated ? (
-          <UsageIndicator 
-            user={user} 
-            usage={usage} 
-            onUpgrade={() => setShowPaywall(true)} 
-          />
-        ) : (
-          <div className="p-4 rounded-xl bg-blue-500/20 border border-blue-500/30">
-            <div className="flex items-center gap-3">
-              <div className="text-blue-400 text-lg">🔐</div>
-              <div>
-                <p className="text-blue-300 font-medium">Sign in required</p>
-                <p className="text-blue-300/80 text-sm">Create a free account to start cleaning text. No credit card required!</p>
-              </div>
-              <button
-                onClick={() => setShowAuth(true)}
-                className="ml-auto px-4 py-2 rounded-lg bg-blue-500 text-white text-sm hover:bg-blue-400 transition-colors"
-              >
-                Sign In
-              </button>
-            </div>
-          </div>
-        )}
+        <UsageIndicator 
+          user={user} 
+          usage={usage} 
+          onUpgrade={() => setShowPaywall(true)} 
+        />
+
+        {/* Security Badge */}
+        <SecurityBadge />
 
         {/* Options Dropdowns */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <OptionGroup 
             title="Text Formatting" 
             options={[
@@ -203,31 +224,123 @@ export default function AcePasteFinalCleaner() {
           />
           
           <OptionGroup 
+            title="Content Removal" 
+            options={[
+              { key: 'removeUrls', label: 'URLs' },
+              { key: 'removeEmailAddresses', label: 'Email Addresses' },
+              { key: 'removePhoneNumbers', label: 'Phone Numbers' },
+              { key: 'removeTimestamps', label: 'Timestamps' },
+              { key: 'removeSpecialCharacters', label: 'Special Characters' },
+              { key: 'removeRepeatedWords', label: 'Repeated Words' }
+            ]}
+            opts={opts}
+            toggle={toggle}
+          />
+          
+          <OptionGroup 
             title="Whitespace & Invisible" 
             options={[
               { key: 'removeInvisible', label: 'Invisible Characters' },
               { key: 'keepVS16Emoji', label: 'Keep Emoji VS16' },
               { key: 'preserveEmoji', label: 'Preserve Emoji Sequences' },
-              { key: 'preserveIndicJoiners', label: 'Preserve Indic Joiners' },
-              { key: 'preserveArabicZWNJ', label: 'Preserve Arabic ZWNJ' },
               { key: 'normalizeWhitespace', label: 'Normalize Whitespace' },
               { key: 'collapseBlankLines', label: 'Collapse Blank Lines' },
-              { key: 'nukeAll', label: 'Remove ALL Invisibles' }
+              { key: 'removeEmptyLines', label: 'Remove Empty Lines' },
+              { key: 'removeTrailingSpaces', label: 'Remove Trailing Spaces' },
+              { key: 'removeLeadingSpaces', label: 'Remove Leading Spaces' }
+            ]}
+            opts={opts}
+            toggle={toggle}
+          />
+
+          <OptionGroup 
+            title="Advanced Features" 
+            options={[
+              { key: 'removeUTMParameters', label: 'Remove UTM Parameters' },
+              { key: 'markdownSafeMode', label: 'Markdown Safe Mode' },
+              { key: 'preserveCodeFences', label: 'Preserve Code Fences' },
+              { key: 'preserveTabsSpaces', label: 'Preserve Tabs/Spaces' },
+              { key: 'preserveEscapeSequences', label: 'Preserve Escape Sequences' }
             ]}
             opts={opts}
             toggle={toggle}
           />
         </div>
 
+        {/* Case Conversion Dropdown */}
+        <div className="mb-6">
+          <label className="block text-sm uppercase tracking-wider text-neutral-400 mb-2">Case Conversion</label>
+          <select
+            value={opts.caseConversion}
+            onChange={(e) => setOpts(prev => ({ ...prev, caseConversion: e.target.value as any }))}
+            className="w-full md:w-64 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="none">No conversion</option>
+            <option value="lowercase">lowercase</option>
+            <option value="uppercase">UPPERCASE</option>
+            <option value="titlecase">Title Case</option>
+            <option value="sentencecase">Sentence case</option>
+          </select>
+        </div>
+
         {/* Input and Output - Stacked Vertically */}
         <div className="grid gap-6">
           <div className="grid gap-3">
             <div className="flex items-center justify-between">
-              <label className="text-sm uppercase tracking-wider text-neutral-400">Input</label>
+              <div className="flex items-center gap-3">
+                <label className="text-sm uppercase tracking-wider text-neutral-400">Input</label>
+                {user && (
+                  <div className="text-xs text-neutral-500">
+                    {user.tier === 'admin' ? (
+                      <span className="text-emerald-400">
+                        {input.length.toLocaleString()} chars (Unlimited)
+                      </span>
+                    ) : user.tier === 'free' ? (
+                      <span className={input.length > 2000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 2,000 chars
+                      </span>
+                    ) : user.tier === 'monthly' ? (
+                      <span className={input.length > 50000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 50,000 chars
+                      </span>
+                    ) : user.tier === 'quarterly' ? (
+                      <span className={input.length > 200000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 200,000 chars
+                      </span>
+                    ) : user.tier === 'six_months' ? (
+                      <span className={input.length > 500000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 500,000 chars
+                      </span>
+                    ) : user.tier === 'yearly' ? (
+                      <span className={input.length > 1000000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 1,000,000 chars
+                      </span>
+                    ) : user.tier === 'two_years' ? (
+                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 2,000,000 chars
+                      </span>
+                    ) : (
+                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-neutral-400'}>
+                        {input.length.toLocaleString()} / 2,000,000 chars
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="flex gap-2">
                 <button
+                  onClick={handleClean}
+                  disabled={!input.trim() || !canClean(input.length)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-500 text-white hover:bg-emerald-400 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors font-medium text-base shadow-lg hover:shadow-emerald-500/25"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Clean Now
+                </button>
+                <button
                   onClick={() => { setInput(""); }}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors text-sm font-medium animate-pulse"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors font-medium text-sm"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -254,7 +367,7 @@ export default function AcePasteFinalCleaner() {
           </div>
 
           {/* What was removed section - between input and output */}
-          <Stats input={input} output={cleaned} opts={eff} markersIn={markersIn} markersOut={markersOut} />
+          <Stats input={input} output={cleaned} opts={opts} />
 
           <div className="grid gap-3">
             <div className="flex items-center justify-between">
@@ -296,13 +409,13 @@ export default function AcePasteFinalCleaner() {
             </div>
             <div className="flex items-center gap-6">
               <button
-                onClick={() => {/* TODO: Add privacy modal */}}
+                onClick={() => setShowPrivacy(true)}
                 className="text-sm text-neutral-400 hover:text-white transition-colors"
               >
                 Privacy Policy
               </button>
               <button
-                onClick={() => {/* TODO: Add security modal */}}
+                onClick={() => setShowSecurity(true)}
                 className="text-sm text-neutral-400 hover:text-white transition-colors"
               >
                 Security Policy
@@ -321,31 +434,43 @@ export default function AcePasteFinalCleaner() {
       </div>
 
       {/* Modals */}
-      <AuthModal
-        isOpen={showAuth}
-        onClose={() => setShowAuth(false)}
-        onSuccess={() => {
-          // Refresh usage data after successful auth
-          window.location.reload();
-        }}
-      />
-      
-      <GumroadPaywallModal
+      <PaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
+        onUpgrade={(tierId) => {
+          upgradeUser(tierId);
+          setShowPaywall(false);
+        }}
         currentTier={user?.tier || 'free'}
         reason={paywallReason}
         currentTextLength={input.length}
+      />
+
+      <PrivacyPolicy
+        isOpen={showPrivacy}
+        onClose={() => setShowPrivacy(false)}
+      />
+
+      <SecurityPolicy
+        isOpen={showSecurity}
+        onClose={() => setShowSecurity(false)}
+      />
+
+      <PrivacyAgreement
+        isOpen={showPrivacyAgreement}
+        onClose={() => setShowPrivacyAgreement(false)}
       />
     </div>
   );
 }
 
+
+
 interface OptionGroupProps {
   title: string;
-  options: Array<{ key: keyof Options; label: string }>;
-  opts: Options;
-  toggle: (key: keyof Options) => void;
+  options: Array<{ key: keyof CleanOptions; label: string }>;
+  opts: CleanOptions;
+  toggle: (key: keyof CleanOptions) => void;
 }
 
 function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
@@ -378,55 +503,55 @@ function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
       
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
-          {options.map((option) => (
-            <label key={option.key} className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer select-none">
-              <input 
-                type="checkbox" 
-                className="size-4 accent-emerald-500" 
-                checked={opts[option.key]} 
-                onChange={() => toggle(option.key)} 
-              />
-              <span className="text-sm text-neutral-200">{option.label}</span>
-            </label>
-          ))}
+          {options.map((option) => {
+            const value = opts[option.key];
+            const isBoolean = typeof value === 'boolean';
+            
+            return (
+              <label key={option.key} className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  className="size-4 accent-emerald-500" 
+                  checked={isBoolean ? value : false}
+                  onChange={() => isBoolean ? toggle(option.key) : undefined}
+                  disabled={!isBoolean}
+                />
+                <span className="text-sm text-neutral-200">{option.label}</span>
+              </label>
+            );
+          })}
         </div>
       )}
     </div>
   );
 }
 
-interface StatsProps {
-  input: string;
-  output: string;
-  opts: Options;
-  markersIn: any;
-  markersOut: any;
-}
-
-function Stats({ input, output, opts, markersIn, markersOut }: StatsProps) {
+function Stats({ input, output, opts }: StatsProps) {
+  const invCounts = useMemo(() => countInvisibles(input), [input]);
   const removedChars = Math.max(0, input.length - output.length);
+  
   
   // Calculate what was actually removed based on options
   const removedItems = useMemo(() => {
     const items = [];
     
     if (opts.removeInvisible) {
-      const totalInvisible = markersIn.zwsp + markersIn.wj + markersIn.zwnj + markersIn.zwj + markersIn.shy + markersIn.dirMarks + markersIn.bom;
+      const totalInvisible = invCounts.zwsp + invCounts.wj + invCounts.zwnj + invCounts.zwj + invCounts.shy + invCounts.ltrRtl + invCounts.bom;
       if (totalInvisible > 0) {
         const details = [];
-        if (markersIn.zwsp > 0) details.push(`${markersIn.zwsp} Zero Width Spaces`);
-        if (markersIn.wj > 0) details.push(`${markersIn.wj} Word Joiners`);
-        if (markersIn.zwnj > 0) details.push(`${markersIn.zwnj} Zero Width Non-Joiners`);
-        if (markersIn.zwj > 0) details.push(`${markersIn.zwj} Zero Width Joiners`);
-        if (markersIn.shy > 0) details.push(`${markersIn.shy} Soft Hyphens`);
-        if (markersIn.dirMarks > 0) details.push(`${markersIn.dirMarks} Direction Marks`);
-        if (markersIn.bom > 0) details.push(`${markersIn.bom} Byte Order Marks`);
+        if (invCounts.zwsp > 0) details.push(`${invCounts.zwsp} Zero Width Spaces`);
+        if (invCounts.wj > 0) details.push(`${invCounts.wj} Word Joiners`);
+        if (invCounts.zwnj > 0) details.push(`${invCounts.zwnj} Zero Width Non-Joiners`);
+        if (invCounts.zwj > 0) details.push(`${invCounts.zwj} Zero Width Joiners`);
+        if (invCounts.shy > 0) details.push(`${invCounts.shy} Soft Hyphens`);
+        if (invCounts.ltrRtl > 0) details.push(`${invCounts.ltrRtl} Direction Marks`);
+        if (invCounts.bom > 0) details.push(`${invCounts.bom} Byte Order Marks`);
         items.push({ type: 'invisible', count: totalInvisible, label: 'Invisible Characters', details });
       }
     }
     
     if (opts.stripMarkdownHeaders) {
-      const headerMatches = input.match(/^\s{0,3}#{1,6}\s+/gmu) || [];
+      const headerMatches = input.match(/^\s{0,3}(#{1,6})\s+/gmu) || [];
       if (headerMatches.length > 0) {
         const details = headerMatches.map(h => h.trim());
         items.push({ type: 'markdown', count: headerMatches.length, label: 'Markdown Headers', details });
@@ -450,8 +575,84 @@ function Stats({ input, output, opts, markersIn, markersOut }: StatsProps) {
       }
     }
     
+    if (opts.stripBackticks) {
+      const inlineMatches = input.match(/`[^`]+`/gmu) || [];
+      const fencedMatches = input.match(/^```[\s\S]*?```/gmu) || [];
+      const totalCode = inlineMatches.length + fencedMatches.length;
+      
+      if (totalCode > 0) {
+        const details = [];
+        if (inlineMatches.length > 0) details.push(`${inlineMatches.length} Inline code blocks`);
+        if (fencedMatches.length > 0) details.push(`${fencedMatches.length} Fenced code blocks`);
+        items.push({ type: 'code', count: totalCode, label: 'Code Blocks', details });
+      }
+    }
+    
+    if (opts.removeUrls) {
+      const urlMatches = input.match(/https?:\/\/[^\s]+|www\.[^\s]+/g) || [];
+      if (urlMatches.length > 0) {
+        const details = urlMatches.slice(0, 5); // Show first 5 URLs
+        if (urlMatches.length > 5) details.push(`... and ${urlMatches.length - 5} more`);
+        items.push({ type: 'urls', count: urlMatches.length, label: 'URLs', details });
+      }
+    }
+    
+    if (opts.removeEmailAddresses) {
+      const emailMatches = input.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || [];
+      if (emailMatches.length > 0) {
+        const details = emailMatches.slice(0, 3); // Show first 3 emails
+        if (emailMatches.length > 3) details.push(`... and ${emailMatches.length - 3} more`);
+        items.push({ type: 'emails', count: emailMatches.length, label: 'Email Addresses', details });
+      }
+    }
+    
+    if (opts.removePhoneNumbers) {
+      const phoneMatches = input.match(/\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b/g) || [];
+      if (phoneMatches.length > 0) {
+        const details = phoneMatches.slice(0, 3); // Show first 3 phones
+        if (phoneMatches.length > 3) details.push(`... and ${phoneMatches.length - 3} more`);
+        items.push({ type: 'phones', count: phoneMatches.length, label: 'Phone Numbers', details });
+      }
+    }
+    
+    if (opts.removeTimestamps) {
+      const timeMatches = input.match(/\b\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?\b/g) || [];
+      const dateMatches = input.match(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b|\b\d{4}-\d{2}-\d{2}\b/g) || [];
+      const totalTimestamps = timeMatches.length + dateMatches.length;
+      
+      if (totalTimestamps > 0) {
+        const details = [];
+        if (timeMatches.length > 0) details.push(`${timeMatches.length} Time formats`);
+        if (dateMatches.length > 0) details.push(`${dateMatches.length} Date formats`);
+        items.push({ type: 'timestamps', count: totalTimestamps, label: 'Timestamps', details });
+      }
+    }
+    
+    if (opts.removeSpecialCharacters) {
+      const specialMatches = input.match(/[!@#$%^&*_+=\[\]{}|\\:"'<>~`]/g) || [];
+      if (specialMatches.length > 0) {
+        const details = [...new Set(specialMatches)].slice(0, 10); // Show unique characters
+        if (specialMatches.length > 10) details.push(`... and ${specialMatches.length - 10} more`);
+        items.push({ type: 'special', count: specialMatches.length, label: 'Special Characters', details });
+      }
+    }
+    
+    if (opts.removeRepeatedWords) {
+      const repeatedMatches = input.match(/\b(\w+)\s+\1\b/g) || [];
+      if (repeatedMatches.length > 0) {
+        const details = repeatedMatches.slice(0, 5); // Show first 5 repeated words
+        if (repeatedMatches.length > 5) details.push(`... and ${repeatedMatches.length - 5} more`);
+        items.push({ type: 'repeated', count: repeatedMatches.length, label: 'Repeated Words', details });
+      }
+    }
+    
     return items;
-  }, [input, opts, markersIn]);
+  }, [input, opts, invCounts]);
+
+  // Check if boxes should be active (have meaningful values)
+  const lengthActive = input.length > 0;
+  const removedActive = removedChars > 0;
+  const typesActive = removedItems.length > 0;
 
   return (
     <div className="space-y-3 mt-2">
@@ -460,17 +661,17 @@ function Stats({ input, output, opts, markersIn, markersOut }: StatsProps) {
         <Metric 
           k="Length (in → out)" 
           v={`${input.length} → ${output.length}`} 
-          isActive={input.length > 0}
+          isActive={lengthActive}
         />
         <Metric 
           k="Removed (chars)" 
           v={`${removedChars}`} 
-          isActive={removedChars > 0}
+          isActive={removedActive}
         />
         <Metric 
           k="Removed Types" 
           v={`${removedItems.length}`} 
-          isActive={removedItems.length > 0}
+          isActive={typesActive}
         />
       </div>
       
@@ -486,6 +687,23 @@ function Stats({ input, output, opts, markersIn, markersOut }: StatsProps) {
         </div>
       )}
       
+      {/* Invisible Character Details */}
+      {opts.removeInvisible && (invCounts.zwsp > 0 || invCounts.wj > 0 || invCounts.zwnj > 0 || invCounts.zwj > 0 || invCounts.shy > 0 || invCounts.ltrRtl > 0 || invCounts.bom > 0) && (
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-neutral-300 mb-2">Invisible characters:</h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {invCounts.zwsp > 0 && <Metric k="ZWSP" v={`${invCounts.zwsp}`} />}
+            {invCounts.wj > 0 && <Metric k="WJ" v={`${invCounts.wj}`} />}
+            {invCounts.zwnj > 0 && <Metric k="ZWNJ" v={`${invCounts.zwnj}`} />}
+            {invCounts.zwj > 0 && <Metric k="ZWJ" v={`${invCounts.zwj}`} />}
+            {invCounts.shy > 0 && <Metric k="SHY" v={`${invCounts.shy}`} />}
+            {invCounts.vs16 > 0 && <Metric k="VS16" v={`${invCounts.vs16}`} />}
+            {invCounts.ltrRtl > 0 && <Metric k="LRM/RLM/ALM" v={`${invCounts.ltrRtl}`} />}
+            {invCounts.bom > 0 && <Metric k="BOM/FEFF" v={`${invCounts.bom}`} />}
+          </div>
+        </div>
+      )}
+      
       {/* No changes message */}
       {removedItems.length === 0 && removedChars === 0 && input.length > 0 && (
         <div className="text-center py-4 text-neutral-400">
@@ -493,6 +711,29 @@ function Stats({ input, output, opts, markersIn, markersOut }: StatsProps) {
           <div className="text-sm">No changes needed - your text is already clean!</div>
         </div>
       )}
+    </div>
+  );
+}
+
+function Metric({ k, v, isActive = false }: MetricProps) {
+  const getActiveClasses = () => {
+    if (!isActive) return 'bg-neutral-900 border-neutral-800';
+    
+    // Determine color based on metric type
+    if (k.includes('Length')) {
+      return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
+    } else if (k.includes('Removed (chars)')) {
+      return 'bg-red-500/20 border-red-500/30 text-red-300';
+    } else if (k.includes('Removed Types')) {
+      return 'bg-green-500/20 border-green-500/30 text-green-300';
+    }
+    return 'bg-neutral-900 border-neutral-800';
+  };
+
+  return (
+    <div className={`rounded-xl border p-3 transition-all duration-300 ${getActiveClasses()}`}>
+      <div className={`text-[11px] uppercase tracking-wider ${isActive ? 'text-current/80' : 'text-neutral-400'}`}>{k}</div>
+      <div className={`text-base font-medium ${isActive ? 'text-current' : ''}`}>{v}</div>
     </div>
   );
 }
@@ -517,6 +758,20 @@ function RemovedItem({ item }: RemovedItemProps) {
         return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
       case 'formatting':
         return 'bg-orange-500/20 border-orange-500/30 text-orange-300';
+      case 'code':
+        return 'bg-gray-500/20 border-gray-500/30 text-gray-300';
+      case 'urls':
+        return 'bg-green-500/20 border-green-500/30 text-green-300';
+      case 'emails':
+        return 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300';
+      case 'phones':
+        return 'bg-pink-500/20 border-pink-500/30 text-pink-300';
+      case 'timestamps':
+        return 'bg-yellow-500/20 border-yellow-500/30 text-yellow-300';
+      case 'special':
+        return 'bg-red-500/20 border-red-500/30 text-red-300';
+      case 'repeated':
+        return 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300';
       default:
         return 'bg-neutral-500/20 border-neutral-500/30 text-neutral-300';
     }
@@ -530,6 +785,20 @@ function RemovedItem({ item }: RemovedItemProps) {
         return '📝';
       case 'formatting':
         return '🎨';
+      case 'code':
+        return '💻';
+      case 'urls':
+        return '🔗';
+      case 'emails':
+        return '📧';
+      case 'phones':
+        return '📞';
+      case 'timestamps':
+        return '⏰';
+      case 'special':
+        return '⚠️';
+      case 'repeated':
+        return '🔄';
       default:
         return '🗑️';
     }
@@ -573,156 +842,217 @@ function RemovedItem({ item }: RemovedItemProps) {
   );
 }
 
-function Metric({ k, v, isActive = false }: { k: string; v: string; isActive?: boolean }) {
-  const getActiveClasses = () => {
-    if (!isActive) return 'bg-neutral-900 border-neutral-800';
-    
-    // Determine color based on metric type
-    if (k.includes('Length')) {
-      return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
-    } else if (k.includes('Removed (chars)')) {
-      return 'bg-red-500/20 border-red-500/30 text-red-300';
-    } else if (k.includes('Removed Types')) {
-      return 'bg-green-500/20 border-green-500/30 text-green-300';
-    }
-    return 'bg-neutral-900 border-neutral-800';
-  };
-
-  return (
-    <div className={`rounded-xl border p-3 transition-all duration-300 ${getActiveClasses()}`}>
-      <div className={`text-[11px] uppercase tracking-wider ${isActive ? 'text-current/80' : 'text-neutral-400'}`}>{k}</div>
-      <div className={`text-base font-medium ${isActive ? 'text-current' : ''}`}>{v}</div>
-    </div>
-  );
-}
-
-/* ——— Cleaning core ——— */
-
-function effectiveOptions(opts: Options): Options {
-  if (!opts.nukeAll) return opts;
-  return {
-    ...opts,
-    keepVS16Emoji: false,
-    preserveEmoji: false,
-    preserveIndicJoiners: false,
-    preserveArabicZWNJ: false,
-  };
-}
-
-function cleanText(text: string, opts: Options): string {
+// --- Cleaning Logic ---
+function cleanText(text: string, opts: CleanOptions): string {
   let t = text;
 
-  // Protect emoji ZWJ sequences so we can strip stray ZWJ safely
+  // Protect ZWJ inside emoji sequences, so we can strip stray ZWJ elsewhere without breaking emoji
+  const SENTINEL_ZWJ = ""; // private-use marker
   if (opts.preserveEmoji) {
     try {
       const EP = "\\p{Extended_Pictographic}";
-      const reEmojiZWJ = new RegExp(`(${EP}(?:\\uFE0F)?)\\u200D(${EP})`, "gu");
-      t = t.replace(reEmojiZWJ, (_, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
-      t = t.replace(reEmojiZWJ, (_, a, b) => `${a}${SENTINEL_ZWJ}${b}`); // catch longer chains
+      const reZWJ = new RegExp(`(${EP})\u200D(${EP})`, "gu");
+      t = t.replace(reZWJ, `$1${SENTINEL_ZWJ}$2`);
     } catch {
-      const reFallback = /([\uD800-\uDBFF][\uDC00-\uDFFF])\u200D([\uD800-\uDBFF][\uDC00-\uDFFF])/gu;
-      t = t.replace(reFallback, (_, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
-      t = t.replace(reFallback, (_, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
+      // Fallback: only match actual emoji sequences with ZWJ
+      t = t.replace(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])\u200D([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/gu, `$1${SENTINEL_ZWJ}$2`);
     }
   }
 
-  // Protect Indic joiners
-  if (opts.preserveIndicJoiners) {
-    const INDIC = "\u0900-\u0DFF"; // broad range
-    t = t.replace(new RegExp(`([${INDIC}])\\u200D([${INDIC}])`, "gu"), (_, a, b) => `${a}${SENTINEL_ZWJ}${b}`);
-    t = t.replace(new RegExp(`([${INDIC}])\\u200C([${INDIC}])`, "gu"), (_, a, b) => `${a}${SENTINEL_ZWNJ}${b}`);
-  }
-
-  // Protect Arabic/Persian ZWNJ
-  if (opts.preserveArabicZWNJ) {
-    const AR = "\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF";
-    t = t.replace(new RegExp(`([${AR}])\\u200C([${AR}])`, "gu"), (_, a, b) => `${a}${SENTINEL_ZWNJ}${b}`);
-  }
-
   if (opts.removeInvisible) {
-    // Explicit ranges (BMP formats + BOM + interlinear + isolates/overrides)
-    const invParts = [
-      "\\u00AD",          // SOFT HYPHEN
-      "\\u034F",          // CGJ
-      "\\u061C",          // ALM
-      "\\u180B-\\u180E",  // Mongolian selectors + MVS
-      "\\u200B-\\u200F",  // ZWSP..RLM
-      "\\u202A-\\u202E",  // embeddings/overrides + PDF
-      "\\u2060-\\u2064",  // WJ + invis ops
-      "\\u2066-\\u2069",  // bidi isolates
-      "\\uFEFF",          // BOM/ZWNBSP
-      "\\uFFF9-\\uFFFB",  // interlinear annotation controls
-    ];
-    if (!opts.keepVS16Emoji) invParts.push("\\uFE00-\\uFE0F"); else invParts.push("\\uFE00-\\uFE0E");
+    // Remove Unicode Format characters (Cf): ZWSP/ZWJ/ZWNJ/WJ/bidi/etc.
+    try {
+      t = t.replace(/\p{Cf}/gu, "");
+    } catch {
+      // Fallback explicit ranges if \p{Cf} unsupported
+      t = t.replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF\uFFF9-\uFFFB]/gu, "");
+    }
+    // Remove CGJ explicitly (Mn)
+    t = t.replace(/\u034F/gu, "");
 
-    const bmp = new RegExp("[" + invParts.join("") + "]", "gu");
-    t = t.replace(bmp, "");
-
-    // Supplementary variation selectors (IVS)
-    try { t = t.replace(/[\u{E0100}-\u{E01EF}]/gu, ""); } catch {}
-    // Plane-14 TAG characters (invisible tags sometimes used for watermarking)
-    try { t = t.replace(/[\u{E0000}-\u{E007F}]/gu, ""); } catch {}
+    // Variation selectors
+    if (!opts.keepVS16Emoji) {
+      t = t.replace(/[\uFE00-\uFE0F]/gu, "");
+    } else {
+      t = t.replace(/[\uFE00-\uFE0E]/gu, "");
+    }
+    t = t.replace(/[\u{E0100}-\u{E01EF}]/gu, "");
+    
+    // After the supplementary variation selectors removal:
+    t = t.replace(/[\u{E0000}-\u{E007F}]/gu, ""); // Plane-14 TAG characters
   }
 
-  // Restore protected joiners
-  if (opts.preserveEmoji || opts.preserveIndicJoiners || opts.preserveArabicZWNJ) {
-    t = t.replace(/\uE000/gu, "\u200D");
-    t = t.replace(/\uE001/gu, "\u200C");
+  if (opts.stripMarkdownHeaders && !opts.markdownSafeMode) {
+    t = t.replace(/^\s{0,3}(#{1,6})\s+/gmu, "");
   }
 
-  // Markdown / formatting cleanup
-  if (opts.stripMarkdownHeaders) t = t.replace(/^\s{0,3}(#{1,6})\s+/gmu, "");
-  if (opts.stripBoldItalic) {
-    t = t.replace(/\*\*([^*\n]+)\*\*/gmu, "$1").replace(/__([^_\n]+)__/gmu, "$1");
-    t = t.replace(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/gmu, "$1");
-    t = t.replace(/(?<!_)_(?!_)([^_\n]+)_(?!_)/gmu, "$1");
-    t = t.replace(/~~([^~\n]+)~~/gmu, "$1");
+  if (opts.stripBoldItalic && !opts.markdownSafeMode) {
+    // Bold/italic markers; keep inner text
+    t = t.replace(/\*\*(.*?)\*\*/gmsu, "$1");
+    t = t.replace(/__(.*?)__/gmsu, "$1");
+    t = t.replace(/(?<!\*)\*(?!\*)(.*?)\*(?<!\*)/gmsu, "$1");
+    t = t.replace(/(?<!_)_(?!_)(.*?)_(?<!_)/gmsu, "$1");
+    t = t.replace(/~~(.*?)~~/gmsu, "$1");
   }
-  if (opts.stripBackticks) {
+
+  if (opts.stripBackticks && !opts.markdownSafeMode && !opts.preserveCodeFences) {
+    // Fenced blocks: remove the backticks but keep content
     t = t.replace(/^```[^\n]*\n([\s\S]*?)\n```\s*$/gmu, "$1\n");
+    // Inline backticks
     t = t.replace(/`([^`]+)`/gmu, "$1");
   }
+
   if (opts.stripEmDashSeparators) {
+    // Remove lines that are just separators of dashes/em-dashes
     t = t.replace(/^\s*[—–-]{2,}\s*$/gmu, "");
+    // Remove standalone em-dash separator lines between paragraphs
     t = t.replace(/\n\s*[—–]\s*\n/gmu, "\n\n");
   }
-  if (opts.stripListMarkers) t = t.replace(/^\s*(?:[-*•]\s+|\d+[.)]\s+)/gmu, "");
-  if (opts.stripBlockquotes) t = t.replace(/^\s{0,3}>\s?/gmu, "");
 
-  if (opts.normalizeWhitespace) {
-    // Normalize all Unicode space separators → ASCII space
-    t = t.replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, " ");
-    // Collapse 2+ spaces inside tokens
+  if (opts.stripListMarkers) {
+    t = t.replace(/^\s*(?:[-*•]\s+|\d+[.)]\s+)/gmu, "");
+  }
+
+  if (opts.stripBlockquotes) {
+    t = t.replace(/^\s{0,3}>\s?/gmu, "");
+  }
+
+  if (opts.normalizeWhitespace && !opts.preserveTabsSpaces) {
+    // Inside normalizeWhitespace:
+    t = t.replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, " "); // all Zs spaces → ASCII space
+    // Collapse 2+ spaces to 1 (but not across newlines)
     t = t.replace(/(\S) {2,}(?=\S)/g, "$1 ");
-    // Trim trailing spaces per line
+    // Trim trailing spaces
     t = t.replace(/[ \t]+$/gmu, "");
   }
-  if (opts.collapseBlankLines) t = t.replace(/\n{3,}/g, "\n\n");
+
+  if (opts.collapseBlankLines) {
+    t = t.replace(/\n{3,}/g, "\n\n");
+  }
+
+  // Additional cleaning options
+  if (opts.removeUrls) {
+    t = t.replace(/https?:\/\/[^\s]+/g, "");
+    t = t.replace(/www\.[^\s]+/g, "");
+  }
+
+  if (opts.removeEmailAddresses) {
+    t = t.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, "");
+  }
+
+  if (opts.removePhoneNumbers) {
+    t = t.replace(/\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b/g, "");
+  }
+
+  if (opts.removeTimestamps) {
+    t = t.replace(/\b\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?\b/g, "");
+    t = t.replace(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, "");
+    t = t.replace(/\b\d{4}-\d{2}-\d{2}\b/g, "");
+  }
+
+  if (opts.removeSpecialCharacters && !opts.preserveEscapeSequences) {
+    // Only remove truly special characters, preserve basic punctuation
+    t = t.replace(/[!@#$%^&*_+=\[\]{}|\\:"'<>~`]/g, "");
+  }
+
+  if (opts.removeExtraPunctuation) {
+    t = t.replace(/\.{2,}/g, ".");
+    t = t.replace(/,{2,}/g, ",");
+    t = t.replace(/!{2,}/g, "!");
+    t = t.replace(/\?{2,}/g, "?");
+  }
+
+  if (opts.removeRepeatedWords) {
+    t = t.replace(/\b(\w+)\s+\1\b/g, "$1");
+  }
+
+  if (opts.removeEmptyLines) {
+    t = t.replace(/^\s*$/gm, "");
+  }
+
+  if (opts.removeTrailingSpaces) {
+    t = t.replace(/[ \t]+$/gm, "");
+  }
+
+  if (opts.removeLeadingSpaces) {
+    t = t.replace(/^[ \t]+/gm, "");
+  }
+
+  // New features implementation
+  if (opts.removeUTMParameters) {
+    // Remove UTM parameters from URLs
+    t = t.replace(/([?&])(utm_[^&\s]*)/g, '$1');
+    t = t.replace(/([?&])(fbclid|gclid|msclkid)[^&\s]*/g, '$1');
+    t = t.replace(/[?&]$/, ''); // Remove trailing ? or &
+  }
+
+
+  // Case conversion
+  if (opts.caseConversion !== 'none') {
+    switch (opts.caseConversion) {
+      case 'lowercase':
+        t = t.toLowerCase();
+        break;
+      case 'uppercase':
+        t = t.toUpperCase();
+        break;
+      case 'titlecase':
+        t = t.replace(/\b\w/g, (char) => char.toUpperCase());
+        break;
+      case 'sentencecase':
+        t = t.replace(/(^|[.!?]\s+)([a-z])/g, (_, prefix, char) => prefix + char.toUpperCase());
+        break;
+    }
+  }
+
+  // Restore protected emoji joiners
+  if (opts.preserveEmoji) {
+    t = t.replace(//gu, "‍");
+  }
 
   return t;
 }
 
-// Count key markers (used for both input and output)
-function countMarkers(text: string) {
-  const m = { zwsp:0, wj:0, zwnj:0, zwj:0, shy:0, vs16:0, dirMarks:0, bom:0,
-              headers:0, boldItalics:0, backticks:0, dashSeparators:0, blockquotes:0, listMarkers:0 } as any;
-  for (let i=0; i<text.length;) {
-    const cp = text.codePointAt(i)!;
-    i += cp > 0xFFFF ? 2 : 1;
-    if (cp === 0x200B) m.zwsp++;
-    else if (cp === 0x2060) m.wj++;
-    else if (cp === 0x200C) m.zwnj++;
-    else if (cp === 0x200D) m.zwj++;
-    else if (cp === 0x00AD) m.shy++;
-    else if (cp === 0xFE0F) m.vs16++;
-    else if (cp === 0x200E || cp === 0x200F || cp === 0x061C) m.dirMarks++;
-    else if (cp === 0xFEFF) m.bom++;
+function countInvisibles(text: string) {
+  const c = {
+    zwsp: 0,
+    wj: 0,
+    zwnj: 0,
+    zwj: 0,
+    shy: 0,
+    vs16: 0,
+    ltrRtl: 0,
+    bom: 0,
+  };
+  for (const ch of text) {
+    const cp = ch.codePointAt(0);
+    
+    if (cp === 0x200B) c.zwsp++;
+    else if (cp === 0x2060) c.wj++;
+    else if (cp === 0x200C) c.zwnj++;
+    else if (cp === 0x200D) c.zwj++;
+    else if (cp === 0x00AD) c.shy++;
+    else if (cp === 0xFE0F) c.vs16++;
+    else if (cp === 0x200E || cp === 0x200F || cp === 0x061C) c.ltrRtl++;
+    else if (cp === 0xFEFF) c.bom++;
   }
-  m.headers = (text.match(/^\s{0,3}#{1,6}\s+/gmu) || []).length;
-  m.boldItalics = (text.match(/\*\*|__|(?<!\*)\*(?!\*)|(?<!_)_(?!_)/gmu) || []).length;
-  m.backticks = (text.match(/```|`/gmu) || []).length;
-  m.dashSeparators = (text.match(/^\s*[—–-]{2,}\s*$/gmu) || []).length;
-  m.blockquotes = (text.match(/^\s{0,3}>\s?/gmu) || []).length;
-  m.listMarkers = (text.match(/^\s*(?:[-*•]\s+|\d+[.)]\s+)/gmu) || []).length;
-  return m;
+  return c;
 }
+
+function App() {
+  return (
+    <AuthProvider>
+      <SecurityProvider>
+        <div className="min-h-screen bg-neutral-900 text-white">
+          <GumroadWebhookHandler />
+          <Header />
+          <div className="container mx-auto px-4 py-8 max-w-6xl">
+            <AppContent />
+          </div>
+        </div>
+      </SecurityProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;

@@ -1,6 +1,22 @@
 # Ace Paste Cleaner
 
-A powerful text cleaner for removing invisible characters, markdown formatting, and other unwanted elements from pasted text.
+**Clean, Normalize & De-Junk Your Text in One Click**
+
+Ace Paste Cleaner instantly strips junk from text—removing weird formatting, hidden characters, tracking junk, and copy-paste gremlins—so you can paste clean, consistent text anywhere.
+
+Ace Paste Cleaner is a fast, browser-based text sanitizer. Paste in messy text; get back clean, plain, standardized output. It fixes smart quotes, spacing, line breaks, and invisible characters, and can optionally normalize casing and punctuation. Runs locally in your browser for speed and privacy. Perfect for writers, editors, marketers, devs, students—anyone who pastes a lot.
+
+## Key Features
+
+* **One-click clean** - Strip formatting & invisible characters
+* **Smart punctuation & dash normalization** - " " ' ' → " ' — – → -
+* **Whitespace & line-break repair** - Collapse excess spaces, fix double line breaks
+* **Optional case conversion** - Title/Sentence/UPPER/lower
+* **URL de-tracking** - Remove UTM parameters and tracking junk
+* **Markdown-safe mode** - Preserve # \* \_ \` and code blocks
+* **Presets + custom profiles** - Save and reuse your favorite cleaning rules
+* **Batch cleaning** - Handle large documents and long articles
+* **100% local processing** - Privacy-first, runs in your browser
 
 ## Features
 
@@ -37,64 +53,40 @@ A powerful text cleaner for removing invisible characters, markdown formatting, 
 - Basic cleaning features
 - Community support
 
-### 💰 Flexible Pricing Options
+### 💰 Subscription Plans
 
-#### Daily - $1.23/day
-- Unlimited cleanings
-- Up to 1,000,000 characters
-- All cleaning features
-- Priority support
-- Advanced detection
+| Plan | Price | Characters | Processing | Value | Savings |
+|------|-------|------------|------------|-------|---------|
+| 🟦 Monthly | **$6.99** | 50,000 | 20+ hours | $500+ | – |
+| 🟩 Quarterly | **$19.99** | 200,000 | 80+ hours | $2,000+ | 5% off |
+| 🟨 6 Months | **$34.99** | 500,000 | 200+ hours | $5,000+ | ⭐ **17% off** |
+| 🟧 Yearly | **$49.99** | 1,000,000 | 400+ hours | $10,000+ | 🔥 **40% off** |
+| 🟥 2 Years | **$79.99** | 2,000,000 | 800+ hours | $20,000+ | 💎 **52% off** |
 
-#### Weekly - $2.34/week
-- Unlimited cleanings
-- Up to 1,000,000 characters
-- All cleaning features
-- Priority support
-- Advanced detection
-- Bulk processing
+### 🚀 Add-on Features
 
-#### Monthly - $3.45/month
-- Unlimited cleanings
-- Up to 1,000,000 characters
-- All cleaning features
-- Priority support
-- Advanced detection
-- Bulk processing
-- API access
+#### 👥 Team License - $9.99/month
+- Shared preset pack + priority support
+- Team collaboration tools
+- Team usage analytics
+- Custom team branding
 
-#### Yearly - $45.67/year
-- Everything in Monthly
-- 2 months free
-- Priority support
-- Custom integrations
-- Team management
+#### ⚙️ Pro Preset Pack - $4.99/month
+- CMS-focused: WordPress, Notion, Substack, HubSpot
+- One-click CMS cleaning
+- Platform-specific optimizations
 
-#### 2 Years - $56.78/year
-- Everything in Yearly
-- 4 months free
-- White-label options
+#### ✍️ Writers' Toolkit - $7.99/month
+- Sentence-case rules + style-safe clean
+- Writing style preservation
+- Author-specific presets
+- Publishing optimization
 
-#### 3 Years - $67.89/year
-- Everything in 2 Years
-- 6 months free
-- Dedicated support
-
-#### 4 Years - $78.90/year
-- Everything in 3 Years
-- 8 months free
-- Custom branding
-
-#### 🏆 Lifetime - $99.99 (One-time)
-- Everything forever
-- Unlimited everything
-- Priority support
-- Custom integrations
-- Team management
-- White-label options
-- Dedicated support
-- Custom branding
-- Future updates included
+#### 💻 Dev Mode - $5.99/month
+- Preserve code fences, tabs/spaces, escape sequences
+- Syntax highlighting safe
+- Developer presets
+- Code structure preservation
 
 ## Getting Started
 
@@ -130,13 +122,24 @@ npm run build
 
 The built files will be in the `dist` directory.
 
-## Usage
+## How It Works
 
-1. Paste your text into the input area
-2. Toggle the cleaning options you want to apply
-3. View the cleaned output in real-time
-4. Copy the cleaned text to your clipboard
-5. Use the stats panel to see what was removed
+1. **Paste messy text** into Ace Paste Cleaner
+2. **Toggle cleaning rules** (or choose a preset)
+3. **Copy clean output**, or export to .txt/.md
+
+### Perfect For
+Writers • Editors • Marketers • Students • Developers • Researchers • VA teams • CMS managers • Support teams
+
+### What's Included
+- Web app access at **acepaste.xyz**
+- 6 starter presets (Blog, Docs→CMS, Academic, Email, Markdown, Dev Snippets)
+- Quick-start guide (PDF)
+- Keyboard shortcuts cheat-sheet (PNG)
+- Lifetime updates for v1.x
+
+### Tech Requirements
+Any modern browser (Chrome, Edge, Firefox, Safari). Works on desktop and mobile. No installation required.
 
 ## Technology Stack
 
@@ -153,6 +156,33 @@ The built files will be in the `dist` directory.
 3. Make your changes
 4. Add tests if applicable
 5. Submit a pull request
+
+## FAQ
+
+**Does my text leave my device?**
+No—processing happens in your browser.
+
+**Can I keep certain formatting?**
+Yes. Toggle rules individually or build a preset.
+
+**Will it change my content?**
+Only the rules you enable. Defaults aim for safe cleaning.
+
+**Does it handle big chunks?**
+Yes. Batch mode is built for long articles/emails.
+
+**Markdown?**
+Enable "Markdown-safe" to preserve # \* \_ \` and code blocks.
+
+**Teams?**
+Use the Team license for shared presets with your team.
+
+## Support
+
+Questions or feature requests? Email [support@acepaste.xyz](mailto:support@acepaste.xyz) or use the in-app link.
+
+**Refunds:**
+If Ace doesn't save you time, request a refund within 14 days—no drama.
 
 ## License
 

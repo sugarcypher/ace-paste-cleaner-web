@@ -1,83 +1,143 @@
-import React from 'react';
-import { useAuth } from '../hooks/useAuth0';
+import { useState } from 'react';
+import { X, Mail, Lock, User } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onAuth: (email: string, password: string, isSignUp: boolean) => void;
+  mode: 'signin' | 'signup';
+  onModeChange: (mode: 'signin' | 'signup') => void;
 }
 
-export function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps) {
-  const { signIn, isLoading } = useAuth();
+export function AuthModal({ isOpen, onClose, onAuth, mode, onModeChange }: AuthModalProps) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      if (mode === 'signup' && password !== confirmPassword) {
+        setError('Passwords do not match');
+        setIsLoading(false);
+        return;
+      }
+
+      if (password.length < 6) {
+        setError('Password must be at least 6 characters');
+        setIsLoading(false);
+        return;
+      }
+
+      await onAuth(email, password, mode === 'signup');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
-  const handleLogin = () => {
-    signIn();
-  };
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-neutral-900 rounded-2xl border border-neutral-700 w-full max-w-md">
-        <div className="p-6">
-          {/* Header */}
-          <div className="text-center mb-6">
-            <div className="text-4xl mb-4">🔐</div>
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome to Ace Paste Cleaner</h2>
-            <p className="text-neutral-400 text-sm">
-              Sign in to start cleaning your text with our powerful tools
-            </p>
-          </div>
+      <div className="bg-neutral-800 rounded-xl border border-neutral-700 w-full max-w-md">
+        <div className="flex items-center justify-between p-6 border-b border-neutral-700">
+          <h2 className="text-xl font-semibold text-white">
+            {mode === 'signin' ? 'Sign In' : 'Sign Up'}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-neutral-400 hover:text-white transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-          {/* Auth0 Login Button */}
-          <div className="space-y-4">
-            <button
-              onClick={handleLogin}
-              disabled={isLoading}
-              className="w-full px-6 py-4 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-400 active:translate-y-[1px] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Signing in...
-                </>
-              ) : (
-                <>
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 0C4.477 0 0 4.484 0 10.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.203 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0020 10.017C20 4.484 15.522 0 10 0z" clipRule="evenodd" />
-                  </svg>
-                  Continue with Auth0
-                </>
-              )}
-            </button>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-300 text-sm">
+              {error}
+            </div>
+          )}
 
-            {/* Features */}
-            <div className="mt-6 space-y-3">
-              <div className="flex items-center gap-3 text-sm text-neutral-400">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <span>Secure authentication with email verification</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-neutral-400">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <span>No passwords to remember</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm text-neutral-400">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                <span>Free tier includes 10 cleanings per day</span>
-              </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-neutral-300">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Enter your email"
+                required
+              />
             </div>
           </div>
 
-          {/* Close Button */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-neutral-300">Password</label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+          </div>
+
+          {mode === 'signup' && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-neutral-300">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+            </div>
+          )}
+
           <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-neutral-400 hover:text-white transition-colors"
+            type="submit"
+            disabled={isLoading}
+            className="w-full py-3 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors font-medium"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            {isLoading ? 'Processing...' : (mode === 'signin' ? 'Sign In' : 'Create Account')}
           </button>
-        </div>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => onModeChange(mode === 'signin' ? 'signup' : 'signin')}
+              className="text-emerald-400 hover:text-emerald-300 text-sm transition-colors"
+            >
+              {mode === 'signin' 
+                ? "Don't have an account? Sign up" 
+                : "Already have an account? Sign in"
+              }
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { X, Check, Zap, Crown, Building } from 'lucide-react';
-import { PRICING_TIERS, PricingTier } from '../types/pricing';
+import { X, Check, Zap, Crown, Building, Users, Settings, PenTool, Code } from 'lucide-react';
+import { PRICING_TIERS, UPSELL_FEATURES, PricingTier, UpsellFeature } from '../types/pricing';
 
 interface PaywallModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUpgrade: (tierId: string) => void;
+  onAddUpsell?: (upsellId: string) => void;
   currentTier: string;
+  currentUpsells?: string[];
   reason: 'daily_limit' | 'text_length' | 'feature_required';
   currentTextLength?: number;
 }
@@ -15,11 +17,15 @@ export function PaywallModal({
   isOpen, 
   onClose, 
   onUpgrade, 
+  onAddUpsell,
   currentTier, 
+  currentUpsells = [],
   reason,
   currentTextLength = 0 
 }: PaywallModalProps) {
-  const [selectedTier, setSelectedTier] = useState<string>('pro');
+  const [selectedTier, setSelectedTier] = useState<string>('monthly');
+  const [selectedUpsells, setSelectedUpsells] = useState<string[]>(currentUpsells);
+  const [activeTab, setActiveTab] = useState<'plans' | 'addons'>('plans');
 
   if (!isOpen) return null;
 
@@ -40,12 +46,33 @@ export function PaywallModal({
     switch (tierId) {
       case 'free':
         return <Zap className="w-6 h-6 text-gray-400" />;
-      case 'pro':
+      case 'monthly':
+        return <Crown className="w-6 h-6 text-blue-500" />;
+      case 'quarterly':
+        return <Crown className="w-6 h-6 text-green-500" />;
+      case 'six_months':
         return <Crown className="w-6 h-6 text-yellow-500" />;
-      case 'enterprise':
-        return <Building className="w-6 h-6 text-purple-500" />;
+      case 'yearly':
+        return <Crown className="w-6 h-6 text-orange-500" />;
+      case 'two_years':
+        return <Crown className="w-6 h-6 text-red-500" />;
       default:
         return <Zap className="w-6 h-6" />;
+    }
+  };
+
+  const getUpsellIcon = (category: string) => {
+    switch (category) {
+      case 'team':
+        return <Users className="w-5 h-5 text-blue-500" />;
+      case 'presets':
+        return <Settings className="w-5 h-5 text-green-500" />;
+      case 'writing':
+        return <PenTool className="w-5 h-5 text-purple-500" />;
+      case 'development':
+        return <Code className="w-5 h-5 text-orange-500" />;
+      default:
+        return <Settings className="w-5 h-5" />;
     }
   };
 
@@ -79,9 +106,36 @@ export function PaywallModal({
           </button>
         </div>
 
-        {/* Pricing Cards */}
+        {/* Tabs */}
+        <div className="border-b border-neutral-800">
+          <div className="flex">
+            <button
+              onClick={() => setActiveTab('plans')}
+              className={`px-6 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'plans'
+                  ? 'text-white border-b-2 border-white'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              Subscription Plans
+            </button>
+            <button
+              onClick={() => setActiveTab('addons')}
+              className={`px-6 py-3 text-sm font-medium transition-colors ${
+                activeTab === 'addons'
+                  ? 'text-white border-b-2 border-white'
+                  : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              Add-on Features
+            </button>
+          </div>
+        </div>
+
+        {/* Content */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {activeTab === 'plans' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {PRICING_TIERS.map((tier) => (
               <div
                 key={tier.id}
@@ -110,29 +164,9 @@ export function PaywallModal({
                         <span className="text-neutral-400 text-sm">/{tier.interval}</span>
                       )}
                     </div>
-                    {tier.id === 'yearly' && (
+                    {tier.savings && (
                       <div className="text-xs text-green-400 font-medium">
-                        Save 2 months vs monthly
-                      </div>
-                    )}
-                    {tier.id === 'two_years' && (
-                      <div className="text-xs text-green-400 font-medium">
-                        Save 4 months vs monthly
-                      </div>
-                    )}
-                    {tier.id === 'three_years' && (
-                      <div className="text-xs text-green-400 font-medium">
-                        Save 6 months vs monthly
-                      </div>
-                    )}
-                    {tier.id === 'four_years' && (
-                      <div className="text-xs text-green-400 font-medium">
-                        Save 8 months vs monthly
-                      </div>
-                    )}
-                    {tier.id === 'lifetime' && (
-                      <div className="text-xs text-yellow-400 font-medium">
-                        Best Value - Pay Once
+                        {tier.savings}
                       </div>
                     )}
                   </div>
@@ -163,7 +197,69 @@ export function PaywallModal({
                 </button>
               </div>
             ))}
-          </div>
+            </div>
+          )}
+
+          {activeTab === 'addons' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {UPSELL_FEATURES.map((upsell) => (
+                <div
+                  key={upsell.id}
+                  className={`relative rounded-xl border p-6 cursor-pointer transition-all ${
+                    selectedUpsells.includes(upsell.id)
+                      ? 'border-blue-500/50 bg-blue-500/10 ring-2 ring-blue-500/30'
+                      : 'border-neutral-700 bg-neutral-800/50 hover:border-neutral-600'
+                  }`}
+                  onClick={() => {
+                    if (selectedUpsells.includes(upsell.id)) {
+                      setSelectedUpsells(selectedUpsells.filter(id => id !== upsell.id));
+                    } else {
+                      setSelectedUpsells([...selectedUpsells, upsell.id]);
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    {getUpsellIcon(upsell.category)}
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{upsell.name}</h3>
+                      <p className="text-sm text-neutral-400">{upsell.description}</p>
+                      <div className="flex items-baseline gap-1 mt-1">
+                        <span className="text-xl font-bold text-white">
+                          ${upsell.price}
+                        </span>
+                        <span className="text-neutral-400 text-sm">/{upsell.interval}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mb-4">
+                    {upsell.features.map((feature, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span className="text-sm text-neutral-300">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onAddUpsell) {
+                        onAddUpsell(upsell.id);
+                      }
+                    }}
+                    className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+                      selectedUpsells.includes(upsell.id)
+                        ? 'bg-blue-500 text-white hover:bg-blue-600'
+                        : 'bg-neutral-700 text-white hover:bg-neutral-600'
+                    }`}
+                  >
+                    {selectedUpsells.includes(upsell.id) ? 'Selected' : 'Add to Plan'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
