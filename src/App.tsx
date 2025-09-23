@@ -331,26 +331,6 @@ function AppContent() {
                   </div>
                 )}
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => { setInput(""); }}
-                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors font-medium text-sm"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Clear
-                </button>
-                <button
-                  onClick={pasteFromClipboard}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-yellow-500 text-yellow-950 hover:bg-yellow-400 transition-colors text-sm font-medium animate-pulse"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  Paste
-                </button>
-              </div>
             </div>
             <textarea
               value={input}
@@ -358,16 +338,43 @@ function AppContent() {
               placeholder="Paste your text here..."
               className="h-[30vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-center gap-3">
+              <button
+                onClick={() => { setInput(""); }}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors font-medium text-sm animate-pulse"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Clear
+              </button>
+              <button
+                onClick={pasteFromClipboard}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500 text-yellow-950 hover:bg-yellow-400 transition-colors text-sm font-medium animate-pulse"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Paste
+              </button>
               <button
                 onClick={handleClean}
                 disabled={!input.trim() || !canClean(input.length)}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-emerald-500 text-white hover:bg-emerald-400 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors font-medium text-lg shadow-lg hover:shadow-emerald-500/25"
+                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-fuchsia-500 text-white hover:bg-fuchsia-400 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors font-medium text-lg shadow-lg hover:shadow-fuchsia-500/25 animate-pulse"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Clean Now
+              </button>
+              <button
+                onClick={copyToClipboard}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors text-sm font-medium animate-pulse"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy Clean
               </button>
             </div>
           </div>
@@ -378,26 +385,6 @@ function AppContent() {
           <div className="grid gap-3">
             <div className="flex items-center justify-between">
               <label className="text-sm uppercase tracking-wider text-neutral-400">Output</label>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => { setInput(""); }}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors text-sm font-medium animate-pulse"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Clear
-                </button>
-                <button
-                  onClick={copyToClipboard}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors text-sm font-medium animate-pulse"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                  </svg>
-                  Copy Clean
-                </button>
-              </div>
             </div>
             <textarea
               value={cleaned}
