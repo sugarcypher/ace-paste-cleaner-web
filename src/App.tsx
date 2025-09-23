@@ -453,8 +453,38 @@ function AppContent() {
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
         onUpgrade={(tierId) => {
-          upgradeUser(tierId);
+          // Redirect to Gumroad sales page for the selected tier
+          const gumroadUrls = {
+            'monthly': 'https://sugarcypher.gumroad.com/l/ace-paste-monthly',
+            'quarterly': 'https://sugarcypher.gumroad.com/l/ace-paste-quarterly', 
+            'six_months': 'https://sugarcypher.gumroad.com/l/ace-paste-6months',
+            'yearly': 'https://sugarcypher.gumroad.com/l/ace-paste-yearly',
+            'two_years': 'https://sugarcypher.gumroad.com/l/ace-paste-2years'
+          };
+          
+          const gumroadUrl = gumroadUrls[tierId as keyof typeof gumroadUrls];
+          if (gumroadUrl) {
+            window.open(gumroadUrl, '_blank');
+          } else {
+            console.error('No Gumroad URL found for tier:', tierId);
+          }
           setShowPaywall(false);
+        }}
+        onAddUpsell={(upsellId) => {
+          // Redirect to Gumroad sales page for upsell features
+          const upsellUrls = {
+            'team_license': 'https://sugarcypher.gumroad.com/l/ace-paste-team',
+            'pro_preset_pack': 'https://sugarcypher.gumroad.com/l/ace-paste-presets',
+            'writers_toolkit': 'https://sugarcypher.gumroad.com/l/ace-paste-writers',
+            'dev_mode': 'https://sugarcypher.gumroad.com/l/ace-paste-dev'
+          };
+          
+          const upsellUrl = upsellUrls[upsellId as keyof typeof upsellUrls];
+          if (upsellUrl) {
+            window.open(upsellUrl, '_blank');
+          } else {
+            console.error('No Gumroad URL found for upsell:', upsellId);
+          }
         }}
         currentTier={user?.tier || 'free'}
         reason={paywallReason}
