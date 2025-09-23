@@ -212,7 +212,9 @@ function AppContent() {
         <SecurityBadge />
 
         {/* Options Dropdowns */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="mb-4">
+          <label className="block text-sm uppercase tracking-wider text-neutral-400 mb-4">Features</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <OptionGroup 
             title="Text Formatting" 
             options={[
@@ -269,6 +271,7 @@ function AppContent() {
             opts={opts}
             toggle={toggle}
           />
+          </div>
         </div>
 
         {/* Case Conversion Dropdown */}
@@ -336,7 +339,7 @@ function AppContent() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Paste your text here..."
-              className="h-[30vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="h-[15vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
             <div className="mt-4 flex justify-center gap-3">
               <button
@@ -389,7 +392,7 @@ function AppContent() {
             <textarea
               value={cleaned}
               readOnly
-              className="h-[30vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm"
+              className="h-[15vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm"
             />
           </div>
         </div>
