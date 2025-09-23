@@ -6,9 +6,9 @@ name: "CodeQL Config"
 # The queries to run for each language
 queries:
   # Use these to specify which queries to run:
-  - name: security-and-quality
-  - name: security-extended
-  - name: javascript-security-and-quality
+  - uses: security-and-quality
+  - uses: security-extended
+  - uses: javascript-security-and-quality
 
 # Paths to exclude from analysis
 paths-ignore:
