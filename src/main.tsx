@@ -8,8 +8,10 @@ import { AuthWrapper } from './components/AuthWrapper'
 
 // Check if we should skip Auth0 (for debugging)
 const skipAuth = new URLSearchParams(window.location.search).get('skipAuth') === 'true';
+// Temporarily default to debug mode until Auth0 is properly configured
+const useDebugMode = skipAuth || true; // Set to false when Auth0 is working
 
-if (skipAuth) {
+if (useDebugMode) {
   // Render app without Auth0 for debugging
   console.warn('Running in debug mode without Auth0');
   ReactDOM.createRoot(document.getElementById('root')!).render(

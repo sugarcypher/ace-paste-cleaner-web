@@ -64,7 +64,15 @@ function AppContent() {
   const [showSecurity, setShowSecurity] = useState(false);
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
-  const { user, usage, recordCleaning, canClean, upgradeUser } = useAuth();
+  // Mock auth for debug mode when Auth0 is not available
+  const authData = useAuth();
+  const { user, usage, recordCleaning, canClean, upgradeUser } = authData || {
+    user: { id: 'debug-user', email: 'debug@example.com', tier: 'free' },
+    usage: { dailyCleanings: 0, totalCleanings: 0, lastResetDate: new Date().toISOString().split('T')[0], currentTier: 'free' },
+    recordCleaning: async () => true,
+    canClean: () => true,
+    upgradeUser: () => {}
+  };
   const { hasAcceptedTerms, securitySettings } = useSecurity();
   
   const [opts, setOpts] = useState<CleanOptions>({
