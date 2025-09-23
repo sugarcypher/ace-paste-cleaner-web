@@ -8,6 +8,35 @@ const STORAGE_KEY = 'acepaste_user_data';
 const USAGE_KEY = 'acepaste_usage';
 
 export function useAuth() {
+  // Check if we're in debug mode (Auth0 not available)
+  const isDebugMode = typeof window !== 'undefined' && 
+    (window.location.search.includes('skipAuth=true') || 
+     window.location.hostname === 'localhost' ||
+     !window.Auth0Provider); // Check if Auth0 is available
+
+  // Return debug data if in debug mode
+  if (isDebugMode) {
+    console.log('Debug mode detected - returning mock auth data');
+    return {
+      user: null, // No user in debug mode
+      isAuthenticated: false,
+      isLoading: false,
+      signIn: () => {
+        console.log('Debug: Sign in clicked - Auth0 not available');
+        alert('Debug Mode: Authentication is disabled. The app works without signing in.');
+      },
+      signOut: () => {
+        console.log('Debug: Sign out clicked - Auth0 not available');
+        alert('Debug Mode: Sign out clicked - Auth0 not available');
+      },
+      usage: { dailyCleanings: 0, totalCleanings: 0, lastResetDate: new Date().toISOString().split('T')[0], currentTier: 'free' },
+      recordCleaning: async () => true,
+      canClean: () => true,
+      upgradeUser: () => {},
+      getRemainingCleanings: () => 3 // Free tier limit
+    };
+  }
+
   const { 
     user: auth0User, 
     isAuthenticated, 
