@@ -455,11 +455,11 @@ function AppContent() {
         onUpgrade={(tierId) => {
           // Redirect to Gumroad sales page for the selected tier
           const gumroadUrls = {
-            'monthly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-monthly',
-            'quarterly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-quarterly', 
-            'six_months': 'https://thinkwelllabs.gumroad.com/l/ace-paste-six_months',
-            'yearly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-yearly',
-            'two_years': 'https://thinkwelllabs.gumroad.com/l/ace-paste-two_years'
+            'monthly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-monthly?wanted=true',
+            'quarterly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-quarterly?wanted=true', 
+            'six_months': 'https://thinkwelllabs.gumroad.com/l/ace-paste-six_months?wanted=true',
+            'yearly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-yearly?wanted=true',
+            'two_years': 'https://thinkwelllabs.gumroad.com/l/ace-paste-two_years?wanted=true'
           };
           
           const gumroadUrl = gumroadUrls[tierId as keyof typeof gumroadUrls];
@@ -473,10 +473,10 @@ function AppContent() {
         onAddUpsell={(upsellId) => {
           // Redirect to Gumroad sales page for upsell features
           const upsellUrls = {
-            'team_license': 'https://thinkwelllabs.gumroad.com/l/ace-paste-team_license',
-            'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/ace-paste-pro_preset_pack',
-            'writers_toolkit': 'https://thinkwelllabs.gumroad.com/l/ace-paste-writers_toolkit',
-            'dev_mode': 'https://thinkwelllabs.gumroad.com/l/ace-paste-dev_mode'
+            'team_license': 'https://thinkwelllabs.gumroad.com/l/ace-paste-team_license?wanted=true',
+            'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/ace-paste-pro_preset_pack?wanted=true',
+            'writers_toolkit': 'https://thinkwelllabs.gumroad.com/l/ace-paste-writers_toolkit?wanted=true',
+            'dev_mode': 'https://thinkwelllabs.gumroad.com/l/ace-paste-dev_mode?wanted=true'
           };
           
           const upsellUrl = upsellUrls[upsellId as keyof typeof upsellUrls];
