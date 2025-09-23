@@ -11,6 +11,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       domain={AUTH0_CONFIG.domain}
       clientId={AUTH0_CONFIG.clientId}
       authorizationParams={AUTH0_CONFIG.authorizationParams}
+      onRedirectCallback={(appState) => {
+        // Handle redirect after login
+        window.location.replace(
+          appState?.returnTo || window.location.pathname
+        );
+      }}
     >
       <App />
     </Auth0Provider>

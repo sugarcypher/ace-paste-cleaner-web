@@ -64,7 +64,22 @@ function AppContent() {
   const [showSecurity, setShowSecurity] = useState(false);
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
-  const { user, usage, recordCleaning, canClean, upgradeUser } = useAuth();
+  
+  // Add error boundary for useAuth hook
+  let authData;
+  try {
+    authData = useAuth();
+  } catch (error) {
+    console.error('Auth0 not ready:', error);
+    return (
+      <div className="text-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+        <p className="text-gray-300">Loading authentication...</p>
+      </div>
+    );
+  }
+  
+  const { user, usage, recordCleaning, canClean, upgradeUser } = authData;
   const { hasAcceptedTerms, securitySettings } = useSecurity();
   
   const [opts, setOpts] = useState<CleanOptions>({

@@ -8,13 +8,31 @@ const STORAGE_KEY = 'acepaste_user_data';
 const USAGE_KEY = 'acepaste_usage';
 
 export function useAuth() {
+  const auth0Result = useAuth0();
+  
+  // Handle case where Auth0Provider might not be ready
+  if (!auth0Result) {
+    return {
+      user: null,
+      usage: null,
+      isAuthenticated: false,
+      isLoading: true,
+      signIn: () => {},
+      signOut: () => {},
+      recordCleaning: async () => false,
+      canClean: () => false,
+      getRemainingCleanings: () => 0,
+      upgradeUser: () => {}
+    };
+  }
+
   const { 
     user: auth0User, 
     isAuthenticated, 
     isLoading, 
     loginWithRedirect, 
     logout 
-  } = useAuth0();
+  } = auth0Result;
 
   // Admin users with unlimited access
   const ADMIN_USERS = [
