@@ -33,7 +33,7 @@ class AcePasteGumroadIntegration
     end
 
     begin
-      @session = Gumroad::Session.new(@access_token)
+      @session = Gumroad::Session.new(@access_token, {})
       puts "✅ Successfully authenticated with Gumroad API"
       return true
     rescue => e
