@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useAuth } from "./hooks/useAuth0";
 import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
-import { SecurityBadge } from "./components/SecurityBadge";
+import { SecurityOptions } from "./components/SecurityOptions";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
 import { SecurityPolicy } from "./components/SecurityPolicy";
 import { PrivacyAgreement } from "./components/PrivacyAgreement";
@@ -220,8 +220,8 @@ function AppContent() {
           onUpgrade={() => setShowPaywall(true)} 
         />
 
-        {/* Security Badge */}
-        <SecurityBadge />
+        {/* Security Options */}
+        <SecurityOptions />
 
         {/* Options Dropdowns */}
         <div className="mb-4">
