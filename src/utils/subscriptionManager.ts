@@ -1,4 +1,4 @@
-import { PRICING_TIERS } from '../types/pricing';
+import { PRICING_TIERS, ADMIN_TIER } from '../types/pricing';
 
 export interface Subscription {
   id: string;
@@ -77,6 +77,14 @@ class LocalSubscriptionManager implements SubscriptionManager {
   // Calculate subscription end date based on tier and interval
   calculateEndDate(startDate: string, tier: string): string {
     const start = new Date(startDate);
+    
+    // Handle admin tier separately
+    if (tier === 'admin') {
+      const end = new Date(start);
+      end.setFullYear(end.getFullYear() + 100); // Effectively lifetime
+      return end.toISOString();
+    }
+    
     const tierData = PRICING_TIERS.find(t => t.id === tier);
     
     if (!tierData) return startDate;

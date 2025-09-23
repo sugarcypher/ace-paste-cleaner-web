@@ -63,26 +63,6 @@ export const PRICING_TIERS: PricingTier[] = [
     }
   },
   {
-    id: 'admin',
-    name: 'Admin',
-    price: 0,
-    currency: 'USD',
-    interval: 'forever',
-    features: [
-      'Unlimited cleanings',
-      'Unlimited character limit',
-      'All premium features',
-      'Priority support',
-      'Admin access'
-    ],
-    limits: {
-      dailyCleanings: -1, // unlimited
-      maxTextLength: -1, // unlimited
-      advancedFeatures: true,
-      prioritySupport: true
-    }
-  },
-  {
     id: 'monthly',
     name: 'Monthly',
     price: 6.99,
@@ -203,6 +183,28 @@ export const PRICING_TIERS: PricingTier[] = [
     stripePriceId: 'price_two_years'
   }
 ];
+
+// Admin tier - hidden from public, only for internal use
+export const ADMIN_TIER: PricingTier = {
+  id: 'admin',
+  name: 'Admin',
+  price: 0,
+  currency: 'USD',
+  interval: 'forever',
+  features: [
+    'Unlimited cleanings',
+    'Unlimited character limit',
+    'All premium features',
+    'Priority support',
+    'Admin access'
+  ],
+  limits: {
+    dailyCleanings: -1, // unlimited
+    maxTextLength: -1, // unlimited
+    advancedFeatures: true,
+    prioritySupport: true
+  }
+};
 
 export const UPSELL_FEATURES: UpsellFeature[] = [
   {

@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { subscriptionManager } from '../utils/subscriptionManager';
+import { ADMIN_TIER } from '../types/pricing';
 
 interface User {
   id: string;

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { UsageStats, User, PRICING_TIERS } from '../types/pricing';
+import { UsageStats, User, PRICING_TIERS, ADMIN_TIER } from '../types/pricing';
 import { subscriptionManager } from '../utils/subscriptionManager';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -98,6 +98,28 @@ export function useUsage() {
   const recordCleaning = useCallback((textLength: number) => {
     if (!user || !usage) return false;
 
+    // Handle admin tier separately
+    if (user.tier === 'admin') {
+      // Admin has unlimited access - always allow
+      const updatedUsage = {
+        ...usage,
+        dailyCleanings: usage.dailyCleanings + 1,
+        totalCleanings: usage.totalCleanings + 1
+      };
+      
+      setUsage(updatedUsage);
+      localStorage.setItem(USAGE_KEY, JSON.stringify(updatedUsage));
+
+      const updatedUser = {
+        ...user,
+        usage: updatedUsage
+      };
+      setUser(updatedUser);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUser));
+
+      return true;
+    }
+
     const currentTier = PRICING_TIERS.find(tier => tier.id === user.tier) || PRICING_TIERS[0];
     
     // Check daily limit
@@ -134,6 +156,11 @@ export function useUsage() {
   const canClean = useCallback((textLength: number) => {
     if (!user || !usage) return false;
 
+    // Admin has unlimited access
+    if (user.tier === 'admin') {
+      return true;
+    }
+
     const currentTier = PRICING_TIERS.find(tier => tier.id === user.tier) || PRICING_TIERS[0];
     
     // Check daily limit
@@ -151,6 +178,11 @@ export function useUsage() {
 
   const getRemainingCleanings = useCallback(() => {
     if (!user || !usage) return 0;
+
+    // Admin has unlimited access
+    if (user.tier === 'admin') {
+      return -1; // unlimited
+    }
 
     const currentTier = PRICING_TIERS.find(tier => tier.id === user.tier) || PRICING_TIERS[0];
     
