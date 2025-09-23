@@ -6,7 +6,7 @@ puts "🚀 Ace Paste Cleaner - Gumroad Product URLs"
 puts "=" * 50
 
 # Your Gumroad username (from the URL you showed me)
-username = "sugarcypher"
+username = "thinkwelllabs"
 
 # Pricing tiers
 tiers = {

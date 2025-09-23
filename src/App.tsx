@@ -455,11 +455,11 @@ function AppContent() {
         onUpgrade={(tierId) => {
           // Redirect to Gumroad sales page for the selected tier
           const gumroadUrls = {
-            'monthly': 'https://sugarcypher.gumroad.com/l/ace-paste-monthly',
-            'quarterly': 'https://sugarcypher.gumroad.com/l/ace-paste-quarterly', 
-            'six_months': 'https://sugarcypher.gumroad.com/l/ace-paste-six_months',
-            'yearly': 'https://sugarcypher.gumroad.com/l/ace-paste-yearly',
-            'two_years': 'https://sugarcypher.gumroad.com/l/ace-paste-two_years'
+            'monthly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-monthly',
+            'quarterly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-quarterly', 
+            'six_months': 'https://thinkwelllabs.gumroad.com/l/ace-paste-six_months',
+            'yearly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-yearly',
+            'two_years': 'https://thinkwelllabs.gumroad.com/l/ace-paste-two_years'
           };
           
           const gumroadUrl = gumroadUrls[tierId as keyof typeof gumroadUrls];
@@ -473,10 +473,10 @@ function AppContent() {
         onAddUpsell={(upsellId) => {
           // Redirect to Gumroad sales page for upsell features
           const upsellUrls = {
-            'team_license': 'https://sugarcypher.gumroad.com/l/ace-paste-team_license',
-            'pro_preset_pack': 'https://sugarcypher.gumroad.com/l/ace-paste-pro_preset_pack',
-            'writers_toolkit': 'https://sugarcypher.gumroad.com/l/ace-paste-writers_toolkit',
-            'dev_mode': 'https://sugarcypher.gumroad.com/l/ace-paste-dev_mode'
+            'team_license': 'https://thinkwelllabs.gumroad.com/l/ace-paste-team_license',
+            'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/ace-paste-pro_preset_pack',
+            'writers_toolkit': 'https://thinkwelllabs.gumroad.com/l/ace-paste-writers_toolkit',
+            'dev_mode': 'https://thinkwelllabs.gumroad.com/l/ace-paste-dev_mode'
           };
           
           const upsellUrl = upsellUrls[upsellId as keyof typeof upsellUrls];
