@@ -10,9 +10,7 @@ const USAGE_KEY = 'acepaste_usage';
 export function useAuth() {
   // Check if we're in debug mode (Auth0 not available)
   const isDebugMode = typeof window !== 'undefined' && 
-    (window.location.search.includes('skipAuth=true') || 
-     window.location.hostname === 'localhost' ||
-     !window.Auth0Provider); // Check if Auth0 is available
+    window.location.search.includes('skipAuth=true');
 
   // Return debug data if in debug mode
   if (isDebugMode) {
