@@ -118,7 +118,7 @@ function AppContent() {
     return cleanText(input, opts);
   }, [input, opts, securitySettings]);
 
-  const handleClean = () => {
+  const handleClean = async () => {
     if (!canClean(input.length)) {
       // Check character limits based on tier
       const maxLength = user?.tier === 'free' ? 2000 :
@@ -138,11 +138,15 @@ function AppContent() {
     }
     
     // Record the cleaning usage
-    const success = recordCleaning(input.length);
+    const success = await recordCleaning();
     if (!success) {
       setPaywallReason('daily_limit');
       setShowPaywall(true);
+      return;
     }
+    
+    // The cleaning is already done by the cleaned useMemo, so we don't need to do anything else
+    // The cleaned text will automatically update in the UI
   };
 
   const copyToClipboard = async () => {
