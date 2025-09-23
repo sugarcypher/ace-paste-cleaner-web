@@ -109,16 +109,27 @@ function AppContent() {
   }
 
   const cleaned = useMemo(() => {
-    // Always clean the text - don't check limits here
+    // Only clean if user is authenticated
+    if (!user) {
+      return input; // Return input as-is if not authenticated
+    }
+    
     // Use advanced invisible character detection if enabled
     if (opts.removeInvisible && securitySettings.encryptionLevel === 'enhanced') {
       return stripInvisibleCharacters(cleanText(input, opts));
     }
     
     return cleanText(input, opts);
-  }, [input, opts, securitySettings]);
+  }, [input, opts, securitySettings, user]);
 
   const handleClean = async () => {
+    // Check if user is authenticated first
+    if (!user) {
+      setPaywallReason('daily_limit');
+      setShowPaywall(true);
+      return;
+    }
+    
     if (!canClean(input.length)) {
       // Check character limits based on tier
       const maxLength = user?.tier === 'free' ? 2000 :
@@ -335,10 +346,17 @@ function AppContent() {
                 )}
               </div>
             </div>
+            {!user && (
+              <div className="mb-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
+                <p className="text-yellow-400 text-sm text-center">
+                  🔒 Please sign in to use the text cleaning features
+                </p>
+              </div>
+            )}
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste your text here..."
+              placeholder={user ? "Paste your text here..." : "Sign in to clean your text..."}
               className="h-[15vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
             <div className="mt-4 flex justify-center gap-3">
@@ -362,7 +380,7 @@ function AppContent() {
               </button>
               <button
                 onClick={handleClean}
-                disabled={!input.trim() || !canClean(input.length)}
+                disabled={!input.trim() || !user || !canClean(input.length)}
                 className="flex items-center gap-2 px-6 py-3 rounded-lg bg-fuchsia-500 text-white hover:bg-fuchsia-400 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors font-medium text-lg shadow-lg hover:shadow-fuchsia-500/25 animate-pulse"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
