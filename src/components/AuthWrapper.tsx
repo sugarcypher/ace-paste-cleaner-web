@@ -14,7 +14,7 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
     if (isLoading) {
       const timer = setTimeout(() => {
         setShowTimeout(true);
-      }, 5000); // 5 second timeout
+      }, 3000); // Reduced to 3 second timeout
 
       return () => clearTimeout(timer);
     } else {
@@ -31,12 +31,23 @@ export function AuthWrapper({ children }: AuthWrapperProps) {
           {showTimeout && (
             <div className="mt-4">
               <p className="text-yellow-400 text-sm mb-2">Taking longer than expected?</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-yellow-500 text-yellow-950 rounded-lg hover:bg-yellow-400 transition-colors text-sm"
-              >
-                Reload Page
-              </button>
+              <div className="space-y-2">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-yellow-500 text-yellow-950 rounded-lg hover:bg-yellow-400 transition-colors text-sm mr-2"
+                >
+                  Reload Page
+                </button>
+                <button
+                  onClick={() => {
+                    // Skip Auth0 and use debug mode
+                    window.location.href = window.location.origin + '?skipAuth=true';
+                  }}
+                  className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 transition-colors text-sm"
+                >
+                  Continue Without Auth
+                </button>
+              </div>
             </div>
           )}
         </div>

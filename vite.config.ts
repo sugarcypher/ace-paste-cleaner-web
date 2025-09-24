@@ -8,6 +8,19 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'auth0': ['@auth0/auth0-react'],
+          'icons': ['lucide-react'],
+          'vendor': ['react', 'react-dom']
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
+  },
+  optimizeDeps: {
+    include: ['@auth0/auth0-react', 'lucide-react']
   }
 })
 
