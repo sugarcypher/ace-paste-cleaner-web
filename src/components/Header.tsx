@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { User, LogOut, Settings, Crown } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth0';
+import { useSimpleAuth } from '../hooks/useSimpleAuth';
 
-export function Header() {
-  // Get auth data - will be mock data in debug mode
-  const { user, signOut, signIn, isAuthenticated } = useAuth();
+interface HeaderProps {
+  onShowAuthModal: () => void;
+}
+
+export function Header({ onShowAuthModal }: HeaderProps) {
+  // Get auth data from simple authentication
+  const { user, signOut, isAuthenticated } = useSimpleAuth();
 
   const handleSignOut = () => {
     signOut();
   };
 
   const handleSignIn = () => {
-    signIn();
+    onShowAuthModal();
   };
 
   return (
@@ -21,15 +25,15 @@ export function Header() {
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 flex items-center justify-center">
+              <div className="w-12 h-12 flex items-center justify-center">
                 <img 
-                  src="/logo.svg" 
-                  alt="Ace Paste Cleaner Logo" 
-                  className="w-full h-full object-contain"
+                  src="/30E5FAEC-6A70-4961-BAAF-946AC6BFFEE1.jpeg" 
+                  alt="ACE PASTE CLEANER Pro Logo" 
+                  className="w-full h-full object-contain rounded-lg"
                 />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">Ace Paste Cleaner</h1>
+                <h1 className="text-xl font-bold text-white">ACE PASTE CLEANER Pro</h1>
                 <p className="text-xs text-neutral-400">Clean text, every time</p>
               </div>
             </div>

@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
-import { useUsage } from '../hooks/useUsage';
+import { handleWebhookFromURL, processGumroadWebhook } from '../utils/gumroadWebhook';
 
 interface GumroadWebhookHandlerProps {
   webhookUrl?: string;
 }
 
 export function GumroadWebhookHandler({ webhookUrl = '/api/gumroad-webhook' }: GumroadWebhookHandlerProps) {
-  const { handleGumroadWebhook } = useUsage();
 
   useEffect(() => {
     // Listen for Gumroad webhook messages (if using postMessage)
@@ -14,7 +13,12 @@ export function GumroadWebhookHandler({ webhookUrl = '/api/gumroad-webhook' }: G
       if (event.origin !== window.location.origin) return;
       
       if (event.data.type === 'gumroad_webhook') {
-        handleGumroadWebhook(event.data.payload);
+        const result = processGumroadWebhook(event.data.payload);
+        if (result.success) {
+          alert(`✅ ${result.message}`);
+        } else {
+          alert(`❌ ${result.message}`);
+        }
       }
     };
 
@@ -33,7 +37,12 @@ export function GumroadWebhookHandler({ webhookUrl = '/api/gumroad-webhook' }: G
         };
         
         if (purchaseData.product_id) {
-          handleGumroadWebhook(purchaseData);
+          const result = processGumroadWebhook(purchaseData);
+          if (result.success) {
+            alert(`✅ ${result.message}`);
+          } else {
+            alert(`❌ ${result.message}`);
+          }
         }
       }
     };
@@ -43,7 +52,12 @@ export function GumroadWebhookHandler({ webhookUrl = '/api/gumroad-webhook' }: G
       if (event.key === 'gumroad_purchase_data' && event.newValue) {
         try {
           const purchaseData = JSON.parse(event.newValue);
-          handleGumroadWebhook(purchaseData);
+          const result = processGumroadWebhook(purchaseData);
+          if (result.success) {
+            alert(`✅ ${result.message}`);
+          } else {
+            alert(`❌ ${result.message}`);
+          }
           // Clear the data after processing
           localStorage.removeItem('gumroad_purchase_data');
         } catch (error) {
@@ -59,6 +73,9 @@ export function GumroadWebhookHandler({ webhookUrl = '/api/gumroad-webhook' }: G
 
     // Check for existing purchase data on load
     handleHashChange();
+    
+    // Check for webhook data in URL parameters
+    handleWebhookFromURL();
 
     // Cleanup
     return () => {
@@ -66,7 +83,7 @@ export function GumroadWebhookHandler({ webhookUrl = '/api/gumroad-webhook' }: G
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('storage', handleStorageChange);
     };
-  }, [handleGumroadWebhook]);
+  }, []);
 
   // This component doesn't render anything
   return null;

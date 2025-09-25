@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useAuth } from "./hooks/useAuth0";
+import { useSimpleAuth } from "./hooks/useSimpleAuth";
 import { PaywallModal } from "./components/PaywallModal";
 import { UsageIndicator } from "./components/UsageIndicator";
 import { SecurityOptions } from "./components/SecurityOptions";
@@ -11,6 +11,7 @@ import { stripInvisibleCharacters } from "./utils/advancedInvisibleCharacters";
 import { GumroadWebhookHandler } from "./components/GumroadWebhookHandler";
 import { Header } from "./components/Header";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { SimpleAuthModal } from "./components/SimpleAuthModal";
 
 interface CleanOptions {
   removeInvisible: boolean;
@@ -65,8 +66,9 @@ function AppContent() {
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
   const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
   const [isSavingFeatures, setIsSavingFeatures] = useState(false);
-  // Get auth data - will be mock data in debug mode
-  const { user, usage, recordCleaning, canClean } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  // Get auth data from simple authentication
+  const { user, usage, recordCleaning, canClean, signIn, signUp, signOut } = useSimpleAuth();
   const { hasAcceptedTerms, securitySettings } = useSecurity();
   
   const [opts, setOpts] = useState<CleanOptions>({
@@ -1132,11 +1134,19 @@ function App() {
       <SecurityProvider>
         <div className="min-h-screen bg-neutral-900 text-white">
           <GumroadWebhookHandler />
-          <Header />
+          <Header onShowAuthModal={() => setShowAuthModal(true)} />
           <div className="container mx-auto px-4 py-8 max-w-6xl">
             <AppContent />
           </div>
         </div>
+        
+        {/* Authentication Modal */}
+        <SimpleAuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          onSignIn={signIn}
+          onSignUp={signUp}
+        />
       </SecurityProvider>
     </ErrorBoundary>
   );
