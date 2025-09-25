@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { UsageStats, User, PRICING_TIERS, ADMIN_TIER } from '../types/pricing';
 import { subscriptionManager } from '../utils/subscriptionManager';
-import { useAuth } from './useAuth0';
+import { useSimpleAuth } from './useSimpleAuth';
 
 const STORAGE_KEY = 'acepaste_user_data';
 const USAGE_KEY = 'acepaste_usage';
 
 export function useUsage() {
-  const { user: authUser, isAuthenticated } = useAuth();
+  const { user: authUser, isAuthenticated } = useSimpleAuth();
   const [user, setUser] = useState<User | null>(null);
   const [usage, setUsage] = useState<UsageStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);

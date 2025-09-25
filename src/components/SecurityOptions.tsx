@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Shield, Lock, Eye, ChevronDown, ChevronUp, Save } from 'lucide-react';
 import { useSecurity } from '../contexts/SecurityContext';
-import { useAuth } from '../hooks/useAuth0';
+import { useSimpleAuth } from '../hooks/useSimpleAuth';
 
 export function SecurityOptions() {
   const { securitySettings, updateSecuritySettings } = useSecurity();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useSimpleAuth();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     dataProtection: false,
     privacyControls: false,
