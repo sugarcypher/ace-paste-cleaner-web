@@ -38,7 +38,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-monthly', // Replace with your actual Gumroad URL
+    gumroadUrl: 'https://thinkwelllabs.gumroad.com/l/kcrps', // Monthly subscription
     description: 'Save 20+ hours per month - pays for itself in 3 minutes!'
   },
   {
@@ -62,7 +62,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-quarterly', // Replace with your actual Gumroad URL
+    gumroadUrl: 'https://thinkwelllabs.gumroad.com/l/kcrps', // Quarterly subscription
     description: 'Save 80+ hours per quarter - incredible value!'
   },
   {
@@ -87,7 +87,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-6months', // Replace with your actual Gumroad URL
+    gumroadUrl: 'https://thinkwelllabs.gumroad.com/l/kcrps', // 6 months subscription
     description: 'Save 200+ hours per 6 months - ⭐ 17% off!'
   },
   {
@@ -114,7 +114,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-yearly', // Replace with your actual Gumroad URL
+    gumroadUrl: 'https://thinkwelllabs.gumroad.com/l/kcrps', // Yearly subscription
     description: 'Save 400+ hours per year - 🔥 40% off!'
   },
   {
@@ -143,7 +143,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-2years', // Replace with your actual Gumroad URL
+    gumroadUrl: 'https://thinkwelllabs.gumroad.com/l/kcrps', // 2 years subscription
     description: 'Save 800+ hours over 2 years - 💎 52% off!'
   },
   {
@@ -175,7 +175,7 @@ export const GUMROAD_PRODUCTS: GumroadProduct[] = [
       advancedFeatures: true,
       prioritySupport: true
     },
-    gumroadUrl: 'https://sugarcypher.gumroad.com/l/ace-paste-cleaner-lifetime', // Replace with your actual Gumroad URL
+    gumroadUrl: 'https://thinkwelllabs.gumroad.com/l/kcrps', // Lifetime subscription
     description: 'LIMITED: Only 50 available - 🏆 LIFETIME ACCESS!'
   }
 ];
