@@ -30,4 +30,15 @@ execSync('cp index.html dist/', { stdio: 'inherit' });
 execSync('cp -r public/* dist/', { stdio: 'inherit' });
 execSync('cp CNAME dist/', { stdio: 'inherit' });
 
+// Update HTML to reference built JS file
+console.log('Updating HTML references...');
+const fs = await import('fs');
+const htmlPath = 'dist/index.html';
+let htmlContent = fs.readFileSync(htmlPath, 'utf8');
+htmlContent = htmlContent.replace(
+  '<script type="module" src="/src/main.tsx"></script>',
+  '<script type="module" src="/main.js"></script>'
+);
+fs.writeFileSync(htmlPath, htmlContent);
+
 console.log('✅ Build complete!');
