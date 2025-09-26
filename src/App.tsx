@@ -1129,6 +1129,9 @@ function countInvisibles(text: string) {
 }
 
 function App() {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { signIn, signUp } = useSimpleAuth();
+
   return (
     <ErrorBoundary>
       <SecurityProvider>
