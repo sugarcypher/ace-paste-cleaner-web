@@ -93,3 +93,18 @@ jspm_packages/
 
 
 
+# Large files that should be optimized
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.mp4
+*.mov
+*.avi
+*.zip
+*.tar.gz
+*.rar
+
+# But allow small optimized images
+!public/logo.jpg
+!public/30E5FAEC-6A70-4961-BAAF-946AC6BFFEE1.jpeg
