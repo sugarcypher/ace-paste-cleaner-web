@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun run --hot src/main.tsx",
     "build": "bun run build.js",
-    "preview": "bun run --serve dist"
+    "preview": "python3 -m http.server 5173 --directory dist"
   },
   "keywords": [
     "text",

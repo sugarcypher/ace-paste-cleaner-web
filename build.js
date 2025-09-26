@@ -2,16 +2,33 @@
 
 import { build } from 'bun';
 import { execSync } from 'child_process';
-import { existsSync, rmSync } from 'fs';
+import { existsSync, rmSync, readFileSync, writeFileSync } from 'fs';
 
 // Clean dist directory
 if (existsSync('dist')) {
   rmSync('dist', { recursive: true });
 }
 
-// Build CSS with Tailwind
+// Build CSS with Tailwind (prefer Node npx for best compatibility)
 console.log('Building CSS with Tailwind...');
-execSync('bunx tailwindcss -i ./src/index.css -o ./dist/main.css --minify', { stdio: 'inherit' });
+let cssBuilt = false;
+// 1) Try postcss CLI with explicit plugins (most stable across runtimes)
+try {
+  execSync('bunx postcss ./src/index.css -o ./dist/main.css --no-map -u tailwindcss@3.4.17 autoprefixer', { stdio: 'inherit' });
+  cssBuilt = true;
+} catch {}
+// 2) Try npx tailwindcss if Node/npm exists
+if (!cssBuilt) {
+  try {
+    execSync('npx -y tailwindcss@3.4.17 -i ./src/index.css -o ./dist/main.css --minify', { stdio: 'inherit' });
+    cssBuilt = true;
+  } catch {}
+}
+// 3) Fallback to bunx tailwindcss
+if (!cssBuilt) {
+  console.warn('postcss and npx paths failed, falling back to bunx tailwindcss...');
+  execSync('bunx tailwindcss@3.4.17 -i ./src/index.css -o ./dist/main.css --minify', { stdio: 'inherit' });
+}
 
 // Build JavaScript
 console.log('Building JavaScript...');
@@ -24,13 +41,26 @@ await build({
   sourcemap: 'external',
 });
 
-// Copy HTML and assets
+// Create production index.html that points to built assets
+console.log('Generating production index.html...');
+const rawHtml = readFileSync('index.html', 'utf8');
+// Prefer relative URLs so it works on custom domains and subpaths
+let prodHtml = rawHtml
+  .replace('/src/main.tsx', './main.js')
+  .replace('src="/src/main.tsx"', 'src="./main.js"')
+  // ensure favicon and other asset hrefs are relative
+  .replaceAll('href="/', 'href="./');
+if (!/href="\.\/main\.css"/.test(prodHtml)) {
+  prodHtml = prodHtml.replace('</head>', '    <link rel="stylesheet" href="./main.css">\n  </head>');
+}
+writeFileSync('dist/index.html', prodHtml, 'utf8');
+
+// Copy static assets
 console.log('Copying assets...');
-execSync('cp index.html dist/', { stdio: 'inherit' });
 execSync('cp -r public/* dist/', { stdio: 'inherit' });
 execSync('cp CNAME dist/', { stdio: 'inherit' });
 
-// Update HTML to reference built JS file
+console.log('✅ Build complete!');
 console.log('Updating HTML references...');
 const fs = await import('fs');
 const htmlPath = 'dist/index.html';
