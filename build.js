@@ -36,9 +36,22 @@ await build({
   entrypoints: ['src/main.tsx'],
   outdir: 'dist',
   target: 'browser',
-  minify: true,
-  splitting: true,
-  sourcemap: 'external',
+  minify: {
+    whitespace: true,
+    identifiers: true,
+    syntax: true,
+  },
+  splitting: false, // Disable splitting to reduce complexity
+  sourcemap: false, // Disable sourcemaps to reduce CodeQL noise
+  format: 'esm',
+  treeShaking: true, // Enable aggressive tree shaking
+  drop: ['console', 'debugger'], // Remove console logs and debugger statements
+  define: {
+    'process.env.NODE_ENV': '"production"',
+    'global': 'globalThis',
+  },
+  external: [], // Bundle everything to avoid external references
+  bundle: true,
 });
 
 // Create production index.html that points to built assets

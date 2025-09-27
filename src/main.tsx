@@ -11,9 +11,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <App />
     </SecurityProvider>
   </React.StrictMode>,
-)
-
-
-
-
+);
 
