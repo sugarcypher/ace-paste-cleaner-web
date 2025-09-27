@@ -1,215 +1,91 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useSimpleAuth } from "./hooks/useSimpleAuth";
 import { PaywallModal } from "./components/PaywallModal";
-import { UsageIndicator } from "./components/UsageIndicator";
-import { SecurityOptions } from "./components/SecurityOptions";
-import { PrivacyPolicy } from "./components/PrivacyPolicy";
-import { SecurityPolicy } from "./components/SecurityPolicy";
 import { PrivacyAgreement } from "./components/PrivacyAgreement";
-import { SecurityProvider, useSecurity } from "./contexts/SecurityContext";
-import { stripInvisibleCharacters } from "./utils/advancedInvisibleCharacters";
-import { GumroadWebhookHandler } from "./components/GumroadWebhookHandler";
-import { Header } from "./components/Header";
-import { ErrorBoundary } from "./components/ErrorBoundary";
 import { SimpleAuthModal } from "./components/SimpleAuthModal";
+import { cleanText } from "./utils/textCleaner";
 
+// Basic clean options for simplified interface
 interface CleanOptions {
   removeInvisible: boolean;
-  keepVS16Emoji: boolean;
-  preserveEmoji: boolean;
   stripMarkdownHeaders: boolean;
   stripBoldItalic: boolean;
   stripBackticks: boolean;
-  stripEmDashSeparators: boolean;
-  stripListMarkers: boolean;
-  stripBlockquotes: boolean;
   normalizeWhitespace: boolean;
   collapseBlankLines: boolean;
-  // Additional options for removing other things
   removeUrls: boolean;
   removeEmailAddresses: boolean;
   removePhoneNumbers: boolean;
-  removeTimestamps: boolean;
-  removeSpecialCharacters: boolean;
-  removeExtraPunctuation: boolean;
-  removeRepeatedWords: boolean;
-  removeEmptyLines: boolean;
-  removeTrailingSpaces: boolean;
-  removeLeadingSpaces: boolean;
-  // New features from README
-  caseConversion: 'none' | 'lowercase' | 'uppercase' | 'titlecase' | 'sentencecase';
-  removeUTMParameters: boolean;
-  markdownSafeMode: boolean;
-  preserveCodeFences: boolean;
-  preserveTabsSpaces: boolean;
-  preserveEscapeSequences: boolean;
 }
 
-
-interface StatsProps {
-  input: string;
-  output: string;
-  opts: CleanOptions;
-}
-
-interface MetricProps {
-  k: string;
-  v: string;
-  isActive?: boolean;
-}
-
-function AppContent() {
-  const [input, setInput] = useState("");
-  const [showPaywall, setShowPaywall] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
-  const [showSecurity, setShowSecurity] = useState(false);
-  const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
-  const [paywallReason, setPaywallReason] = useState<'daily_limit' | 'text_length' | 'feature_required'>('daily_limit');
-  const [isSavingFeatures, setIsSavingFeatures] = useState(false);
+function App() {
+  const { user, signOut, usage, recordCleaning } = useSimpleAuth();
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  // Get auth data from simple authentication
-  const { user, usage, recordCleaning, canClean, signIn, signUp, signOut } = useSimpleAuth();
-  const { hasAcceptedTerms, securitySettings } = useSecurity();
-  
-  const [opts, setOpts] = useState<CleanOptions>({
+  const [showPaywall, setShowPaywall] = useState(false);
+  const [paywallReason, setPaywallReason] = useState('daily_limit');
+  const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
+  const hasAcceptedTerms = true; // Simplified for clean interface
+
+  // Default clean options
+  const opts: CleanOptions = {
     removeInvisible: true,
-    keepVS16Emoji: true,
-    preserveEmoji: true,
     stripMarkdownHeaders: true,
     stripBoldItalic: true,
     stripBackticks: true,
-    stripEmDashSeparators: true,
-    stripListMarkers: true,
-    stripBlockquotes: true,
     normalizeWhitespace: true,
     collapseBlankLines: true,
     removeUrls: false,
     removeEmailAddresses: false,
     removePhoneNumbers: false,
-    removeTimestamps: false,
-    removeSpecialCharacters: false,
-    removeExtraPunctuation: false,
-    removeRepeatedWords: false,
-    removeEmptyLines: false,
-    removeTrailingSpaces: false,
-    removeLeadingSpaces: false,
-    // New features
-    caseConversion: 'none',
-    removeUTMParameters: false,
-    markdownSafeMode: false,
-    preserveCodeFences: false,
-    preserveTabsSpaces: false,
-    preserveEscapeSequences: false,
-  });
-
-  function toggle(key: keyof CleanOptions) {
-    setOpts((o) => {
-      const currentValue = o[key];
-      if (typeof currentValue === 'boolean') {
-        return { ...o, [key]: !currentValue };
-      }
-      return o;
-    });
-  }
-
-  const cleaned = useMemo(() => {
-    // Allow basic cleaning without authentication for demo purposes
-    // Limit demo to 500 characters
-    if (!user && input.length > 500) {
-      return input; // Return input as-is if over demo limit
-    }
-    
-    // Use advanced invisible character detection if enabled and user is authenticated
-    if (user && opts.removeInvisible && securitySettings.encryptionLevel === 'enhanced') {
-      return stripInvisibleCharacters(cleanText(input, opts));
-    }
-    
-    return cleanText(input, opts);
-  }, [input, opts, securitySettings, user]);
-
-  const handleClean = async () => {
-    // SECURITY: Type validation to prevent type confusion attacks
-    // Validate input is a string to ensure safe text processing
-    if (typeof input !== 'string') {
-      console.error('Invalid input type for text cleaning');
-      return;
-    }
-    
-    // Allow demo usage without authentication for text under 500 characters
-    if (!user) {
-      if (input.length > 500) {
-        setPaywallReason('daily_limit');
-        setShowPaywall(true);
-        return;
-      }
-      // Demo usage is allowed, cleaning happens automatically via useMemo
-      return;
-    }
-    
-    if (!canClean(input.length)) {
-      // Check character limits based on tier
-      const maxLength = user?.tier === 'free' ? 2000 :
-                       user?.tier === 'monthly' ? 50000 :
-                       user?.tier === 'quarterly' ? 200000 :
-                       user?.tier === 'six_months' ? 500000 :
-                       user?.tier === 'yearly' ? 1000000 :
-                       user?.tier === 'two_years' ? 2000000 : 2000000;
-      
-      if (input.length > maxLength) {
-        setPaywallReason('text_length');
-      } else {
-        setPaywallReason('daily_limit');
-      }
-      setShowPaywall(true);
-      return;
-    }
-    
-    // Record the cleaning usage
-    const success = await recordCleaning();
-    if (!success) {
-      setPaywallReason('daily_limit');
-      setShowPaywall(true);
-      return;
-    }
-    
-    // The cleaning is already done by the cleaned useMemo, so we don't need to do anything else
-    // The cleaned text will automatically update in the UI
   };
 
-  const saveFeaturesConfiguration = async () => {
-    if (!user) return;
+  const handleClean = async () => {
+    if (!input.trim()) return;
     
-    setIsSavingFeatures(true);
+    setIsProcessing(true);
+    
+    // Check limits for demo users
+    if (!user && input.length > 500) {
+      setPaywallReason('daily_limit');
+      setShowPaywall(true);
+      setIsProcessing(false);
+      return;
+    }
+
+    // Check limits for authenticated users
+    if (user && user.tier === 'free' && input.length > 2000) {
+      setPaywallReason('text_length');
+      setShowPaywall(true);
+      setIsProcessing(false);
+      return;
+    }
+
     try {
-      // Save features configuration
-      const config = {
-        features: opts,
-        timestamp: new Date().toISOString(),
-        userId: user.id
-      };
+      // Clean the text
+      const cleaned = cleanText(input, opts);
+      setOutput(cleaned);
       
-      // Store in localStorage for now (can be extended to backend)
-      localStorage.setItem(`acepaste_features_${user.id}`, JSON.stringify(config));
-      
-      // Show success message
-      alert('Features configuration saved successfully!');
+      // Record usage if user is logged in
+      if (user) {
+        await recordCleaning();
+      }
     } catch (error) {
-      console.error('Failed to save features configuration:', error);
-      alert('Failed to save features configuration. Please try again.');
+      console.error('Failed to clean text:', error);
+      alert('Failed to clean text. Please try again.');
     } finally {
-      setIsSavingFeatures(false);
+      setIsProcessing(false);
     }
   };
 
   const copyToClipboard = async () => {
+    if (!output) return;
+    
     try {
-      // SECURITY: Output validation to prevent clipboard injection attacks
-      // Validate cleaned text before copying to ensure data integrity
-      if (typeof cleaned !== 'string') {
-        console.error('Invalid cleaned text type');
-        return;
-      }
-      await navigator.clipboard.writeText(cleaned);
+      await navigator.clipboard.writeText(output);
+      alert('Cleaned text copied to clipboard!');
     } catch (err) {
       console.error('Failed to copy text: ', err);
     }
@@ -218,14 +94,11 @@ function AppContent() {
   const pasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
-      // SECURITY: Input validation to prevent clipboard-based attacks
-      // Validate clipboard content type to prevent type confusion
       if (typeof text !== 'string') {
         console.error('Invalid clipboard content type');
         return;
       }
-      // SECURITY: Resource protection - limit clipboard size to prevent memory exhaustion
-      if (text.length > 10000000) { // 10MB character limit for security
+      if (text.length > 10000000) { // 10MB character limit
         console.error('Clipboard content too large');
         alert('The clipboard content is too large. Please paste smaller text.');
         return;
