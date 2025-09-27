@@ -130,17 +130,18 @@ function isPrivateUse(ch: string, scope: string): boolean {
   return false;
 }
 
-// SECURITY: Safe HTML entity decoder to prevent double escaping/unescaping (CWE-116/CWE-020)
+// SECURITY: Safe HTML entity decoder to prevent XSS and double escaping/unescaping (CWE-079, CWE-116/CWE-020)
 function safeDecodeHtmlEntities(text: string): string {
-  // Use DOMParser or textarea element for robust entity decoding (browser environment)
-  if (typeof document !== "undefined") {
+  // SECURITY FIX: Use DOMParser instead of innerHTML to prevent XSS execution (CWE-079)
+  if (typeof DOMParser !== "undefined") {
     try {
-      const textarea = document.createElement("textarea");
-      textarea.innerHTML = text;
-      return textarea.textContent || textarea.innerText || "";
+      // DOMParser treats content as inert - no script execution
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
+      return doc.body.textContent || doc.body.innerText || "";
     } catch (e) {
-      // Fallback to manual decoding if DOM methods fail
-      console.warn("DOM-based entity decoding failed, using fallback:", e);
+      // Fallback to manual decoding if DOMParser fails
+      console.warn("DOMParser-based entity decoding failed, using manual fallback:", e);
     }
   }
   
