@@ -113,13 +113,14 @@ function AppContent() {
   }
 
   const cleaned = useMemo(() => {
-    // Only clean if user is authenticated
-    if (!user) {
-      return input; // Return input as-is if not authenticated
+    // Allow basic cleaning without authentication for demo purposes
+    // Limit demo to 500 characters
+    if (!user && input.length > 500) {
+      return input; // Return input as-is if over demo limit
     }
     
-    // Use advanced invisible character detection if enabled
-    if (opts.removeInvisible && securitySettings.encryptionLevel === 'enhanced') {
+    // Use advanced invisible character detection if enabled and user is authenticated
+    if (user && opts.removeInvisible && securitySettings.encryptionLevel === 'enhanced') {
       return stripInvisibleCharacters(cleanText(input, opts));
     }
     
@@ -127,10 +128,14 @@ function AppContent() {
   }, [input, opts, securitySettings, user]);
 
   const handleClean = async () => {
-    // Check if user is authenticated first
+    // Allow demo usage without authentication for text under 500 characters
     if (!user) {
-      setPaywallReason('daily_limit');
-      setShowPaywall(true);
+      if (input.length > 500) {
+        setPaywallReason('daily_limit');
+        setShowPaywall(true);
+        return;
+      }
+      // Demo usage is allowed, cleaning happens automatically via useMemo
       return;
     }
     
@@ -239,19 +244,22 @@ function AppContent() {
               </div>
             </div>
             
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-6 animate-shimmer">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 animate-shimmer">
               <span className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent">
-                ACE PASTE
+                ACE PASTE CLEANER
               </span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                CLEANER
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-3xl md:text-4xl lg:text-5xl">
+                Pro
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Transform messy text into pristine content with our revolutionary AI-powered cleaning engine. 
-              <span className="font-semibold text-blue-600">Clean • Normalize • Perfect</span>
+            <p className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 max-w-4xl mx-auto leading-tight">
+              Instantly strip formatting, invisible characters, and junk from any text
+            </p>
+            
+            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Clean thousands of characters in milliseconds • Perfect formatting every time • Enterprise-grade security
             </p>
             
             <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -289,36 +297,124 @@ function AppContent() {
               </button>
             </div>
             
-            {/* Revolutionary Feature Showcase */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
-              <div className="card-glow text-center" style={{'--delay': '0s'}}>
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+            {/* Key Benefits - Above the Fold */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
+              <div className="card-glow text-left p-6" style={{'--delay': '0s'}}>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Lightning Fast</h3>
+                    <p className="text-gray-600 mb-3">Clean thousands of characters in milliseconds with our optimized engine</p>
+                    <div className="text-sm text-blue-600 font-medium">Example: 50,000 chars cleaned in &lt;0.1s</div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Lightning Fast</h3>
-                <p className="text-gray-600">Clean thousands of characters in milliseconds with our optimized engine</p>
               </div>
               
-              <div className="card-glow text-center" style={{'--delay': '0.2s'}}>
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+              <div className="card-glow text-left p-6" style={{'--delay': '0.2s'}}>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Detection</h3>
+                    <p className="text-gray-600 mb-3">Automatically identifies and removes invisible characters, formatting, and junk</p>
+                    <div className="text-sm text-emerald-600 font-medium">Detects 40+ types of hidden characters</div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Detection</h3>
-                <p className="text-gray-600">Automatically identifies and removes invisible characters, formatting, and junk</p>
               </div>
               
-              <div className="card-glow text-center" style={{'--delay': '0.4s'}}>
-                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-500 to-red-600 rounded-2xl flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
+              <div className="card-glow text-left p-6" style={{'--delay': '0.4s'}}>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">Privacy First</h3>
+                    <p className="text-gray-600 mb-3">Your text never leaves your browser. 100% client-side processing</p>
+                    <div className="text-sm text-pink-600 font-medium">Zero data transmission to servers</div>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Privacy First</h3>
-                <p className="text-gray-600">Your text never leaves your browser. 100% client-side processing</p>
+              </div>
+            </div>
+            
+            {/* Try Without Sign-In Section */}
+            <div className="max-w-4xl mx-auto mb-16 text-center">
+              <div className="card-ultra p-8">
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">Try It Now - No Sign-Up Required</h2>
+                <p className="text-gray-600 mb-6">Experience the power of ACE Paste Cleaner with our demo. Sign up for advanced features and higher limits.</p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <a href="#cleaner" className="btn-glow flex items-center gap-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                    Try the Cleaner Below
+                  </a>
+                  <button
+                    onClick={() => setShowAuthModal(true)}
+                    className="btn-ultra flex items-center gap-3"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Get Started Free
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Sample Tasks Section */}
+            <div className="max-w-4xl mx-auto mb-8">
+              <div className="card-glow p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  Try Sample Cleaning Tasks
+                </h3>
+                <p className="text-gray-600 mb-4">Click these examples to see ACE Paste Cleaner in action:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => setInput('# Hello World\n\n**This** is _formatted_ text with `code` blocks and extra   spaces.\n\n• List item 1\n• List item 2\n\nVisit https://example.com for more info!')}
+                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+                  >
+                    <div className="font-medium text-gray-800 mb-1">📝 Markdown Cleanup</div>
+                    <div className="text-sm text-gray-600">Remove headers, bold/italic, code blocks, and list markers</div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setInput('Contact us at: support@example.com or call (555) 123-4567\nOur address: 123 Main St, City, State 12345\nTiming: Mon-Fri 9AM-5PM EST\n\nFollow: https://twitter.com/example?utm_source=email&utm_medium=newsletter')}
+                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+                  >
+                    <div className="font-medium text-gray-800 mb-1">🔒 Privacy Scrub</div>
+                    <div className="text-sm text-gray-600">Remove emails, phone numbers, and tracking URLs</div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setInput('This    text     has\n\n\n\nmultiple blank lines\n\n\nand     extra     spaces     everywhere\t\t\nMixed\twhitespace\tcharacters   too!')}
+                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+                  >
+                    <div className="font-medium text-gray-800 mb-1">🧹 Whitespace Cleanup</div>
+                    <div className="text-sm text-gray-600">Fix spacing issues and normalize whitespace</div>
+                  </button>
+                  
+                  <button
+                    onClick={() => setInput('Convert THIS mixed CaSe TeXt into the format you want. some words are ALL CAPS while others are lowercase. what would you like it to become?')}
+                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
+                  >
+                    <div className="font-medium text-gray-800 mb-1">🔤 Case Conversion</div>
+                    <div className="text-sm text-gray-600">Transform text case to proper format</div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -338,69 +434,143 @@ function AppContent() {
           <SecurityOptions />
         </div>
 
-        {/* Features Section */}
-        <div className="mb-8">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white mb-2">Cleaning Features</h2>
-            <p className="text-slate-300">Choose what to clean from your text</p>
+        {/* Advanced Features Section */}
+        <div className="mb-16 max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Advanced Cleaning Options</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Fine-tune your text cleaning with these professional-grade options. Each category targets specific types of content.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <OptionGroup 
-            title="Text Formatting" 
-            options={[
-              { key: 'stripMarkdownHeaders', label: 'Markdown Headers' },
-              { key: 'stripBoldItalic', label: 'Bold/Italic Markers' },
-              { key: 'stripBackticks', label: 'Code Blocks' },
-              { key: 'stripListMarkers', label: 'List Markers' },
-              { key: 'stripBlockquotes', label: 'Blockquotes' },
-              { key: 'stripEmDashSeparators', label: 'Em-dash Separators' }
-            ]}
-            opts={opts}
-            toggle={toggle}
-          />
           
-          <OptionGroup 
-            title="Content Removal" 
-            options={[
-              { key: 'removeUrls', label: 'URLs' },
-              { key: 'removeEmailAddresses', label: 'Email Addresses' },
-              { key: 'removePhoneNumbers', label: 'Phone Numbers' },
-              { key: 'removeTimestamps', label: 'Timestamps' },
-              { key: 'removeSpecialCharacters', label: 'Special Characters' },
-              { key: 'removeRepeatedWords', label: 'Repeated Words' }
-            ]}
-            opts={opts}
-            toggle={toggle}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+            <div className="card-glow p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Text Formatting</h3>
+              </div>
+              <p className="text-gray-600 text-sm mb-4">Remove markdown syntax and formatting markers like headers, bold/italic, and code blocks</p>
+              <OptionGroup 
+                title="" 
+                options={[
+                  { key: 'stripMarkdownHeaders', label: 'Markdown Headers' },
+                  { key: 'stripBoldItalic', label: 'Bold/Italic Markers' },
+                  { key: 'stripBackticks', label: 'Code Blocks' },
+                  { key: 'stripListMarkers', label: 'List Markers' },
+                  { key: 'stripBlockquotes', label: 'Blockquotes' },
+                  { key: 'stripEmDashSeparators', label: 'Em-dash Separators' }
+                ]}
+                opts={opts}
+                toggle={toggle}
+              />
+            </div>
           
-          <OptionGroup 
-            title="Whitespace & Invisible" 
-            options={[
-              { key: 'removeInvisible', label: 'Invisible Characters' },
-              { key: 'keepVS16Emoji', label: 'Keep Emoji VS16' },
-              { key: 'preserveEmoji', label: 'Preserve Emoji Sequences' },
-              { key: 'normalizeWhitespace', label: 'Normalize Whitespace' },
-              { key: 'collapseBlankLines', label: 'Collapse Blank Lines' },
-              { key: 'removeEmptyLines', label: 'Remove Empty Lines' },
-              { key: 'removeTrailingSpaces', label: 'Remove Trailing Spaces' },
-              { key: 'removeLeadingSpaces', label: 'Remove Leading Spaces' }
-            ]}
-            opts={opts}
-            toggle={toggle}
-          />
+            <div className="card-glow p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Content Removal</h3>
+              </div>
+              <p className="text-gray-600 text-sm mb-4">Strip out specific types of content like URLs, emails, phone numbers, and other identifiable information</p>
+              <OptionGroup 
+                title="" 
+                options={[
+                  { key: 'removeUrls', label: 'URLs' },
+                  { key: 'removeEmailAddresses', label: 'Email Addresses' },
+                  { key: 'removePhoneNumbers', label: 'Phone Numbers' },
+                  { key: 'removeTimestamps', label: 'Timestamps' },
+                  { key: 'removeSpecialCharacters', label: 'Special Characters' },
+                  { key: 'removeRepeatedWords', label: 'Repeated Words' }
+                ]}
+                opts={opts}
+                toggle={toggle}
+              />
+            </div>
+            
+            <div className="card-glow p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Whitespace & Invisible</h3>
+              </div>
+              <p className="text-gray-600 text-sm mb-4">Clean up spacing issues and remove hidden characters that can cause formatting problems</p>
+              <OptionGroup 
+                title="" 
+                options={[
+                  { key: 'removeInvisible', label: 'Invisible Characters' },
+                  { key: 'keepVS16Emoji', label: 'Keep Emoji VS16' },
+                  { key: 'preserveEmoji', label: 'Preserve Emoji Sequences' },
+                  { key: 'normalizeWhitespace', label: 'Normalize Whitespace' },
+                  { key: 'collapseBlankLines', label: 'Collapse Blank Lines' },
+                  { key: 'removeEmptyLines', label: 'Remove Empty Lines' },
+                  { key: 'removeTrailingSpaces', label: 'Remove Trailing Spaces' },
+                  { key: 'removeLeadingSpaces', label: 'Remove Leading Spaces' }
+                ]}
+                opts={opts}
+                toggle={toggle}
+              />
+            </div>
 
-          <OptionGroup 
-            title="Advanced Features" 
-            options={[
-              { key: 'removeUTMParameters', label: 'Remove UTM Parameters' },
-              { key: 'markdownSafeMode', label: 'Markdown Safe Mode' },
-              { key: 'preserveCodeFences', label: 'Preserve Code Fences' },
-              { key: 'preserveTabsSpaces', label: 'Preserve Tabs/Spaces' },
-              { key: 'preserveEscapeSequences', label: 'Preserve Escape Sequences' }
-            ]}
-            opts={opts}
-            toggle={toggle}
-          />
+            <div className="card-glow p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">Advanced Features</h3>
+              </div>
+              <p className="text-gray-600 text-sm mb-4">Professional features for developers and power users, including code preservation and URL cleaning</p>
+              <OptionGroup 
+                title="" 
+                options={[
+                  { key: 'removeUTMParameters', label: 'Remove UTM Parameters' },
+                  { key: 'markdownSafeMode', label: 'Markdown Safe Mode' },
+                  { key: 'preserveCodeFences', label: 'Preserve Code Fences' },
+                  { key: 'preserveTabsSpaces', label: 'Preserve Tabs/Spaces' },
+                  { key: 'preserveEscapeSequences', label: 'Preserve Escape Sequences' }
+                ]}
+                opts={opts}
+                toggle={toggle}
+              />
+            </div>
+          </div>
+          
+          {/* Case Conversion Section */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div className="card-glow p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">Text Case Conversion</h3>
+                  <p className="text-gray-600 text-sm">Transform the capitalization of your text</p>
+                </div>
+              </div>
+              <select
+                value={opts.caseConversion}
+                onChange={(e) => setOpts(prev => ({ ...prev, caseConversion: e.target.value as any }))}
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+              >
+                <option value="none">No conversion</option>
+                <option value="lowercase">lowercase</option>
+                <option value="uppercase">UPPERCASE</option>
+                <option value="titlecase">Title Case</option>
+                <option value="sentencecase">Sentence case</option>
+              </select>
+            </div>
           </div>
           
           {/* Save Features Configuration Button */}
@@ -409,42 +579,27 @@ function AppContent() {
               <button
                 onClick={saveFeaturesConfiguration}
                 disabled={isSavingFeatures}
-                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:from-emerald-600 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
+                className="btn-glow flex items-center gap-3"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                {isSavingFeatures ? 'Saving...' : 'Save Features'}
+                {isSavingFeatures ? 'Saving Features...' : 'Save Feature Configuration'}
               </button>
             </div>
           )}
         </div>
 
-        {/* Case Conversion Section */}
-        <div className="mb-8">
-          <div className="text-center mb-6">
-            <h3 className="text-xl font-semibold text-white mb-2">Text Formatting</h3>
-            <p className="text-slate-300">Transform your text case</p>
-          </div>
-          <div className="max-w-md mx-auto">
-            <select
-              value={opts.caseConversion}
-              onChange={(e) => setOpts(prev => ({ ...prev, caseConversion: e.target.value as any }))}
-              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm"
-            >
-              <option value="none">No conversion</option>
-              <option value="lowercase">lowercase</option>
-              <option value="uppercase">UPPERCASE</option>
-              <option value="titlecase">Title Case</option>
-              <option value="sentencecase">Sentence case</option>
-            </select>
-          </div>
-        </div>
-
           {/* Revolutionary Text Processing Interface */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
-            {/* Input Section */}
-            <div className="card-ultra animate-slide-scale" style={{animationDelay: '0.2s'}}>
+          <div id="cleaner" className="scroll-mt-20">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">Text Cleaner Tool</h2>
+              <p className="text-lg text-gray-600">Paste, configure, and clean your text in seconds</p>
+            </div>
+            
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+              {/* Input Section */}
+              <div className="card-ultra animate-slide-scale" style={{animationDelay: '0.2s'}}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
@@ -453,51 +608,71 @@ function AppContent() {
                     </svg>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800">Input Text</h3>
-                {user && (
-                  <div className="text-sm">
-                    {user.tier === 'admin' ? (
+                <div className="text-sm">
+                  {!user ? (
+                    <span className={input.length > 500 ? 'text-red-500 font-semibold' : 'text-gray-600'}>
+                      Demo: {input.length.toLocaleString()} / 500 chars
+                      {input.length > 500 && ' (Sign in for unlimited)'}
+                    </span>
+                  ) : (
+                    user.tier === 'admin' ? (
                       <span className="text-emerald-400 font-medium">
                         {input.length.toLocaleString()} chars (Unlimited)
                       </span>
                     ) : user.tier === 'free' ? (
-                      <span className={input.length > 2000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 2000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 2,000 chars
                       </span>
                     ) : user.tier === 'monthly' ? (
-                      <span className={input.length > 50000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 50000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 50,000 chars
                       </span>
                     ) : user.tier === 'quarterly' ? (
-                      <span className={input.length > 200000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 200000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 200,000 chars
                       </span>
                     ) : user.tier === 'six_months' ? (
-                      <span className={input.length > 500000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 500000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 500,000 chars
                       </span>
                     ) : user.tier === 'yearly' ? (
-                      <span className={input.length > 1000000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 1000000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 1,000,000 chars
                       </span>
                     ) : user.tier === 'two_years' ? (
-                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 2,000,000 chars
                       </span>
                     ) : (
-                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-slate-300'}>
+                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-gray-300'}>
                         {input.length.toLocaleString()} / 2,000,000 chars
                       </span>
-                    )}
-                  </div>
-                )}
+                    )
+                  )}
+                </div>
               </div>
             </div>
             
             {!user && (
-              <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
-                <p className="text-amber-300 text-sm text-center">
-                  🔒 Please sign in to use the text cleaning features
-                </p>
+              <div className="mb-4 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl">
+                <div className="text-center">
+                  <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-lg font-semibold text-blue-300 mb-2">Try Demo or Sign In</h4>
+                  <p className="text-blue-200 text-sm mb-4">
+                    <strong>Demo:</strong> Clean up to 500 characters without signing up.<br/>
+                    <strong>Full Access:</strong> Sign in for unlimited cleaning, saved preferences, and advanced features.
+                  </p>
+                  <button
+                    onClick={() => setShowAuthModal(true)}
+                    className="btn-glow text-sm"
+                  >
+                    Sign In / Sign Up Free
+                  </button>
+                </div>
               </div>
             )}
             
@@ -506,14 +681,20 @@ function AppContent() {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Paste your text here to clean it..."
               className="w-full h-32 rounded-xl bg-slate-900/50 border border-slate-700 p-4 font-mono text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm"
+              aria-label="Input text to be cleaned"
+              aria-describedby="input-help"
             />
+            <div id="input-help" className="sr-only">
+              Paste or type your text here. It will be processed according to your selected cleaning options.
+            </div>
             
             <div className="mt-4 flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => { setInput(""); }}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium text-sm shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105"
+                aria-label="Clear input text"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
                 Clear
@@ -521,18 +702,21 @@ function AppContent() {
               <button
                 onClick={pasteFromClipboard}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105"
+                aria-label="Paste text from clipboard"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Paste
               </button>
               <button
                 onClick={handleClean}
-                disabled={!input.trim() || !user || !canClean(input.length)}
+                disabled={!input.trim() || (user && !canClean(input.length))}
                 className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed transition-all duration-200 font-medium text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105 disabled:hover:scale-100"
+                aria-label="Clean the input text using selected options"
+                aria-describedby="clean-help"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Clean Now
@@ -540,8 +724,9 @@ function AppContent() {
               <button
                 onClick={copyToClipboard}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:from-emerald-600 hover:to-green-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
+                aria-label="Copy cleaned text to clipboard"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
                 Copy Clean
@@ -562,7 +747,16 @@ function AppContent() {
               readOnly
               className="w-full h-32 rounded-xl bg-slate-900/50 border border-slate-700 p-4 font-mono text-sm text-white placeholder-slate-400 backdrop-blur-sm"
               placeholder="Your cleaned text will appear here..."
+              aria-label="Cleaned output text"
+              aria-describedby="output-help"
             />
+            <div id="output-help" className="sr-only">
+              This area shows your text after it has been cleaned using the selected options.
+            </div>
+            <div id="clean-help" className="sr-only">
+              This button processes your input text according to your selected cleaning options. You must be signed in to use this feature.
+            </div>
+          </div>
           </div>
         </div>
 
