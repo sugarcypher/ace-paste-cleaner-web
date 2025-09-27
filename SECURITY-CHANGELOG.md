@@ -44,6 +44,78 @@ if (gumroadUrl && typeof gumroadUrl === 'string') {
 
 ### 🛡️ Additional Security Enhancements
 
+#### CWE-116/CWE-020: Double Escaping/Unescaping Prevention
+**Severity**: Medium  
+**CVSS Score**: 5.8 (AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:M/A:L)  
+**Status**: ✅ FIXED
+
+**Description**:
+CodeQL analysis detected potential double escaping/unescaping vulnerabilities in HTML entity processing. Naive string replacement chains could lead to incorrect character transformations when entities are processed multiple times.
+
+**Affected Code Location**:
+- `src/utils/advancedTextCleaner.ts:133-156` - `stripMarkup` function entity decoding
+
+**Root Cause**:
+The original code used a chain of `.replace()` calls for HTML entity decoding:
+```typescript
+// Vulnerable to double escaping/unescaping
+text = text.replace(/&amp;/g, "&")
+           .replace(/&lt;/g, "<")
+           .replace(/&gt;/g, ">")
+           .replace(/&quot;/g, '"')
+           .replace(/&#39;/g, "'");
+```
+
+**Fix Applied**:
+```typescript
+// SECURITY: Safe HTML entity decoder to prevent double escaping/unescaping (CWE-116/CWE-020)
+function safeDecodeHtmlEntities(text: string): string {
+  // Use DOMParser or textarea element for robust entity decoding (browser environment)
+  if (typeof document !== "undefined") {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.innerHTML = text;
+      return textarea.textContent || textarea.innerText || "";
+    } catch (e) {
+      // Fallback to manual decoding if DOM methods fail
+      console.warn("DOM-based entity decoding failed, using fallback:", e);
+    }
+  }
+  
+  // Fallback manual decoding for Node.js or when DOM fails
+  // Process entities in specific order to avoid double-processing
+  const entityMap: Record<string, string> = {
+    '&amp;': '&',    // Process &amp; last to avoid double-decoding
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&#x27;': "'",
+    '&apos;': "'"
+  };
+  
+  // Replace all entities except &amp; first
+  let result = text;
+  Object.entries(entityMap).forEach(([entity, replacement]) => {
+    if (entity !== '&amp;') {
+      result = result.replace(new RegExp(entity, 'g'), replacement);
+    }
+  });
+  
+  // Process &amp; last to prevent double-decoding
+  result = result.replace(/&amp;/g, '&');
+  
+  return result;
+}
+```
+
+**Security Impact**:
+- Prevents character corruption from multiple encoding/decoding cycles
+- Uses robust DOM-based decoding when available
+- Implements controlled fallback with ordered entity processing
+- Eliminates risk of malformed output from double-processing
+- Ensures consistent text sanitization behavior
+
 #### Input Type Validation
 **Enhancement**: Added runtime type checking for all user inputs
 ```typescript

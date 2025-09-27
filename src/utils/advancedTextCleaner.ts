@@ -130,15 +130,52 @@ function isPrivateUse(ch: string, scope: string): boolean {
   return false;
 }
 
+// SECURITY: Safe HTML entity decoder to prevent double escaping/unescaping (CWE-116/CWE-020)
+function safeDecodeHtmlEntities(text: string): string {
+  // Use DOMParser or textarea element for robust entity decoding (browser environment)
+  if (typeof document !== "undefined") {
+    try {
+      const textarea = document.createElement("textarea");
+      textarea.innerHTML = text;
+      return textarea.textContent || textarea.innerText || "";
+    } catch (e) {
+      // Fallback to manual decoding if DOM methods fail
+      console.warn("DOM-based entity decoding failed, using fallback:", e);
+    }
+  }
+  
+  // Fallback manual decoding for Node.js or when DOM fails
+  // Process entities in specific order to avoid double-processing
+  const entityMap: Record<string, string> = {
+    '&amp;': '&',    // Process &amp; last to avoid double-decoding
+    '&lt;': '<',
+    '&gt;': '>',
+    '&quot;': '"',
+    '&#39;': "'",
+    '&#x27;': "'",
+    '&apos;': "'"
+  };
+  
+  // Replace all entities except &amp; first
+  let result = text;
+  Object.entries(entityMap).forEach(([entity, replacement]) => {
+    if (entity !== '&amp;') {
+      result = result.replace(new RegExp(entity, 'g'), replacement);
+    }
+  });
+  
+  // Process &amp; last to prevent double-decoding
+  result = result.replace(/&amp;/g, '&');
+  
+  return result;
+}
+
 function stripMarkup(text: string, config: AdvancedCleanProfile['strip_markup']): string {
   if (config.html_xml) {
+    // Remove HTML/XML tags first
     text = text.replace(HTML_TAG_RE, " ");
-    // Basic HTML entity decoding for common entities
-    text = text.replace(/&amp;/g, "&")
-               .replace(/&lt;/g, "<")
-               .replace(/&gt;/g, ">")
-               .replace(/&quot;/g, '"')
-               .replace(/&#39;/g, "'");
+    // SECURITY: Use safe entity decoder to prevent double escaping/unescaping
+    text = safeDecodeHtmlEntities(text);
   }
   
   if (config.code_fences) {
