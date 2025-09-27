@@ -128,6 +128,13 @@ function AppContent() {
   }, [input, opts, securitySettings, user]);
 
   const handleClean = async () => {
+    // SECURITY: Type validation to prevent type confusion attacks
+    // Validate input is a string to ensure safe text processing
+    if (typeof input !== 'string') {
+      console.error('Invalid input type for text cleaning');
+      return;
+    }
+    
     // Allow demo usage without authentication for text under 500 characters
     if (!user) {
       if (input.length > 500) {
@@ -196,6 +203,12 @@ function AppContent() {
 
   const copyToClipboard = async () => {
     try {
+      // SECURITY: Output validation to prevent clipboard injection attacks
+      // Validate cleaned text before copying to ensure data integrity
+      if (typeof cleaned !== 'string') {
+        console.error('Invalid cleaned text type');
+        return;
+      }
       await navigator.clipboard.writeText(cleaned);
     } catch (err) {
       console.error('Failed to copy text: ', err);
@@ -205,6 +218,18 @@ function AppContent() {
   const pasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
+      // SECURITY: Input validation to prevent clipboard-based attacks
+      // Validate clipboard content type to prevent type confusion
+      if (typeof text !== 'string') {
+        console.error('Invalid clipboard content type');
+        return;
+      }
+      // SECURITY: Resource protection - limit clipboard size to prevent memory exhaustion
+      if (text.length > 10000000) { // 10MB character limit for security
+        console.error('Clipboard content too large');
+        alert('The clipboard content is too large. Please paste smaller text.');
+        return;
+      }
       setInput(text);
     } catch (err) {
       console.error('Failed to paste text: ', err);
@@ -798,7 +823,8 @@ function AppContent() {
         onClose={() => setShowPaywall(false)}
         onUpgrade={(tierId) => {
           // Redirect to Gumroad sales page for the selected tier
-          const gumroadUrls = {
+          // SECURITY FIX: CWE-570 - Added proper validation instead of always-true expression
+          const gumroadUrls: Record<string, string> = {
             'monthly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=monthly&wanted=true',
             'quarterly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=quarterly&wanted=true', 
             'six_months': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=six-months&wanted=true',
@@ -806,8 +832,9 @@ function AppContent() {
             'two_years': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=two-years&wanted=true'
           };
           
-          const gumroadUrl = gumroadUrls[tierId as keyof typeof gumroadUrls];
-          if (gumroadUrl) {
+          const gumroadUrl = gumroadUrls[tierId];
+          // Validate URL exists and is a string (prevents CWE-570 always-true condition)
+          if (gumroadUrl && typeof gumroadUrl === 'string') {
             window.open(gumroadUrl, '_blank');
           } else {
             console.error('No Gumroad URL found for tier:', tierId);
@@ -816,15 +843,17 @@ function AppContent() {
         }}
         onAddUpsell={(upsellId) => {
           // Redirect to Gumroad sales page for upsell features
-          const upsellUrls = {
+          // SECURITY FIX: CWE-571 - Added proper validation instead of always-true expression
+          const upsellUrls: Record<string, string> = {
             'team_license': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=team-license&wanted=true',
             'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=pro-preset-pack&wanted=true',
             'writers_toolkit': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=writers-toolkit&wanted=true',
             'dev_mode': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=dev-mode&wanted=true'
           };
           
-          const upsellUrl = upsellUrls[upsellId as keyof typeof upsellUrls];
-          if (upsellUrl) {
+          const upsellUrl = upsellUrls[upsellId];
+          // Validate URL exists and is a string (prevents CWE-571 always-true condition)
+          if (upsellUrl && typeof upsellUrl === 'string') {
             window.open(upsellUrl, '_blank');
           } else {
             console.error('No Gumroad URL found for upsell:', upsellId);

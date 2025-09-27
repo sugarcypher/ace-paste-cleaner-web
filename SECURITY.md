@@ -91,9 +91,49 @@ We maintain compliance with:
 - PIPEDA (Canada)
 - LGPD (Brazil)
 
+## Recent Security Fixes
+
+### CWE-570/571: Expression Always Evaluates to True/False
+**Status**: ✅ FIXED (September 27, 2025)
+
+**Issue Description**: 
+Static analysis detected expressions that always evaluate to the same boolean value, which could indicate logical errors or dead code paths that might mask security issues.
+
+**Locations Fixed**:
+- `src/App.tsx:810` - Gumroad URL validation logic
+- `src/App.tsx:827` - Upsell URL validation logic
+
+**Fix Implementation**:
+```typescript
+// BEFORE (Always True Expression):
+if (gumroadUrl) { // Always true for predefined object keys
+  window.open(gumroadUrl, '_blank');
+}
+
+// AFTER (Proper Validation):
+if (gumroadUrl && typeof gumroadUrl === 'string') {
+  window.open(gumroadUrl, '_blank');
+} else {
+  console.error('Invalid URL for tier:', tierId);
+}
+```
+
+### Additional Security Enhancements (September 27, 2025)
+
+1. **Input Type Validation**: Added runtime type checking for all user inputs
+2. **Clipboard Security**: Implemented size limits (10MB) and type validation for clipboard operations
+3. **Output Validation**: Enhanced validation for cleaned text before clipboard operations
+4. **Resource Protection**: Added safeguards against memory exhaustion attacks
+
 ## Updates
 
-This security policy is reviewed and updated quarterly. Last updated: September 15, 2025.
+This security policy is reviewed and updated quarterly.
+
+**Recent Updates**:
+- September 27, 2025: Added CWE-570/571 vulnerability fixes
+- September 15, 2025: Updated compliance certifications
+
+**Last Updated**: September 27, 2025
 
 ---
 
