@@ -237,593 +237,244 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen w-full relative overflow-hidden">
-      {/* Revolutionary Hero Section */}
-      <div className="relative">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 animate-morph-float" style={{animationDelay: '0s'}}>
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-400/20 to-purple-600/20 blur-3xl"></div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Simple Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">ACE PASTE CLEANER</h1>
+              <p className="text-sm text-gray-600">Clean text instantly</p>
+            </div>
+            <div className="flex items-center gap-3">
+              {user ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600">{user.email}</span>
+                  <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full capitalize">{user.tier}</span>
+                  <button onClick={signOut} className="text-sm text-gray-500 hover:text-gray-700">Sign Out</button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setShowAuthModal(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                >
+                  Sign In
+                </button>
+              )}
+            </div>
           </div>
-          <div className="absolute top-40 right-20 w-96 h-96 animate-morph-float" style={{animationDelay: '2s'}}>
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-pink-400/20 to-red-600/20 blur-3xl"></div>
+        </div>
+      </div>
+      
+      {/* MAIN TOOL - Priority #1 */}
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        {/* User Status */}
+        {!user ? (
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-blue-900 font-medium">Demo Mode</p>
+                <p className="text-blue-700 text-sm">Clean up to 500 characters without signing up</p>
+              </div>
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+              >
+                Get Unlimited
+              </button>
+            </div>
           </div>
-          <div className="absolute bottom-40 left-1/4 w-80 h-80 animate-morph-float" style={{animationDelay: '4s'}}>
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-600/20 blur-3xl"></div>
+        ) : (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-green-900 font-medium capitalize">{user.tier} Plan</p>
+                {usage && (
+                  <p className="text-green-700 text-sm">
+                    {user.tier === 'free' ? (
+                      `${Math.max(0, 3 - usage.dailyCleanings)} cleanings remaining today`
+                    ) : (
+                      `${usage.totalCleanings} total cleanings`
+                    )}
+                  </p>
+                )}
+              </div>
+              {user.tier === 'free' && (
+                <button
+                  onClick={() => setShowPaywall(true)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                >
+                  Upgrade
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Text Cleaning Tool */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Text Cleaner</h2>
+            
+            {/* Input Section */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Paste or type your text here
+                </label>
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  placeholder="Paste your messy text here and click Clean to remove formatting and invisible characters..."
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  {input.length} characters {!user && input.length > 500 && '(Demo limit: 500 characters)'}
+                </p>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={pasteFromClipboard}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 border border-gray-300 text-sm flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Paste
+                </button>
+                <button
+                  onClick={() => setInput('')}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 border border-gray-300 text-sm flex items-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Clear
+                </button>
+                <button
+                  onClick={handleClean}
+                  disabled={!input || isProcessing}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-sm font-medium flex items-center gap-2"
+                >
+                  {isProcessing ? (
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  )}
+                  Clean Text
+                </button>
+              </div>
+              
+              {/* Output Section */}
+              {output && (
+                <div className="mt-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Cleaned text
+                  </label>
+                  <textarea
+                    value={output}
+                    readOnly
+                    className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 resize-none"
+                  />
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xs text-gray-500">
+                      {output.length} characters • {input.length - output.length} characters removed
+                    </p>
+                    <button
+                      onClick={copyToClipboard}
+                      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy Clean Text
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              {!hasAcceptedTerms && (
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <p className="text-sm text-yellow-800 mb-2">To use this tool, please accept our privacy terms.</p>
+                  <button
+                    onClick={() => setShowPrivacyAgreement(true)}
+                    className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700"
+                  >
+                    Accept Privacy Terms
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
         
-        <div className="relative z-10 mx-auto max-w-7xl px-6 py-16">
-          {/* Revolutionary Hero */}
-          <div className="text-center mb-20 animate-slide-scale">
-            <div className="inline-flex items-center justify-center mb-8">
-              <div className="relative">
-                <div className="w-24 h-24 animate-liquid-glow rounded-3xl flex items-center justify-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center animate-morph-float">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-emerald-400 rounded-full animate-pulse"></div>
-              </div>
-            </div>
-            
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 animate-shimmer">
-              <span className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent">
-                ACE PASTE CLEANER
-              </span>
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-3xl md:text-4xl lg:text-5xl">
-                Pro
-              </span>
-            </h1>
-            
-            <p className="text-2xl md:text-3xl font-semibold text-gray-800 mb-4 max-w-4xl mx-auto leading-tight">
-              Instantly strip formatting, invisible characters, and junk from any text
-            </p>
-            
-            <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Clean thousands of characters in milliseconds • Perfect formatting every time • Enterprise-grade security
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-4 mb-12">
-          
-              {!hasAcceptedTerms && (
+        {/* Example Tasks */}
+        <div className="mt-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Try Example Tasks</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <button
-                  onClick={() => setShowPrivacyAgreement(true)}
-                  className="btn-neo flex items-center gap-3"
+                  onClick={() => setInput('# Hello World\n\n**This** is _formatted_ text with `code` blocks and extra   spaces.\n\n• List item 1\n• List item 2\n\nVisit https://example.com for more info!')}
+                  className="p-3 text-left border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                  </svg>
-                  Accept Privacy Terms
+                  <div className="font-medium text-gray-800 mb-1">📝 Markdown Cleanup</div>
+                  <div className="text-xs text-gray-600">Remove headers, bold/italic, code blocks</div>
                 </button>
-              )}
-              
-              <button
-                onClick={pasteFromClipboard}
-                className="btn-glow flex items-center gap-3"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Quick Paste
-              </button>
-              
-              <button
-                onClick={copyToClipboard}
-                className="btn-ultra flex items-center gap-3"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copy Clean Text
-              </button>
-            </div>
-            
-            {/* Key Benefits - Above the Fold */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-              <div className="card-glow text-left p-6" style={{'--delay': '0s'}}>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Lightning Fast</h3>
-                    <p className="text-gray-600 mb-3">Clean thousands of characters in milliseconds with our optimized engine</p>
-                    <div className="text-sm text-blue-600 font-medium">Example: 50,000 chars cleaned in &lt;0.1s</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card-glow text-left p-6" style={{'--delay': '0.2s'}}>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Detection</h3>
-                    <p className="text-gray-600 mb-3">Automatically identifies and removes invisible characters, formatting, and junk</p>
-                    <div className="text-sm text-emerald-600 font-medium">Detects 40+ types of hidden characters</div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card-glow text-left p-6" style={{'--delay': '0.4s'}}>
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-red-600 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800 mb-2">Privacy First</h3>
-                    <p className="text-gray-600 mb-3">Your text never leaves your browser. 100% client-side processing</p>
-                    <div className="text-sm text-pink-600 font-medium">Zero data transmission to servers</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Try Without Sign-In Section */}
-            <div className="max-w-4xl mx-auto mb-16 text-center">
-              <div className="card-ultra p-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">Try It Now - No Sign-Up Required</h2>
-                <p className="text-gray-600 mb-6">Experience the power of ACE Paste Cleaner with our demo. Sign up for advanced features and higher limits.</p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  <a href="#cleaner" className="btn-glow flex items-center gap-3">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                    Try the Cleaner Below
-                  </a>
-                  <button
-                    onClick={() => setShowAuthModal(true)}
-                    className="btn-ultra flex items-center gap-3"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                    Get Started Free
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Sample Tasks Section */}
-            <div className="max-w-4xl mx-auto mb-8">
-              <div className="card-glow p-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  Try Sample Cleaning Tasks
-                </h3>
-                <p className="text-gray-600 mb-4">Click these examples to see ACE Paste Cleaner in action:</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <button
-                    onClick={() => setInput('# Hello World\n\n**This** is _formatted_ text with `code` blocks and extra   spaces.\n\n• List item 1\n• List item 2\n\nVisit https://example.com for more info!')}
-                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-                  >
-                    <div className="font-medium text-gray-800 mb-1">📝 Markdown Cleanup</div>
-                    <div className="text-sm text-gray-600">Remove headers, bold/italic, code blocks, and list markers</div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setInput('Contact us at: support@example.com or call (555) 123-4567\nOur address: 123 Main St, City, State 12345\nTiming: Mon-Fri 9AM-5PM EST\n\nFollow: https://twitter.com/example?utm_source=email&utm_medium=newsletter')}
-                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-                  >
-                    <div className="font-medium text-gray-800 mb-1">🔒 Privacy Scrub</div>
-                    <div className="text-sm text-gray-600">Remove emails, phone numbers, and tracking URLs</div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setInput('This    text     has\n\n\n\nmultiple blank lines\n\n\nand     extra     spaces     everywhere\t\t\nMixed\twhitespace\tcharacters   too!')}
-                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-                  >
-                    <div className="font-medium text-gray-800 mb-1">🧹 Whitespace Cleanup</div>
-                    <div className="text-sm text-gray-600">Fix spacing issues and normalize whitespace</div>
-                  </button>
-                  
-                  <button
-                    onClick={() => setInput('Convert THIS mixed CaSe TeXt into the format you want. some words are ALL CAPS while others are lowercase. what would you like it to become?')}
-                    className="p-4 text-left border border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all duration-200"
-                  >
-                    <div className="font-medium text-gray-800 mb-1">🔤 Case Conversion</div>
-                    <div className="text-sm text-gray-600">Transform text case to proper format</div>
-                  </button>
-                </div>
+                
+                <button
+                  onClick={() => setInput('This    text     has\n\n\n\nmultiple blank lines\n\n\nand     extra     spaces     everywhere\t\t\nMixed\twhitespace\tcharacters   too!')}
+                  className="p-3 text-left border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
+                >
+                  <div className="font-medium text-gray-800 mb-1">🧹 Whitespace Cleanup</div>
+                  <div className="text-xs text-gray-600">Fix spacing and normalize whitespace</div>
+                </button>
+                
+                <button
+                  onClick={() => setInput('Contact: support@example.com or call (555) 123-4567\nFollow: https://twitter.com/example?utm_source=email&utm_medium=newsletter')}
+                  className="p-3 text-left border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
+                >
+                  <div className="font-medium text-gray-800 mb-1">🔒 Privacy Scrub</div>
+                  <div className="text-xs text-gray-600">Remove emails, phones, tracking URLs</div>
+                </button>
+                
+                <button
+                  onClick={() => setInput('Convert THIS mixed CaSe TeXt into the format you want. some words are ALL CAPS while others are lowercase.')}
+                  className="p-3 text-left border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
+                >
+                  <div className="font-medium text-gray-800 mb-1">🔤 Case Conversion</div>
+                  <div className="text-xs text-gray-600">Transform text case format</div>
+                </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Usage Indicator */}
-        <div className="mb-8">
-          <UsageIndicator 
-            user={user} 
-            usage={usage} 
-            onUpgrade={() => setShowPaywall(true)} 
-          />
-        </div>
-
-        {/* Security Options */}
-        <div className="mb-8">
-          <SecurityOptions />
-        </div>
-
-        {/* Advanced Features Section */}
-        <div className="mb-16 max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Advanced Cleaning Options</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">Fine-tune your text cleaning with these professional-grade options. Each category targets specific types of content.</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            <div className="card-glow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">Text Formatting</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Remove markdown syntax and formatting markers like headers, bold/italic, and code blocks</p>
-              <OptionGroup 
-                title="" 
-                options={[
-                  { key: 'stripMarkdownHeaders', label: 'Markdown Headers' },
-                  { key: 'stripBoldItalic', label: 'Bold/Italic Markers' },
-                  { key: 'stripBackticks', label: 'Code Blocks' },
-                  { key: 'stripListMarkers', label: 'List Markers' },
-                  { key: 'stripBlockquotes', label: 'Blockquotes' },
-                  { key: 'stripEmDashSeparators', label: 'Em-dash Separators' }
-                ]}
-                opts={opts}
-                toggle={toggle}
-              />
-            </div>
-          
-            <div className="card-glow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">Content Removal</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Strip out specific types of content like URLs, emails, phone numbers, and other identifiable information</p>
-              <OptionGroup 
-                title="" 
-                options={[
-                  { key: 'removeUrls', label: 'URLs' },
-                  { key: 'removeEmailAddresses', label: 'Email Addresses' },
-                  { key: 'removePhoneNumbers', label: 'Phone Numbers' },
-                  { key: 'removeTimestamps', label: 'Timestamps' },
-                  { key: 'removeSpecialCharacters', label: 'Special Characters' },
-                  { key: 'removeRepeatedWords', label: 'Repeated Words' }
-                ]}
-                opts={opts}
-                toggle={toggle}
-              />
-            </div>
-            
-            <div className="card-glow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">Whitespace & Invisible</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Clean up spacing issues and remove hidden characters that can cause formatting problems</p>
-              <OptionGroup 
-                title="" 
-                options={[
-                  { key: 'removeInvisible', label: 'Invisible Characters' },
-                  { key: 'keepVS16Emoji', label: 'Keep Emoji VS16' },
-                  { key: 'preserveEmoji', label: 'Preserve Emoji Sequences' },
-                  { key: 'normalizeWhitespace', label: 'Normalize Whitespace' },
-                  { key: 'collapseBlankLines', label: 'Collapse Blank Lines' },
-                  { key: 'removeEmptyLines', label: 'Remove Empty Lines' },
-                  { key: 'removeTrailingSpaces', label: 'Remove Trailing Spaces' },
-                  { key: 'removeLeadingSpaces', label: 'Remove Leading Spaces' }
-                ]}
-                opts={opts}
-                toggle={toggle}
-              />
-            </div>
-
-            <div className="card-glow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-800">Advanced Features</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Professional features for developers and power users, including code preservation and URL cleaning</p>
-              <OptionGroup 
-                title="" 
-                options={[
-                  { key: 'removeUTMParameters', label: 'Remove UTM Parameters' },
-                  { key: 'markdownSafeMode', label: 'Markdown Safe Mode' },
-                  { key: 'preserveCodeFences', label: 'Preserve Code Fences' },
-                  { key: 'preserveTabsSpaces', label: 'Preserve Tabs/Spaces' },
-                  { key: 'preserveEscapeSequences', label: 'Preserve Escape Sequences' }
-                ]}
-                opts={opts}
-                toggle={toggle}
-              />
-            </div>
-          </div>
-          
-          {/* Case Conversion Section */}
-          <div className="max-w-2xl mx-auto mb-8">
-            <div className="card-glow p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800">Text Case Conversion</h3>
-                  <p className="text-gray-600 text-sm">Transform the capitalization of your text</p>
-                </div>
-              </div>
-              <select
-                value={opts.caseConversion}
-                onChange={(e) => setOpts(prev => ({ ...prev, caseConversion: e.target.value as any }))}
-                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-              >
-                <option value="none">No conversion</option>
-                <option value="lowercase">lowercase</option>
-                <option value="uppercase">UPPERCASE</option>
-                <option value="titlecase">Title Case</option>
-                <option value="sentencecase">Sentence case</option>
-              </select>
-            </div>
-          </div>
-          
-          {/* Save Features Configuration Button */}
-          {user && (
-            <div className="flex justify-center">
-              <button
-                onClick={saveFeaturesConfiguration}
-                disabled={isSavingFeatures}
-                className="btn-glow flex items-center gap-3"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
-                </svg>
-                {isSavingFeatures ? 'Saving Features...' : 'Save Feature Configuration'}
-              </button>
-            </div>
-          )}
-        </div>
-
-          {/* Revolutionary Text Processing Interface */}
-          <div id="cleaner" className="scroll-mt-20">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">Text Cleaner Tool</h2>
-              <p className="text-lg text-gray-600">Paste, configure, and clean your text in seconds</p>
-            </div>
-            
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
-              {/* Input Section */}
-              <div className="card-ultra animate-slide-scale" style={{animationDelay: '0.2s'}}>
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-800">Input Text</h3>
-                <div className="text-sm">
-                  {!user ? (
-                    <span className={input.length > 500 ? 'text-red-500 font-semibold' : 'text-gray-600'}>
-                      Demo: {input.length.toLocaleString()} / 500 chars
-                      {input.length > 500 && ' (Sign in for unlimited)'}
-                    </span>
-                  ) : (
-                    user.tier === 'admin' ? (
-                      <span className="text-emerald-400 font-medium">
-                        {input.length.toLocaleString()} chars (Unlimited)
-                      </span>
-                    ) : user.tier === 'free' ? (
-                      <span className={input.length > 2000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 2,000 chars
-                      </span>
-                    ) : user.tier === 'monthly' ? (
-                      <span className={input.length > 50000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 50,000 chars
-                      </span>
-                    ) : user.tier === 'quarterly' ? (
-                      <span className={input.length > 200000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 200,000 chars
-                      </span>
-                    ) : user.tier === 'six_months' ? (
-                      <span className={input.length > 500000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 500,000 chars
-                      </span>
-                    ) : user.tier === 'yearly' ? (
-                      <span className={input.length > 1000000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 1,000,000 chars
-                      </span>
-                    ) : user.tier === 'two_years' ? (
-                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 2,000,000 chars
-                      </span>
-                    ) : (
-                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-gray-300'}>
-                        {input.length.toLocaleString()} / 2,000,000 chars
-                      </span>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
-            
-            {!user && (
-              <div className="mb-4 p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30 rounded-xl">
-                <div className="text-center">
-                  <div className="w-12 h-12 mx-auto mb-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                  </div>
-                  <h4 className="text-lg font-semibold text-blue-300 mb-2">Try Demo or Sign In</h4>
-                  <p className="text-blue-200 text-sm mb-4">
-                    <strong>Demo:</strong> Clean up to 500 characters without signing up.<br/>
-                    <strong>Full Access:</strong> Sign in for unlimited cleaning, saved preferences, and advanced features.
-                  </p>
-                  <button
-                    onClick={() => setShowAuthModal(true)}
-                    className="btn-glow text-sm"
-                  >
-                    Sign In / Sign Up Free
-                  </button>
-                </div>
-              </div>
-            )}
-            
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Paste your text here to clean it..."
-              className="w-full h-32 rounded-xl bg-slate-900/50 border border-slate-700 p-4 font-mono text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm"
-              aria-label="Input text to be cleaned"
-              aria-describedby="input-help"
-            />
-            <div id="input-help" className="sr-only">
-              Paste or type your text here. It will be processed according to your selected cleaning options.
-            </div>
-            
-            <div className="mt-4 flex flex-wrap justify-center gap-3">
-              <button
-                onClick={() => { setInput(""); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium text-sm shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105"
-                aria-label="Clear input text"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Clear
-              </button>
-              <button
-                onClick={pasteFromClipboard}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105"
-                aria-label="Paste text from clipboard"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Paste
-              </button>
-              <button
-                onClick={handleClean}
-                disabled={!input.trim() || (user && !canClean(input.length))}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed transition-all duration-200 font-medium text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105 disabled:hover:scale-100"
-                aria-label="Clean the input text using selected options"
-                aria-describedby="clean-help"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Clean Now
-              </button>
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:from-emerald-600 hover:to-green-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
-                aria-label="Copy cleaned text to clipboard"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                Copy Clean
-              </button>
-            </div>
-          </div>
-
-          {/* What was removed section - between input and output */}
-          <Stats input={input} output={cleaned} opts={opts} />
-
-          {/* Output Section */}
-          <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-white">Cleaned Output</h3>
-            </div>
-            <textarea
-              value={cleaned}
-              readOnly
-              className="w-full h-32 rounded-xl bg-slate-900/50 border border-slate-700 p-4 font-mono text-sm text-white placeholder-slate-400 backdrop-blur-sm"
-              placeholder="Your cleaned text will appear here..."
-              aria-label="Cleaned output text"
-              aria-describedby="output-help"
-            />
-            <div id="output-help" className="sr-only">
-              This area shows your text after it has been cleaned using the selected options.
-            </div>
-            <div id="clean-help" className="sr-only">
-              This button processes your input text according to your selected cleaning options. You must be signed in to use this feature.
-            </div>
-          </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-slate-700/50">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-slate-400">
-              © 2025 Ace Paste Cleaner. All rights reserved.
-            </div>
-            <div className="flex items-center gap-6">
-              <button
-                onClick={() => setShowPrivacy(true)}
-                className="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                Privacy Policy
-              </button>
-              <button
-                onClick={() => setShowSecurity(true)}
-                className="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                Security Policy
-              </button>
-              <a
-                href="https://github.com/sugarcypher/Ace-Paste-Cleaner"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                GitHub
-              </a>
-            </div>
-          </div>
-        </footer>
       </div>
-
+      
+      {/* Simple Footer */}
+      <div className="mt-16 border-t border-gray-200 py-8">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <p className="text-sm text-gray-500">
+            Your text never leaves your browser. Processing is 100% client-side.
+          </p>
+        </div>
+      </div>
+      
       {/* Modals */}
+      <SimpleAuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => setShowAuthModal(false)}
+      />
+      
       <PaywallModal
         isOpen={showPaywall}
         onClose={() => setShowPaywall(false)}
         onUpgrade={(tierId) => {
-          // Redirect to Gumroad sales page for the selected tier
-          // SECURITY FIX: CWE-570 - Added proper validation instead of always-true expression
           const gumroadUrls: Record<string, string> = {
             'monthly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=monthly&wanted=true',
             'quarterly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=quarterly&wanted=true', 
@@ -833,7 +484,6 @@ function AppContent() {
           };
           
           const gumroadUrl = gumroadUrls[tierId];
-          // Validate URL exists and is a string (prevents CWE-570 always-true condition)
           if (gumroadUrl && typeof gumroadUrl === 'string') {
             window.open(gumroadUrl, '_blank');
           } else {
@@ -842,8 +492,6 @@ function AppContent() {
           setShowPaywall(false);
         }}
         onAddUpsell={(upsellId) => {
-          // Redirect to Gumroad sales page for upsell features
-          // SECURITY FIX: CWE-571 - Added proper validation instead of always-true expression
           const upsellUrls: Record<string, string> = {
             'team_license': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=team-license&wanted=true',
             'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=pro-preset-pack&wanted=true',
@@ -852,7 +500,6 @@ function AppContent() {
           };
           
           const upsellUrl = upsellUrls[upsellId];
-          // Validate URL exists and is a string (prevents CWE-571 always-true condition)
           if (upsellUrl && typeof upsellUrl === 'string') {
             window.open(upsellUrl, '_blank');
           } else {
@@ -864,642 +511,11 @@ function AppContent() {
         currentTextLength={input.length}
       />
 
-      <PrivacyPolicy
-        isOpen={showPrivacy}
-        onClose={() => setShowPrivacy(false)}
-      />
-
-      <SecurityPolicy
-        isOpen={showSecurity}
-        onClose={() => setShowSecurity(false)}
-      />
-
       <PrivacyAgreement
         isOpen={showPrivacyAgreement}
         onClose={() => setShowPrivacyAgreement(false)}
       />
     </div>
-  );
-}
-
-
-
-interface OptionGroupProps {
-  title: string;
-  options: Array<{ key: keyof CleanOptions; label: string }>;
-  opts: CleanOptions;
-  toggle: (key: keyof CleanOptions) => void;
-}
-
-function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const enabledCount = options.filter(opt => opts[opt.key]).length;
-
-  return (
-    <div className="relative animate-slide-in">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 hover:border-emerald-500/50 hover:bg-slate-700/50 transition-all duration-300 shadow-lg hover:shadow-xl group"
-      >
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors">{title}</span>
-          {enabledCount > 0 && (
-            <span className="px-2 py-1 text-xs bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full animate-pulse-soft shadow-lg">
-              {enabledCount}
-            </span>
-          )}
-        </div>
-        <svg 
-          className={`w-5 h-5 text-slate-400 group-hover:text-emerald-400 transition-all duration-300 ${isOpen ? 'rotate-180' : ''}`} 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      
-      {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-3 p-3 glass-dark rounded-2xl shadow-2xl z-20 max-h-72 overflow-y-auto animate-slide-in border border-slate-600/30">
-          <div className="space-y-2">
-            {options.map((option) => {
-              const value = opts[option.key];
-              const isBoolean = typeof value === 'boolean';
-              
-              return (
-                <label key={option.key} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer select-none transition-all duration-200 group">
-                  <div className="relative">
-                    <input 
-                      type="checkbox" 
-                      className="w-5 h-5 rounded border-2 border-slate-500 bg-transparent checked:bg-gradient-to-r checked:from-emerald-500 checked:to-teal-500 checked:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 focus:outline-none transition-all duration-200" 
-                      checked={isBoolean ? value : false}
-                      onChange={() => isBoolean ? toggle(option.key) : undefined}
-                      disabled={!isBoolean}
-                    />
-                    {isBoolean && value && (
-                      <svg className="absolute inset-0 w-5 h-5 text-white pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                  <span className="text-sm text-slate-200 group-hover:text-white transition-colors">{option.label}</span>
-                </label>
-              );
-            })}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Stats({ input, output, opts }: StatsProps) {
-  const invCounts = useMemo(() => countInvisibles(input), [input]);
-  const removedChars = Math.max(0, input.length - output.length);
-  
-  
-  // Calculate what was actually removed based on options
-  const removedItems = useMemo(() => {
-    const items = [];
-    
-    if (opts.removeInvisible) {
-      const totalInvisible = invCounts.zwsp + invCounts.wj + invCounts.zwnj + invCounts.zwj + invCounts.shy + invCounts.ltrRtl + invCounts.bom;
-      if (totalInvisible > 0) {
-        const details = [];
-        if (invCounts.zwsp > 0) details.push(`${invCounts.zwsp} Zero Width Spaces`);
-        if (invCounts.wj > 0) details.push(`${invCounts.wj} Word Joiners`);
-        if (invCounts.zwnj > 0) details.push(`${invCounts.zwnj} Zero Width Non-Joiners`);
-        if (invCounts.zwj > 0) details.push(`${invCounts.zwj} Zero Width Joiners`);
-        if (invCounts.shy > 0) details.push(`${invCounts.shy} Soft Hyphens`);
-        if (invCounts.ltrRtl > 0) details.push(`${invCounts.ltrRtl} Direction Marks`);
-        if (invCounts.bom > 0) details.push(`${invCounts.bom} Byte Order Marks`);
-        items.push({ type: 'invisible', count: totalInvisible, label: 'Invisible Characters', details });
-      }
-    }
-    
-    if (opts.stripMarkdownHeaders) {
-      const headerMatches = input.match(/^\s{0,3}(#{1,6})\s+/gmu) || [];
-      if (headerMatches.length > 0) {
-        const details = headerMatches.map(h => h.trim());
-        items.push({ type: 'markdown', count: headerMatches.length, label: 'Markdown Headers', details });
-      }
-    }
-    
-    if (opts.stripBoldItalic) {
-      const boldMatches = input.match(/\*\*.*?\*\*/gmsu) || [];
-      const italicMatches = input.match(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/gmsu) || [];
-      const underlineMatches = input.match(/__.*?__/gmsu) || [];
-      const strikeMatches = input.match(/~~.*?~~/gmsu) || [];
-      const totalFormatting = boldMatches.length + italicMatches.length + underlineMatches.length + strikeMatches.length;
-      
-      if (totalFormatting > 0) {
-        const details = [];
-        if (boldMatches.length > 0) details.push(`${boldMatches.length} Bold markers (**)`);
-        if (italicMatches.length > 0) details.push(`${italicMatches.length} Italic markers (*)`);
-        if (underlineMatches.length > 0) details.push(`${underlineMatches.length} Underline markers (__)`);
-        if (strikeMatches.length > 0) details.push(`${strikeMatches.length} Strikethrough markers (~~)`);
-        items.push({ type: 'formatting', count: totalFormatting, label: 'Text Formatting', details });
-      }
-    }
-    
-    if (opts.stripBackticks) {
-      const inlineMatches = input.match(/`[^`]+`/gmu) || [];
-      const fencedMatches = input.match(/^```[\s\S]*?```/gmu) || [];
-      const totalCode = inlineMatches.length + fencedMatches.length;
-      
-      if (totalCode > 0) {
-        const details = [];
-        if (inlineMatches.length > 0) details.push(`${inlineMatches.length} Inline code blocks`);
-        if (fencedMatches.length > 0) details.push(`${fencedMatches.length} Fenced code blocks`);
-        items.push({ type: 'code', count: totalCode, label: 'Code Blocks', details });
-      }
-    }
-    
-    if (opts.removeUrls) {
-      const urlMatches = input.match(/https?:\/\/[^\s]+|www\.[^\s]+/g) || [];
-      if (urlMatches.length > 0) {
-        const details = urlMatches.slice(0, 5); // Show first 5 URLs
-        if (urlMatches.length > 5) details.push(`... and ${urlMatches.length - 5} more`);
-        items.push({ type: 'urls', count: urlMatches.length, label: 'URLs', details });
-      }
-    }
-    
-    if (opts.removeEmailAddresses) {
-      const emailMatches = input.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g) || [];
-      if (emailMatches.length > 0) {
-        const details = emailMatches.slice(0, 3); // Show first 3 emails
-        if (emailMatches.length > 3) details.push(`... and ${emailMatches.length - 3} more`);
-        items.push({ type: 'emails', count: emailMatches.length, label: 'Email Addresses', details });
-      }
-    }
-    
-    if (opts.removePhoneNumbers) {
-      const phoneMatches = input.match(/\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b/g) || [];
-      if (phoneMatches.length > 0) {
-        const details = phoneMatches.slice(0, 3); // Show first 3 phones
-        if (phoneMatches.length > 3) details.push(`... and ${phoneMatches.length - 3} more`);
-        items.push({ type: 'phones', count: phoneMatches.length, label: 'Phone Numbers', details });
-      }
-    }
-    
-    if (opts.removeTimestamps) {
-      const timeMatches = input.match(/\b\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?\b/g) || [];
-      const dateMatches = input.match(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b|\b\d{4}-\d{2}-\d{2}\b/g) || [];
-      const totalTimestamps = timeMatches.length + dateMatches.length;
-      
-      if (totalTimestamps > 0) {
-        const details = [];
-        if (timeMatches.length > 0) details.push(`${timeMatches.length} Time formats`);
-        if (dateMatches.length > 0) details.push(`${dateMatches.length} Date formats`);
-        items.push({ type: 'timestamps', count: totalTimestamps, label: 'Timestamps', details });
-      }
-    }
-    
-    if (opts.removeSpecialCharacters) {
-      const specialMatches = input.match(/[!@#$%^&*_+=\[\]{}|\\:"'<>~`]/g) || [];
-      if (specialMatches.length > 0) {
-        const details = [...new Set(specialMatches)].slice(0, 10); // Show unique characters
-        if (specialMatches.length > 10) details.push(`... and ${specialMatches.length - 10} more`);
-        items.push({ type: 'special', count: specialMatches.length, label: 'Special Characters', details });
-      }
-    }
-    
-    if (opts.removeRepeatedWords) {
-      const repeatedMatches = input.match(/\b(\w+)\s+\1\b/g) || [];
-      if (repeatedMatches.length > 0) {
-        const details = repeatedMatches.slice(0, 5); // Show first 5 repeated words
-        if (repeatedMatches.length > 5) details.push(`... and ${repeatedMatches.length - 5} more`);
-        items.push({ type: 'repeated', count: repeatedMatches.length, label: 'Repeated Words', details });
-      }
-    }
-    
-    return items;
-  }, [input, opts, invCounts]);
-
-  // Check if boxes should be active (have meaningful values)
-  const lengthActive = input.length > 0;
-  const removedActive = removedChars > 0;
-  const typesActive = removedItems.length > 0;
-
-  return (
-    <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-      <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-white mb-2">Processing Results</h3>
-        <p className="text-slate-300 text-sm">See what was cleaned from your text</p>
-      </div>
-      
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Metric 
-          k="Length (in → out)" 
-          v={`${input.length} → ${output.length}`} 
-          isActive={lengthActive}
-        />
-        <Metric 
-          k="Removed (chars)" 
-          v={`${removedChars}`} 
-          isActive={removedActive}
-        />
-        <Metric 
-          k="Removed Types" 
-          v={`${removedItems.length}`} 
-          isActive={typesActive}
-        />
-      </div>
-      
-      {/* Detailed Removal Breakdown */}
-      {removedItems.length > 0 && (
-        <div className="space-y-4">
-          <h4 className="text-sm font-medium text-slate-300 mb-3">What was removed:</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {removedItems.map((item, index) => (
-              <RemovedItem key={index} item={item} />
-            ))}
-          </div>
-        </div>
-      )}
-      
-      {/* Invisible Character Details */}
-      {opts.removeInvisible && (invCounts.zwsp > 0 || invCounts.wj > 0 || invCounts.zwnj > 0 || invCounts.zwj > 0 || invCounts.shy > 0 || invCounts.ltrRtl > 0 || invCounts.bom > 0) && (
-        <div className="space-y-3 mt-6">
-          <h4 className="text-sm font-medium text-slate-300 mb-3">Invisible characters:</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {invCounts.zwsp > 0 && <Metric k="ZWSP" v={`${invCounts.zwsp}`} />}
-            {invCounts.wj > 0 && <Metric k="WJ" v={`${invCounts.wj}`} />}
-            {invCounts.zwnj > 0 && <Metric k="ZWNJ" v={`${invCounts.zwnj}`} />}
-            {invCounts.zwj > 0 && <Metric k="ZWJ" v={`${invCounts.zwj}`} />}
-            {invCounts.shy > 0 && <Metric k="SHY" v={`${invCounts.shy}`} />}
-            {invCounts.vs16 > 0 && <Metric k="VS16" v={`${invCounts.vs16}`} />}
-            {invCounts.ltrRtl > 0 && <Metric k="LRM/RLM/ALM" v={`${invCounts.ltrRtl}`} />}
-            {invCounts.bom > 0 && <Metric k="BOM/FEFF" v={`${invCounts.bom}`} />}
-          </div>
-        </div>
-      )}
-      
-      {/* No changes message */}
-      {removedItems.length === 0 && removedChars === 0 && input.length > 0 && (
-        <div className="text-center py-8 text-slate-400">
-          <div className="text-4xl mb-3">✨</div>
-          <div className="text-lg font-medium">No changes needed</div>
-          <div className="text-sm">Your text is already clean!</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function Metric({ k, v, isActive = false }: MetricProps) {
-  const getActiveClasses = () => {
-    if (!isActive) return 'bg-slate-800/50 border-slate-700/50 text-slate-400';
-    
-    // Determine color based on metric type
-    if (k.includes('Length')) {
-      return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
-    } else if (k.includes('Removed (chars)')) {
-      return 'bg-red-500/20 border-red-500/30 text-red-300';
-    } else if (k.includes('Removed Types')) {
-      return 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300';
-    }
-    return 'bg-slate-800/50 border-slate-700/50 text-slate-400';
-  };
-
-  return (
-    <div className={`rounded-xl border p-4 transition-all duration-300 backdrop-blur-sm ${getActiveClasses()}`}>
-      <div className={`text-xs uppercase tracking-wider font-medium ${isActive ? 'text-current/80' : 'text-slate-400'}`}>{k}</div>
-      <div className={`text-lg font-bold mt-1 ${isActive ? 'text-current' : 'text-slate-300'}`}>{v}</div>
-    </div>
-  );
-}
-
-interface RemovedItemProps {
-  item: {
-    type: string;
-    count: number;
-    label: string;
-    details?: string[];
-  };
-}
-
-function RemovedItem({ item }: RemovedItemProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  
-  const getColorClasses = (type: string) => {
-    switch (type) {
-      case 'invisible':
-        return 'bg-purple-500/20 border-purple-500/30 text-purple-300';
-      case 'markdown':
-        return 'bg-blue-500/20 border-blue-500/30 text-blue-300';
-      case 'formatting':
-        return 'bg-orange-500/20 border-orange-500/30 text-orange-300';
-      case 'code':
-        return 'bg-gray-500/20 border-gray-500/30 text-gray-300';
-      case 'urls':
-        return 'bg-green-500/20 border-green-500/30 text-green-300';
-      case 'emails':
-        return 'bg-cyan-500/20 border-cyan-500/30 text-cyan-300';
-      case 'phones':
-        return 'bg-pink-500/20 border-pink-500/30 text-pink-300';
-      case 'timestamps':
-        return 'bg-yellow-500/20 border-yellow-500/30 text-yellow-300';
-      case 'special':
-        return 'bg-red-500/20 border-red-500/30 text-red-300';
-      case 'repeated':
-        return 'bg-indigo-500/20 border-indigo-500/30 text-indigo-300';
-      default:
-        return 'bg-neutral-500/20 border-neutral-500/30 text-neutral-300';
-    }
-  };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'invisible':
-        return '👻';
-      case 'markdown':
-        return '📝';
-      case 'formatting':
-        return '🎨';
-      case 'code':
-        return '💻';
-      case 'urls':
-        return '🔗';
-      case 'emails':
-        return '📧';
-      case 'phones':
-        return '📞';
-      case 'timestamps':
-        return '⏰';
-      case 'special':
-        return '⚠️';
-      case 'repeated':
-        return '🔄';
-      default:
-        return '🗑️';
-    }
-  };
-
-  return (
-    <div className={`rounded-2xl border p-4 ${getColorClasses(item.type)} cursor-pointer hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm`}
-         onClick={() => setIsExpanded(!isExpanded)}>
-      <div className="flex items-center gap-3">
-        <div className="flex-shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-black/10 flex items-center justify-center">
-            <span className="text-xl">{getIcon(item.type)}</span>
-          </div>
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-semibold truncate">{item.label}</div>
-          <div className="text-xs opacity-75">
-            {item.count} {item.count === 1 ? 'item' : 'items'} removed
-          </div>
-        </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="text-xl font-bold">{item.count}</div>
-          <svg 
-            className={`w-5 h-5 transition-all duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
-      </div>
-      
-      {isExpanded && item.details && item.details.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-current/20 animate-slide-in">
-          <div className="text-xs font-semibold mb-3 opacity-90 uppercase tracking-wider">Details:</div>
-          <div className="space-y-2">
-            {item.details.map((detail, index) => (
-              <div key={index} className="text-xs opacity-80 bg-black/20 rounded-lg px-3 py-2 font-mono border border-current/10">
-                {detail}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// --- Cleaning Logic ---
-function cleanText(text: string, opts: CleanOptions): string {
-  let t = text;
-
-  // Protect ZWJ inside emoji sequences, so we can strip stray ZWJ elsewhere without breaking emoji
-  const SENTINEL_ZWJ = ""; // private-use marker
-  if (opts.preserveEmoji) {
-    try {
-      const EP = "\\p{Extended_Pictographic}";
-      const reZWJ = new RegExp(`(${EP})\u200D(${EP})`, "gu");
-      t = t.replace(reZWJ, `$1${SENTINEL_ZWJ}$2`);
-    } catch {
-      // Fallback: only match actual emoji sequences with ZWJ
-      t = t.replace(/([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])\u200D([\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}])/gu, `$1${SENTINEL_ZWJ}$2`);
-    }
-  }
-
-  if (opts.removeInvisible) {
-    // Remove Unicode Format characters (Cf): ZWSP/ZWJ/ZWNJ/WJ/bidi/etc.
-    try {
-      t = t.replace(/\p{Cf}/gu, "");
-    } catch {
-      // Fallback explicit ranges if \p{Cf} unsupported
-      t = t.replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF\uFFF9-\uFFFB]/gu, "");
-    }
-    // Remove CGJ explicitly (Mn)
-    t = t.replace(/\u034F/gu, "");
-
-    // Variation selectors
-    if (!opts.keepVS16Emoji) {
-      t = t.replace(/[\uFE00-\uFE0F]/gu, "");
-    } else {
-      t = t.replace(/[\uFE00-\uFE0E]/gu, "");
-    }
-    t = t.replace(/[\u{E0100}-\u{E01EF}]/gu, "");
-    
-    // After the supplementary variation selectors removal:
-    t = t.replace(/[\u{E0000}-\u{E007F}]/gu, ""); // Plane-14 TAG characters
-  }
-
-  if (opts.stripMarkdownHeaders && !opts.markdownSafeMode) {
-    t = t.replace(/^\s{0,3}(#{1,6})\s+/gmu, "");
-  }
-
-  if (opts.stripBoldItalic && !opts.markdownSafeMode) {
-    // Bold/italic markers; keep inner text
-    t = t.replace(/\*\*(.*?)\*\*/gmsu, "$1");
-    t = t.replace(/__(.*?)__/gmsu, "$1");
-    t = t.replace(/(?<!\*)\*(?!\*)(.*?)\*(?<!\*)/gmsu, "$1");
-    t = t.replace(/(?<!_)_(?!_)(.*?)_(?<!_)/gmsu, "$1");
-    t = t.replace(/~~(.*?)~~/gmsu, "$1");
-  }
-
-  if (opts.stripBackticks && !opts.markdownSafeMode && !opts.preserveCodeFences) {
-    // Fenced blocks: remove the backticks but keep content
-    t = t.replace(/^```[^\n]*\n([\s\S]*?)\n```\s*$/gmu, "$1\n");
-    // Inline backticks
-    t = t.replace(/`([^`]+)`/gmu, "$1");
-  }
-
-  if (opts.stripEmDashSeparators) {
-    // Remove lines that are just separators of dashes/em-dashes
-    t = t.replace(/^\s*[—–-]{2,}\s*$/gmu, "");
-    // Remove standalone em-dash separator lines between paragraphs
-    t = t.replace(/\n\s*[—–]\s*\n/gmu, "\n\n");
-  }
-
-  if (opts.stripListMarkers) {
-    t = t.replace(/^\s*(?:[-*•]\s+|\d+[.)]\s+)/gmu, "");
-  }
-
-  if (opts.stripBlockquotes) {
-    t = t.replace(/^\s{0,3}>\s?/gmu, "");
-  }
-
-  if (opts.normalizeWhitespace && !opts.preserveTabsSpaces) {
-    // Inside normalizeWhitespace:
-    t = t.replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, " "); // all Zs spaces → ASCII space
-    // Collapse 2+ spaces to 1 (but not across newlines)
-    t = t.replace(/(\S) {2,}(?=\S)/g, "$1 ");
-    // Trim trailing spaces
-    t = t.replace(/[ \t]+$/gmu, "");
-  }
-
-  if (opts.collapseBlankLines) {
-    t = t.replace(/\n{3,}/g, "\n\n");
-  }
-
-  // Additional cleaning options
-  if (opts.removeUrls) {
-    t = t.replace(/https?:\/\/[^\s]+/g, "");
-    t = t.replace(/www\.[^\s]+/g, "");
-  }
-
-  if (opts.removeEmailAddresses) {
-    t = t.replace(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g, "");
-  }
-
-  if (opts.removePhoneNumbers) {
-    t = t.replace(/\b(?:\+?1[-.\s]?)?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}\b/g, "");
-  }
-
-  if (opts.removeTimestamps) {
-    t = t.replace(/\b\d{1,2}:\d{2}(?::\d{2})?(?:\s?[AP]M)?\b/g, "");
-    t = t.replace(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g, "");
-    t = t.replace(/\b\d{4}-\d{2}-\d{2}\b/g, "");
-  }
-
-  if (opts.removeSpecialCharacters && !opts.preserveEscapeSequences) {
-    // Only remove truly special characters, preserve basic punctuation
-    t = t.replace(/[!@#$%^&*_+=\[\]{}|\\:"'<>~`]/g, "");
-  }
-
-  if (opts.removeExtraPunctuation) {
-    t = t.replace(/\.{2,}/g, ".");
-    t = t.replace(/,{2,}/g, ",");
-    t = t.replace(/!{2,}/g, "!");
-    t = t.replace(/\?{2,}/g, "?");
-  }
-
-  if (opts.removeRepeatedWords) {
-    t = t.replace(/\b(\w+)\s+\1\b/g, "$1");
-  }
-
-  if (opts.removeEmptyLines) {
-    t = t.replace(/^\s*$/gm, "");
-  }
-
-  if (opts.removeTrailingSpaces) {
-    t = t.replace(/[ \t]+$/gm, "");
-  }
-
-  if (opts.removeLeadingSpaces) {
-    t = t.replace(/^[ \t]+/gm, "");
-  }
-
-  // New features implementation
-  if (opts.removeUTMParameters) {
-    // Remove UTM parameters from URLs
-    t = t.replace(/([?&])(utm_[^&\s]*)/g, '$1');
-    t = t.replace(/([?&])(fbclid|gclid|msclkid)[^&\s]*/g, '$1');
-    t = t.replace(/[?&]$/, ''); // Remove trailing ? or &
-  }
-
-
-  // Case conversion
-  if (opts.caseConversion !== 'none') {
-    switch (opts.caseConversion) {
-      case 'lowercase':
-        t = t.toLowerCase();
-        break;
-      case 'uppercase':
-        t = t.toUpperCase();
-        break;
-      case 'titlecase':
-        t = t.replace(/\b\w/g, (char) => char.toUpperCase());
-        break;
-      case 'sentencecase':
-        t = t.replace(/(^|[.!?]\s+)([a-z])/g, (_, prefix, char) => prefix + char.toUpperCase());
-        break;
-    }
-  }
-
-  // Restore protected emoji joiners
-  if (opts.preserveEmoji) {
-    t = t.replace(//gu, "‍");
-  }
-
-  return t;
-}
-
-function countInvisibles(text: string) {
-  const c = {
-    zwsp: 0,
-    wj: 0,
-    zwnj: 0,
-    zwj: 0,
-    shy: 0,
-    vs16: 0,
-    ltrRtl: 0,
-    bom: 0,
-  };
-  for (const ch of text) {
-    const cp = ch.codePointAt(0);
-    
-    if (cp === 0x200B) c.zwsp++;
-    else if (cp === 0x2060) c.wj++;
-    else if (cp === 0x200C) c.zwnj++;
-    else if (cp === 0x200D) c.zwj++;
-    else if (cp === 0x00AD) c.shy++;
-    else if (cp === 0xFE0F) c.vs16++;
-    else if (cp === 0x200E || cp === 0x200F || cp === 0x061C) c.ltrRtl++;
-    else if (cp === 0xFEFF) c.bom++;
-  }
-  return c;
-}
-
-function App() {
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const { signIn, signUp } = useSimpleAuth();
-
-  return (
-    <ErrorBoundary>
-      <SecurityProvider>
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
-          <GumroadWebhookHandler />
-          <Header onShowAuthModal={() => setShowAuthModal(true)} />
-          <AppContent />
-        </div>
-        
-        {/* Authentication Modal */}
-        <SimpleAuthModal
-          isOpen={showAuthModal}
-          onClose={() => setShowAuthModal(false)}
-          onSignIn={signIn}
-          onSignUp={signUp}
-        />
-      </SecurityProvider>
-    </ErrorBoundary>
   );
 }
 
