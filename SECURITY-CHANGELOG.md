@@ -171,11 +171,17 @@ All security fixes have been documented directly in the source code with:
 - ✅ Tested clipboard operations with various content types
 - ✅ Validated resource limits with large text inputs
 - ✅ Confirmed type validation prevents type confusion
+- ✅ Comprehensive CWE-116/CWE-020 security test suite created and validated
+- ✅ Tested double-encoded entity scenarios
+- ✅ Verified ampersand-last processing order
+- ✅ Validated complex entity chain handling
 
 **Automated Testing**:
 - ✅ TypeScript strict mode compilation
 - ✅ ESLint security rules validation
 - ✅ Static analysis tools (no remaining CWE-570/571 issues)
+- ✅ CodeQL double escaping/unescaping rule compliance verified
+- ✅ Security test suite: 6/6 tests passing for entity decoding safety
 
 ### 🔍 Security Review
 
