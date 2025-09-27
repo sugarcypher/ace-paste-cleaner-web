@@ -31,13 +31,13 @@ export function UsageIndicator({ user, usage, onUpgrade }: UsageIndicatorProps) 
   const getTierColor = () => {
     switch (user.tier) {
       case 'free':
-        return 'bg-gray-800 border-gray-700';
+        return 'bg-slate-800/50 border-slate-700/50';
       case 'pro':
         return 'bg-yellow-500/20 border-yellow-500/30';
       case 'enterprise':
         return 'bg-purple-500/20 border-purple-500/30';
       default:
-        return 'bg-gray-800 border-gray-700';
+        return 'bg-slate-800/50 border-slate-700/50';
     }
   };
 
@@ -56,41 +56,41 @@ export function UsageIndicator({ user, usage, onUpgrade }: UsageIndicatorProps) 
   };
 
   return (
-    <div className={`rounded-xl border p-4 ${getTierColor()}`}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
+    <div className={`rounded-2xl border p-6 ${getTierColor()} backdrop-blur-sm`}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
           {getTierIcon()}
-          <span className="text-sm font-medium text-white capitalize">
+          <span className="text-lg font-semibold text-white capitalize">
             {currentTier.name} Plan
           </span>
         </div>
         {user.tier === 'free' && (
           <button
             onClick={onUpgrade}
-            className="text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1 rounded-lg transition-colors"
+            className="text-sm bg-gradient-to-r from-emerald-500 to-green-500 hover:from-emerald-600 hover:to-green-600 text-white px-4 py-2 rounded-xl transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
           >
             Upgrade
           </button>
         )}
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-xs text-neutral-400">Daily Usage</span>
-          <span className={`text-sm font-medium ${getUsageColor()}`}>
+          <span className="text-sm text-slate-400">Daily Usage</span>
+          <span className={`text-base font-semibold ${getUsageColor()}`}>
             {getUsageMessage()}
           </span>
         </div>
 
         {remainingCleanings !== -1 && (
-          <div className="w-full bg-neutral-700 rounded-full h-2">
+          <div className="w-full bg-slate-700/50 rounded-full h-3">
             <div
-              className={`h-2 rounded-full transition-all ${
+              className={`h-3 rounded-full transition-all duration-300 ${
                 remainingCleanings === 0 
-                  ? 'bg-red-500' 
+                  ? 'bg-gradient-to-r from-red-500 to-red-600' 
                   : remainingCleanings <= 2 
-                  ? 'bg-yellow-500' 
-                  : 'bg-green-500'
+                  ? 'bg-gradient-to-r from-yellow-500 to-orange-500' 
+                  : 'bg-gradient-to-r from-emerald-500 to-green-500'
               }`}
               style={{
                 width: `${Math.max(0, (usage.dailyCleanings / currentTier.limits.dailyCleanings) * 100)}%`
@@ -99,24 +99,24 @@ export function UsageIndicator({ user, usage, onUpgrade }: UsageIndicatorProps) 
           </div>
         )}
 
-        <div className="flex items-center justify-between text-xs text-neutral-400">
+        <div className="flex items-center justify-between text-sm text-slate-400">
           <span>Total: {usage.totalCleanings.toLocaleString()}</span>
           <span>Max: {currentTier.limits.maxTextLength === -1 ? '∞' : currentTier.limits.maxTextLength.toLocaleString()} chars</span>
         </div>
         
         {/* Character limit warning for free tier */}
         {user.tier === 'free' && (
-          <div className="text-xs text-neutral-500">
+          <div className="text-sm text-slate-500">
             Free tier: 2,000 character limit per cleaning
           </div>
         )}
       </div>
 
       {remainingCleanings === 0 && user.tier === 'free' && (
-        <div className="mt-3 p-2 bg-red-500/20 border border-red-500/30 rounded-lg">
+        <div className="mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-xl">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-400" />
-            <span className="text-xs text-red-300">
+            <span className="text-sm text-red-300">
               Upgrade to Pro for unlimited cleanings
             </span>
           </div>

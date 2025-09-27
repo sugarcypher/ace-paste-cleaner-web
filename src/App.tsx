@@ -207,15 +207,29 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 p-6">
-      <div className="mx-auto max-w-5xl grid gap-6">
-        <header className="flex items-center justify-between">
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Ace Paste — Cleaner</h1>
-          <div className="flex gap-2">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
+      <div className="mx-auto max-w-6xl px-6 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-3 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Ace Paste Cleaner
+              </h1>
+              <p className="text-slate-300 text-lg">Clean, normalize & de-junk your text in one click</p>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap justify-center gap-3">
             {!hasAcceptedTerms && (
               <button
                 onClick={() => setShowPrivacyAgreement(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500 text-white font-medium hover:bg-blue-400 active:translate-y-[1px]"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -225,7 +239,7 @@ function AppContent() {
             )}
             <button
               onClick={pasteFromClipboard}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-yellow-500 text-yellow-950 font-medium hover:bg-yellow-400 active:translate-y-[1px] animate-pulse"
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -234,27 +248,34 @@ function AppContent() {
             </button>
             <button
               onClick={copyToClipboard}
-              className="px-4 py-2 rounded-xl bg-emerald-500 text-neutral-950 font-medium hover:bg-emerald-400 active:translate-y-[1px] animate-pulse"
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-medium hover:from-emerald-600 hover:to-green-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
             >
               Copy cleaned
             </button>
           </div>
-        </header>
+        </div>
 
         {/* Usage Indicator */}
-        <UsageIndicator 
-          user={user} 
-          usage={usage} 
-          onUpgrade={() => setShowPaywall(true)} 
-        />
+        <div className="mb-8">
+          <UsageIndicator 
+            user={user} 
+            usage={usage} 
+            onUpgrade={() => setShowPaywall(true)} 
+          />
+        </div>
 
         {/* Security Options */}
-        <SecurityOptions />
+        <div className="mb-8">
+          <SecurityOptions />
+        </div>
 
-        {/* Options Dropdowns */}
-        <div className="mb-4">
-          <label className="block text-sm uppercase tracking-wider text-neutral-400 mb-4">Features</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {/* Features Section */}
+        <div className="mb-8">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-2">Cleaning Features</h2>
+            <p className="text-slate-300">Choose what to clean from your text</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <OptionGroup 
             title="Text Formatting" 
             options={[
@@ -315,11 +336,11 @@ function AppContent() {
           
           {/* Save Features Configuration Button */}
           {user && (
-            <div className="mt-4 flex justify-end">
+            <div className="flex justify-center">
               <button
                 onClick={saveFeaturesConfiguration}
                 disabled={isSavingFeatures}
-                className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:from-emerald-600 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
@@ -330,60 +351,66 @@ function AppContent() {
           )}
         </div>
 
-        {/* Case Conversion Dropdown */}
-        <div className="mb-6">
-          <label className="block text-sm uppercase tracking-wider text-neutral-400 mb-2">Case Conversion</label>
-          <select
-            value={opts.caseConversion}
-            onChange={(e) => setOpts(prev => ({ ...prev, caseConversion: e.target.value as any }))}
-            className="w-full md:w-64 px-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          >
-            <option value="none">No conversion</option>
-            <option value="lowercase">lowercase</option>
-            <option value="uppercase">UPPERCASE</option>
-            <option value="titlecase">Title Case</option>
-            <option value="sentencecase">Sentence case</option>
-          </select>
+        {/* Case Conversion Section */}
+        <div className="mb-8">
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-semibold text-white mb-2">Text Formatting</h3>
+            <p className="text-slate-300">Transform your text case</p>
+          </div>
+          <div className="max-w-md mx-auto">
+            <select
+              value={opts.caseConversion}
+              onChange={(e) => setOpts(prev => ({ ...prev, caseConversion: e.target.value as any }))}
+              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm"
+            >
+              <option value="none">No conversion</option>
+              <option value="lowercase">lowercase</option>
+              <option value="uppercase">UPPERCASE</option>
+              <option value="titlecase">Title Case</option>
+              <option value="sentencecase">Sentence case</option>
+            </select>
+          </div>
         </div>
 
-        {/* Input and Output - Stacked Vertically */}
-        <div className="grid gap-6">
-          <div className="grid gap-3">
-            <div className="flex items-center justify-between">
+        {/* Text Processing Section */}
+        <div className="space-y-8">
+          {/* Input Section */}
+          <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <label className="text-sm uppercase tracking-wider text-neutral-400">Input</label>
+                <h3 className="text-lg font-semibold text-white">Input Text</h3>
                 {user && (
-                  <div className="text-xs text-neutral-500">
+                  <div className="text-sm">
                     {user.tier === 'admin' ? (
-                      <span className="text-emerald-400">
+                      <span className="text-emerald-400 font-medium">
                         {input.length.toLocaleString()} chars (Unlimited)
                       </span>
                     ) : user.tier === 'free' ? (
-                      <span className={input.length > 2000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 2000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 2,000 chars
                       </span>
                     ) : user.tier === 'monthly' ? (
-                      <span className={input.length > 50000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 50000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 50,000 chars
                       </span>
                     ) : user.tier === 'quarterly' ? (
-                      <span className={input.length > 200000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 200000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 200,000 chars
                       </span>
                     ) : user.tier === 'six_months' ? (
-                      <span className={input.length > 500000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 500000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 500,000 chars
                       </span>
                     ) : user.tier === 'yearly' ? (
-                      <span className={input.length > 1000000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 1000000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 1,000,000 chars
                       </span>
                     ) : user.tier === 'two_years' ? (
-                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 2,000,000 chars
                       </span>
                     ) : (
-                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-neutral-400'}>
+                      <span className={input.length > 2000000 ? 'text-red-400' : 'text-slate-300'}>
                         {input.length.toLocaleString()} / 2,000,000 chars
                       </span>
                     )}
@@ -391,23 +418,26 @@ function AppContent() {
                 )}
               </div>
             </div>
+            
             {!user && (
-              <div className="mb-4 p-4 bg-yellow-900/20 border border-yellow-500/30 rounded-lg">
-                <p className="text-yellow-400 text-sm text-center">
+              <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+                <p className="text-amber-300 text-sm text-center">
                   🔒 Please sign in to use the text cleaning features
                 </p>
               </div>
             )}
+            
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Paste your text here to clean it..."
-              className="h-[15vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+              className="w-full h-32 rounded-xl bg-slate-900/50 border border-slate-700 p-4 font-mono text-sm text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all duration-200 backdrop-blur-sm"
             />
-            <div className="mt-4 flex justify-center gap-3">
+            
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
               <button
                 onClick={() => { setInput(""); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500 text-white hover:bg-red-400 transition-colors font-medium text-sm animate-pulse"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-red-500 to-red-600 text-white hover:from-red-600 hover:to-red-700 transition-all duration-200 font-medium text-sm shadow-lg shadow-red-500/25 hover:shadow-red-500/40 hover:scale-105"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -416,7 +446,7 @@ function AppContent() {
               </button>
               <button
                 onClick={pasteFromClipboard}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-yellow-500 text-yellow-950 hover:bg-yellow-400 transition-colors text-sm font-medium animate-pulse"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -426,16 +456,16 @@ function AppContent() {
               <button
                 onClick={handleClean}
                 disabled={!input.trim() || !user || !canClean(input.length)}
-                className="flex items-center gap-2 px-6 py-3 rounded-lg bg-fuchsia-500 text-white hover:bg-fuchsia-400 disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors font-medium text-lg shadow-lg hover:shadow-fuchsia-500/25 animate-pulse"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 disabled:from-slate-600 disabled:to-slate-700 disabled:cursor-not-allowed transition-all duration-200 font-medium text-lg shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-105 disabled:hover:scale-100"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Clean Now
               </button>
               <button
                 onClick={copyToClipboard}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-colors text-sm font-medium animate-pulse"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 text-white hover:from-emerald-600 hover:to-green-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -448,34 +478,36 @@ function AppContent() {
           {/* What was removed section - between input and output */}
           <Stats input={input} output={cleaned} opts={opts} />
 
-          <div className="grid gap-3">
-            <div className="flex items-center justify-between">
-              <label className="text-sm uppercase tracking-wider text-neutral-400">Output</label>
+          {/* Output Section */}
+          <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-white">Cleaned Output</h3>
             </div>
             <textarea
               value={cleaned}
               readOnly
-              className="h-[15vh] w-full rounded-2xl bg-neutral-900 border border-neutral-800 p-4 font-mono text-sm"
+              className="w-full h-32 rounded-xl bg-slate-900/50 border border-slate-700 p-4 font-mono text-sm text-white placeholder-slate-400 backdrop-blur-sm"
+              placeholder="Your cleaned text will appear here..."
             />
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="mt-12 pt-8 border-t border-neutral-800">
+        <footer className="mt-16 pt-8 border-t border-slate-700/50">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-sm text-neutral-400">
+            <div className="text-sm text-slate-400">
               © 2025 Ace Paste Cleaner. All rights reserved.
             </div>
             <div className="flex items-center gap-6">
               <button
                 onClick={() => setShowPrivacy(true)}
-                className="text-sm text-neutral-400 hover:text-white transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 Privacy Policy
               </button>
               <button
                 onClick={() => setShowSecurity(true)}
-                className="text-sm text-neutral-400 hover:text-white transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 Security Policy
               </button>
@@ -483,7 +515,7 @@ function AppContent() {
                 href="https://github.com/sugarcypher/Ace-Paste-Cleaner"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-neutral-400 hover:text-white transition-colors"
+                className="text-sm text-slate-400 hover:text-white transition-colors"
               >
                 GitHub
               </a>
@@ -570,18 +602,18 @@ function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-neutral-700 transition-colors"
+        className="w-full flex items-center justify-between p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-200 backdrop-blur-sm hover:bg-slate-800/70"
       >
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-neutral-200">{title}</span>
+          <span className="text-sm font-medium text-white">{title}</span>
           {enabledCount > 0 && (
-            <span className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-300 rounded-full">
+            <span className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30">
               {enabledCount}
             </span>
           )}
         </div>
         <svg 
-          className={`w-4 h-4 text-neutral-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} 
+          className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -591,21 +623,21 @@ function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
       </button>
       
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-lg z-10 max-h-64 overflow-y-auto">
+        <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-800/90 border border-slate-700/50 rounded-xl shadow-xl z-10 max-h-64 overflow-y-auto backdrop-blur-sm">
           {options.map((option) => {
             const value = opts[option.key];
             const isBoolean = typeof value === 'boolean';
             
             return (
-              <label key={option.key} className="flex items-center gap-3 p-2 rounded-lg hover:bg-neutral-700 cursor-pointer select-none">
+              <label key={option.key} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer select-none transition-colors duration-200">
                 <input 
                   type="checkbox" 
-                  className="size-4 accent-emerald-500" 
+                  className="size-4 accent-emerald-500 rounded" 
                   checked={isBoolean ? value : false}
                   onChange={() => isBoolean ? toggle(option.key) : undefined}
                   disabled={!isBoolean}
                 />
-                <span className="text-sm text-neutral-200">{option.label}</span>
+                <span className="text-sm text-slate-200">{option.label}</span>
               </label>
             );
           })}
@@ -744,9 +776,14 @@ function Stats({ input, output, opts }: StatsProps) {
   const typesActive = removedItems.length > 0;
 
   return (
-    <div className="space-y-3 mt-2">
+    <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
+      <div className="text-center mb-6">
+        <h3 className="text-lg font-semibold text-white mb-2">Processing Results</h3>
+        <p className="text-slate-300 text-sm">See what was cleaned from your text</p>
+      </div>
+      
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <Metric 
           k="Length (in → out)" 
           v={`${input.length} → ${output.length}`} 
@@ -766,9 +803,9 @@ function Stats({ input, output, opts }: StatsProps) {
       
       {/* Detailed Removal Breakdown */}
       {removedItems.length > 0 && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-neutral-300 mb-2">What was removed:</h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium text-slate-300 mb-3">What was removed:</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {removedItems.map((item, index) => (
               <RemovedItem key={index} item={item} />
             ))}
@@ -778,9 +815,9 @@ function Stats({ input, output, opts }: StatsProps) {
       
       {/* Invisible Character Details */}
       {opts.removeInvisible && (invCounts.zwsp > 0 || invCounts.wj > 0 || invCounts.zwnj > 0 || invCounts.zwj > 0 || invCounts.shy > 0 || invCounts.ltrRtl > 0 || invCounts.bom > 0) && (
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-neutral-300 mb-2">Invisible characters:</h4>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="space-y-3 mt-6">
+          <h4 className="text-sm font-medium text-slate-300 mb-3">Invisible characters:</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {invCounts.zwsp > 0 && <Metric k="ZWSP" v={`${invCounts.zwsp}`} />}
             {invCounts.wj > 0 && <Metric k="WJ" v={`${invCounts.wj}`} />}
             {invCounts.zwnj > 0 && <Metric k="ZWNJ" v={`${invCounts.zwnj}`} />}
@@ -795,9 +832,10 @@ function Stats({ input, output, opts }: StatsProps) {
       
       {/* No changes message */}
       {removedItems.length === 0 && removedChars === 0 && input.length > 0 && (
-        <div className="text-center py-4 text-neutral-400">
-          <div className="text-2xl mb-2">✨</div>
-          <div className="text-sm">No changes needed - your text is already clean!</div>
+        <div className="text-center py-8 text-slate-400">
+          <div className="text-4xl mb-3">✨</div>
+          <div className="text-lg font-medium">No changes needed</div>
+          <div className="text-sm">Your text is already clean!</div>
         </div>
       )}
     </div>
@@ -806,7 +844,7 @@ function Stats({ input, output, opts }: StatsProps) {
 
 function Metric({ k, v, isActive = false }: MetricProps) {
   const getActiveClasses = () => {
-    if (!isActive) return 'bg-neutral-900 border-neutral-800';
+    if (!isActive) return 'bg-slate-800/50 border-slate-700/50 text-slate-400';
     
     // Determine color based on metric type
     if (k.includes('Length')) {
@@ -814,15 +852,15 @@ function Metric({ k, v, isActive = false }: MetricProps) {
     } else if (k.includes('Removed (chars)')) {
       return 'bg-red-500/20 border-red-500/30 text-red-300';
     } else if (k.includes('Removed Types')) {
-      return 'bg-green-500/20 border-green-500/30 text-green-300';
+      return 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300';
     }
-    return 'bg-neutral-900 border-neutral-800';
+    return 'bg-slate-800/50 border-slate-700/50 text-slate-400';
   };
 
   return (
-    <div className={`rounded-xl border p-3 transition-all duration-300 ${getActiveClasses()}`}>
-      <div className={`text-[11px] uppercase tracking-wider ${isActive ? 'text-current/80' : 'text-neutral-400'}`}>{k}</div>
-      <div className={`text-base font-medium ${isActive ? 'text-current' : ''}`}>{v}</div>
+    <div className={`rounded-xl border p-4 transition-all duration-300 backdrop-blur-sm ${getActiveClasses()}`}>
+      <div className={`text-xs uppercase tracking-wider font-medium ${isActive ? 'text-current/80' : 'text-slate-400'}`}>{k}</div>
+      <div className={`text-lg font-bold mt-1 ${isActive ? 'text-current' : 'text-slate-300'}`}>{v}</div>
     </div>
   );
 }
@@ -894,18 +932,18 @@ function RemovedItem({ item }: RemovedItemProps) {
   };
 
   return (
-    <div className={`rounded-xl border p-3 ${getColorClasses(item.type)} cursor-pointer hover:opacity-80 transition-opacity`}
+    <div className={`rounded-xl border p-4 ${getColorClasses(item.type)} cursor-pointer hover:opacity-80 transition-all duration-200 backdrop-blur-sm hover:scale-105`}
          onClick={() => setIsExpanded(!isExpanded)}>
-      <div className="flex items-center gap-2">
-        <span className="text-lg">{getIcon(item.type)}</span>
+      <div className="flex items-center gap-3">
+        <span className="text-xl">{getIcon(item.type)}</span>
         <div className="flex-1">
-          <div className="text-sm font-medium">{item.label}</div>
+          <div className="text-sm font-semibold">{item.label}</div>
           <div className="text-xs opacity-75">{item.count} {item.count === 1 ? 'item' : 'items'} removed</div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="text-lg font-bold">{item.count}</div>
+          <div className="text-xl font-bold">{item.count}</div>
           <svg 
-            className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+            className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -916,11 +954,11 @@ function RemovedItem({ item }: RemovedItemProps) {
       </div>
       
       {isExpanded && item.details && item.details.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-current/20">
-          <div className="text-xs font-medium mb-2 opacity-90">Details:</div>
-          <div className="space-y-1">
+        <div className="mt-4 pt-4 border-t border-current/20">
+          <div className="text-xs font-medium mb-3 opacity-90">Details:</div>
+          <div className="space-y-2">
             {item.details.map((detail, index) => (
-              <div key={index} className="text-xs opacity-75 bg-black/10 rounded px-2 py-1 font-mono">
+              <div key={index} className="text-xs opacity-75 bg-black/20 rounded-lg px-3 py-2 font-mono">
                 {detail}
               </div>
             ))}
@@ -1135,12 +1173,10 @@ function App() {
   return (
     <ErrorBoundary>
       <SecurityProvider>
-        <div className="min-h-screen bg-neutral-900 text-white">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
           <GumroadWebhookHandler />
           <Header onShowAuthModal={() => setShowAuthModal(true)} />
-          <div className="container mx-auto px-4 py-8 max-w-6xl">
-            <AppContent />
-          </div>
+          <AppContent />
         </div>
         
         {/* Authentication Modal */}

@@ -20,21 +20,21 @@ export function Header({ onShowAuthModal }: HeaderProps) {
 
   return (
     <>
-      <header className="bg-neutral-900 border-b border-neutral-800">
-        <div className="container mx-auto px-4 py-4">
+      <header className="bg-slate-900/50 backdrop-blur-sm border-b border-slate-700/50">
+        <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 flex items-center justify-center">
+              <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-emerald-400 to-blue-500 rounded-xl shadow-lg shadow-emerald-500/25">
                 <img 
                   src="/30E5FAEC-6A70-4961-BAAF-946AC6BFFEE1.jpeg" 
                   alt="ACE PASTE CLEANER Pro Logo" 
-                  className="w-full h-full object-contain rounded-lg"
+                  className="w-8 h-8 object-contain rounded-lg"
                 />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">ACE PASTE CLEANER Pro</h1>
-                <p className="text-xs text-neutral-400">Clean text, every time</p>
+                <p className="text-xs text-slate-400">Clean text, every time</p>
               </div>
             </div>
 
@@ -43,15 +43,15 @@ export function Header({ onShowAuthModal }: HeaderProps) {
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
                   {/* User Info */}
-                  <div className="flex items-center gap-2 px-3 py-2 bg-neutral-800 rounded-lg">
+                  <div className="flex items-center gap-2 px-3 py-2 bg-slate-800/50 rounded-xl border border-slate-700/50 backdrop-blur-sm">
                     {user?.isAdmin ? (
                       <Crown className="w-4 h-4 text-yellow-400" />
                     ) : (
-                      <User className="w-4 h-4 text-neutral-400" />
+                      <User className="w-4 h-4 text-slate-400" />
                     )}
                     <div className="text-sm">
                       <div className="text-white font-medium">{user?.email}</div>
-                      <div className="text-xs text-neutral-400 capitalize">
+                      <div className="text-xs text-slate-400 capitalize">
                         {user?.tier === 'admin' ? 'Admin' : user?.tier}
                       </div>
                     </div>
@@ -60,7 +60,7 @@ export function Header({ onShowAuthModal }: HeaderProps) {
                   {/* Sign Out Button */}
                   <button
                     onClick={handleSignOut}
-                    className="flex items-center gap-2 px-3 py-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all duration-200 backdrop-blur-sm"
                   >
                     <LogOut className="w-4 h-4" />
                     <span className="text-sm">Sign Out</span>
@@ -71,7 +71,7 @@ export function Header({ onShowAuthModal }: HeaderProps) {
                   {/* Get Started for Free Button */}
                   <button
                     onClick={handleSignIn}
-                    className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-400 transition-colors font-medium text-sm"
+                    className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white rounded-xl hover:from-emerald-600 hover:to-green-600 transition-all duration-200 font-medium text-sm shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
                   >
                     Get Started for Free
                   </button>
@@ -79,7 +79,7 @@ export function Header({ onShowAuthModal }: HeaderProps) {
                   {/* Sign In Button */}
                   <button
                     onClick={handleSignIn}
-                    className="flex items-center gap-2 px-3 py-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 text-slate-400 hover:text-white hover:bg-slate-800/50 rounded-xl transition-all duration-200 backdrop-blur-sm"
                   >
                     <User className="w-4 h-4" />
                     <span className="text-sm">Sign In</span>
