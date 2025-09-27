@@ -93,9 +93,7 @@ html {
 body {
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
   @apply antialiased;
-  background: var(--gradient-mesh);
-  background-size: 400% 400%;
-  animation: meshShift 20s ease infinite;
+  background: #f8fafc;
   color: var(--gray-900);
   overflow-x: hidden;
   min-height: 100vh;
