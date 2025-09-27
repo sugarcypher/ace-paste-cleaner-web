@@ -1,5 +1,55 @@
 # Security Changelog - ACE Paste Cleaner
 
+## Version 1.4.0 - September 27, 2025
+
+### 🔒 Security Fixes & Code Quality
+
+#### CWE-563: Useless Assignment to Local Variable
+**Severity**: Low  
+**CVSS Score**: 3.1 (AV:L/AC:L/PR:L/UI:N/S:U/C:N/I:N/A:L)  
+**Status**: ✅ FIXED
+
+**Description**:
+CodeQL analysis detected useless assignments to local variables that had no effect. Variables were assigned constant values but used in conditions that could never be true, creating unreachable code blocks.
+
+**Issues Found & Fixed**:
+1. **App.tsx Line 31**: `const hasAcceptedTerms = true;` with `!hasAcceptedTerms` condition
+2. **App-full.tsx Line 31**: Same pattern - variable always true but used in false condition
+
+**Root Cause**:
+```typescript
+// PROBLEMATIC CODE:
+const hasAcceptedTerms = true; // Always true
+// ...
+{!hasAcceptedTerms && (          // Never executes
+  <div>Privacy terms UI</div>    // Unreachable code
+)}
+```
+
+**Fix Applied**:
+```typescript
+// SECURITY FIX: CWE-563 - Remove useless assignment
+// Privacy terms acceptance is handled through simplified flow
+// const hasAcceptedTerms = true; // Removed - was never false, making conditional unreachable
+
+// Also removed the unreachable code block:
+{/* SECURITY FIX: CWE-563 - Removed unreachable code block
+    This privacy terms UI was never shown because hasAcceptedTerms was always true.
+    Privacy handling is now managed through the PrivacyAgreement modal component. */}
+```
+
+**Security Impact**:
+- Eliminates dead code that could confuse developers
+- Prevents logic errors from hidden code paths
+- Improves code maintainability and readability
+- Reduces bundle size by removing unreachable code
+
+**Prevention Measures Implemented**:
+1. **Comprehensive Audit Tool**: Created automated detection for useless assignments
+2. **Pattern Detection**: Identifies unreachable conditions, never-read variables, always-overwritten assignments
+3. **Self-Testing Framework**: Validates detection accuracy
+4. **Documentation**: Clear examples and remediation guidance
+
 ## Version 1.3.0 - September 27, 2025
 
 ### 🔒 Security Audits & Prevention

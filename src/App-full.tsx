@@ -28,7 +28,9 @@ function App() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [paywallReason, setPaywallReason] = useState('daily_limit');
   const [showPrivacyAgreement, setShowPrivacyAgreement] = useState(false);
-  const hasAcceptedTerms = true; // Simplified for clean interface
+  // SECURITY FIX: CWE-563 - Remove useless assignment
+  // Privacy terms acceptance is handled through simplified flow
+  // const hasAcceptedTerms = true; // Removed - was never false, making conditional unreachable
 
   // Default clean options
   const opts: CleanOptions = {
@@ -330,17 +332,9 @@ function App() {
                 </div>
               )}
               
-              {!hasAcceptedTerms && (
-                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <p className="text-sm text-yellow-800 mb-2">To use this tool, please accept our privacy terms.</p>
-                  <button
-                    onClick={() => setShowPrivacyAgreement(true)}
-                    className="px-3 py-1 bg-yellow-600 text-white rounded text-sm hover:bg-yellow-700"
-                  >
-                    Accept Privacy Terms
-                  </button>
-                </div>
-              )}
+              {/* SECURITY FIX: CWE-563 - Removed unreachable code block
+                  This privacy terms UI was never shown because hasAcceptedTerms was always true.
+                  Privacy handling is now managed through the PrivacyAgreement modal component. */}
             </div>
           </div>
         </div>
