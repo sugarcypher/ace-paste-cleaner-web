@@ -132,33 +132,41 @@ function isPrivateUse(ch: string, scope: string): boolean {
 
 // SECURITY: Safe HTML entity decoder to prevent XSS and double escaping/unescaping (CWE-079, CWE-116/CWE-020)
 function safeDecodeHtmlEntities(text: string): string {
-  // SECURITY FIX: Use DOMParser instead of innerHTML to prevent XSS execution (CWE-079)
-  if (typeof DOMParser !== "undefined") {
-    try {
-      // DOMParser treats content as inert - no script execution
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
-      return doc.body.textContent || doc.body.innerText || "";
-    } catch (e) {
-      // Fallback to manual decoding if DOMParser fails
-      console.warn("DOMParser-based entity decoding failed, using manual fallback:", e);
-    }
-  }
+  // SECURITY FIX: Fixed CWE-079 DOM-based XSS by not interpreting untrusted text as HTML
+  // We use pre-defined entity replacement pattern instead of DOM parsing
   
-  // Fallback manual decoding for Node.js or when DOM fails
-  // Process entities in specific order to avoid double-processing
+  // Process entities in a controlled manner with RegExp
   const entityMap: Record<string, string> = {
-    '&amp;': '&',    // Process &amp; last to avoid double-decoding
+    '&amp;': '&',
     '&lt;': '<',
     '&gt;': '>',
     '&quot;': '"',
     '&#39;': "'",
     '&#x27;': "'",
-    '&apos;': "'"
+    '&apos;': "'",
+    '&nbsp;': ' ',
+    '&copy;': '©',
+    '&reg;': '®',
+    '&deg;': '°'
   };
   
-  // Replace all entities except &amp; first
+  // Handle numeric entities
+  const decodeNumericEntity = (match: string, dec: string, hex: string): string => {
+    const code = dec ? parseInt(dec, 10) : parseInt(hex, 16);
+    // Only allow safe range of characters
+    if (code >= 32 && code <= 126) {
+      return String.fromCharCode(code);
+    }
+    return match; // Keep potentially unsafe entities
+  };
+  
+  // Replace named entities first (except &amp;)
   let result = text;
+  
+  // Handle numeric decimal and hex entities
+  result = result.replace(/&#(\d+);|&#x([0-9a-fA-F]+);/g, decodeNumericEntity);
+  
+  // Replace named entities
   Object.entries(entityMap).forEach(([entity, replacement]) => {
     if (entity !== '&amp;') {
       result = result.replace(new RegExp(entity, 'g'), replacement);

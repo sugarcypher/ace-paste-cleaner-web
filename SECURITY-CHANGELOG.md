@@ -1,3 +1,23 @@
+# Security Changelog
+
+## September 27, 2025
+
+### Fixed CWE-079: DOM-based XSS vulnerability in HTML entity decoding
+
+Previous implementation used string interpolation with DOMParser, which could potentially execute malicious code if the input contained specially crafted XSS payloads.
+
+```typescript
+// VULNERABLE CODE (fixed)
+const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
+```
+
+Replaced with a safer approach that:  
+1. Uses controlled RegExp-based entity decoding instead of DOM parsing  
+2. Limits numeric entity decoding to safe character ranges  
+3. Decodes named entities in a controlled manner  
+
+This change eliminates the risk of DOM-based XSS by not interpreting untrusted text as HTML at any stage during entity decoding.
+
 # Security Changelog - ACE Paste Cleaner
 
 ## Version 1.4.0 - September 27, 2025
