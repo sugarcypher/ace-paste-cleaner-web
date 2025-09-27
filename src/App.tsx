@@ -4,6 +4,7 @@ import { PaywallModal } from "./components/PaywallModal";
 import { PrivacyAgreement } from "./components/PrivacyAgreement";
 import { SimpleAuthModal } from "./components/SimpleAuthModal";
 import { cleanText } from "./utils/textCleaner";
+import { sanitizeTextAdvanced, DEFAULT_ADVANCED_PROFILE, PRESET_PROFILES } from "./utils/advancedTextCleaner";
 
 // Basic clean options for simplified interface
 interface CleanOptions {
@@ -64,8 +65,25 @@ function App() {
     }
 
     try {
-      // Clean the text
-      const cleaned = cleanText(input, opts);
+      let cleaned: string;
+      
+      if (!user) {
+        // Demo users get simple cleaning
+        cleaned = cleanText(input, opts);
+      } else {
+        // Authenticated users get advanced Unicode cleaning
+        // Select profile based on user tier
+        const profile = user.tier === 'free' 
+          ? PRESET_PROFILES.EMOJI_SAFE 
+          : user.tier === 'monthly'
+          ? DEFAULT_ADVANCED_PROFILE
+          : PRESET_PROFILES.MAX_STERILE; // Premium users get max cleaning power
+        
+        // Detect language for culturally-aware cleaning (simplified detection)
+        const detectedLang = detectLanguage(input);
+        cleaned = sanitizeTextAdvanced(input, profile, detectedLang);
+      }
+      
       setOutput(cleaned);
       
       // Record usage if user is logged in
@@ -78,6 +96,29 @@ function App() {
     } finally {
       setIsProcessing(false);
     }
+  };
+  
+  // Simple language detection based on common characters
+  const detectLanguage = (text: string): string | undefined => {
+    const sample = text.slice(0, 200); // Check first 200 chars
+    
+    // Arabic/Persian/Urdu
+    if (/[\u0600-\u06FF]/u.test(sample)) {
+      if (/[\u06A9\u06AF\u06CC]/u.test(sample)) return 'fa'; // Persian indicators
+      return 'ar';
+    }
+    
+    // Hindi/Bengali/Tamil/Telugu
+    if (/[\u0900-\u097F]/u.test(sample)) return 'hi'; // Devanagari (Hindi)
+    if (/[\u0980-\u09FF]/u.test(sample)) return 'bn'; // Bengali
+    if (/[\u0B80-\u0BFF]/u.test(sample)) return 'ta'; // Tamil
+    if (/[\u0C00-\u0C7F]/u.test(sample)) return 'te'; // Telugu
+    
+    // Thai/Khmer
+    if (/[\u0E00-\u0E7F]/u.test(sample)) return 'th'; // Thai
+    if (/[\u1780-\u17FF]/u.test(sample)) return 'km'; // Khmer
+    
+    return undefined; // Default to no language override
   };
 
   const copyToClipboard = async () => {
@@ -187,7 +228,26 @@ function App() {
         {/* Text Cleaning Tool */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Text Cleaner</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-gray-900">Text Cleaner</h2>
+              <div className="flex items-center gap-2">
+                {!user ? (
+                  <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Demo Mode</span>
+                ) : (
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    user.tier === 'free' 
+                      ? 'bg-green-100 text-green-800'
+                      : user.tier === 'monthly'
+                      ? 'bg-purple-100 text-purple-800' 
+                      : 'bg-gold-100 text-gold-800'
+                  }`}>
+                    {user.tier === 'free' ? 'Emoji-Safe Cleaning' 
+                     : user.tier === 'monthly' ? 'Advanced Unicode Cleaning'
+                     : 'Maximum Sterile Cleaning'}
+                  </span>
+                )}
+              </div>
+            </div>
             
             {/* Input Section */}
             <div className="space-y-4">
@@ -300,11 +360,14 @@ function App() {
                 </button>
                 
                 <button
-                  onClick={() => setInput('This    text     has\n\n\n\nmultiple blank lines\n\n\nand     extra     spaces     everywhere\t\t\nMixed\twhitespace\tcharacters   too!')}
+                  onClick={() => setInput('This\u200B\u200Ctext\u200D\uFEFFhas\u00ADinvisible\u202Ccharacters\u2060everywhere\u180E!')}
                   className="p-3 text-left border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
                 >
-                  <div className="font-medium text-gray-800 mb-1">🧹 Whitespace Cleanup</div>
-                  <div className="text-xs text-gray-600">Fix spacing and normalize whitespace</div>
+                  <div className="font-medium text-gray-800 mb-1">
+                    👻 Invisible Characters
+                    {user && <span className="ml-1 text-xs text-green-600">(Advanced)</span>}
+                  </div>
+                  <div className="text-xs text-gray-600">Remove zero-width spaces, BOMs, control chars</div>
                 </button>
                 
                 <button
@@ -316,11 +379,14 @@ function App() {
                 </button>
                 
                 <button
-                  onClick={() => setInput('Convert THIS mixed CaSe TeXt into the format you want. some words are ALL CAPS while others are lowercase.')}
+                  onClick={() => setInput('مرحبا\u200Dبالعالم\u200C Thai: สวัสดี\u200Bโลก Emoji: 👨\u200D💻🔥\uFE0F')}
                   className="p-3 text-left border border-gray-200 rounded-md hover:border-blue-300 hover:bg-blue-50 transition-colors text-sm"
                 >
-                  <div className="font-medium text-gray-800 mb-1">🔤 Case Conversion</div>
-                  <div className="text-xs text-gray-600">Transform text case format</div>
+                  <div className="font-medium text-gray-800 mb-1">
+                    🌍 Multilingual Text
+                    {user && <span className="ml-1 text-xs text-purple-600">(Cultural-Aware)</span>}
+                  </div>
+                  <div className="text-xs text-gray-600">Preserve Arabic shaping, Thai breaks, emoji</div>
                 </button>
               </div>
             </div>
