@@ -82,6 +82,7 @@ export function processGumroadWebhook(webhookData: GumroadWebhookData): { succes
 
     // Update user tier
     const success = simpleAuth.updateUserTier(
+      user.id,
       tier,
       webhookData.subscription_id,
       webhookData.customer_id,

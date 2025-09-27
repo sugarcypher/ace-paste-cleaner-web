@@ -78,6 +78,13 @@ export const simpleAuth = {
         return { success: false, error: 'Password must be at least 6 characters' };
       }
       
+      // Check if user already exists
+      const userRegistry = JSON.parse(localStorage.getItem('acepaste_user_registry') || '{}');
+      
+      if (userRegistry[email]) {
+        return { success: false, error: 'User already exists. Please sign in instead.' };
+      }
+      
       // Create user
       const user: User = {
         id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -90,6 +97,10 @@ export const simpleAuth = {
           currentTier: 'free'
         }
       };
+      
+      // Register user in the registry
+      userRegistry[email] = user;
+      localStorage.setItem('acepaste_user_registry', JSON.stringify(userRegistry));
       
       // Create token
       const token = createToken(user);
@@ -108,20 +119,55 @@ export const simpleAuth = {
   // Sign in with email
   signIn: async (email: string, password: string): Promise<{ success: boolean; user?: User; error?: string }> => {
     try {
-      // For demo purposes, accept any email/password combination
-      // In production, you'd validate against a backend
+      // Simple validation
+      if (!email || !email.includes('@')) {
+        return { success: false, error: 'Invalid email address' };
+      }
       
-      const user: User = {
-        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        email,
-        tier: 'free',
-        usage: {
-          dailyCleanings: 0,
-          totalCleanings: 0,
-          lastResetDate: new Date().toISOString().split('T')[0],
-          currentTier: 'free'
-        }
-      };
+      if (!password || password.length < 6) {
+        return { success: false, error: 'Password must be at least 6 characters' };
+      }
+      
+      // Check if user exists in "database" (localStorage registry)
+      const userRegistry = JSON.parse(localStorage.getItem('acepaste_user_registry') || '{}');
+      const existingUser = userRegistry[email];
+      
+      let user: User;
+      
+      if (existingUser) {
+        // Load existing user
+        user = {
+          id: existingUser.id,
+          email: existingUser.email,
+          tier: existingUser.tier || 'free',
+          subscriptionId: existingUser.subscriptionId,
+          customerId: existingUser.customerId,
+          expiresAt: existingUser.expiresAt,
+          usage: existingUser.usage || {
+            dailyCleanings: 0,
+            totalCleanings: 0,
+            lastResetDate: new Date().toISOString().split('T')[0],
+            currentTier: existingUser.tier || 'free'
+          }
+        };
+      } else {
+        // Create new user for first-time sign-in
+        user = {
+          id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          email,
+          tier: 'free',
+          usage: {
+            dailyCleanings: 0,
+            totalCleanings: 0,
+            lastResetDate: new Date().toISOString().split('T')[0],
+            currentTier: 'free'
+          }
+        };
+        
+        // Register user in the registry
+        userRegistry[email] = user;
+        localStorage.setItem('acepaste_user_registry', JSON.stringify(userRegistry));
+      }
       
       // Create token
       const token = createToken(user);
@@ -189,6 +235,13 @@ export const simpleAuth = {
       localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
       
+      // Update user registry
+      const userRegistry = JSON.parse(localStorage.getItem('acepaste_user_registry') || '{}');
+      if (userRegistry[user.email]) {
+        userRegistry[user.email] = updatedUser;
+        localStorage.setItem('acepaste_user_registry', JSON.stringify(userRegistry));
+      }
+      
       return true;
     } catch {
       return false;
@@ -208,6 +261,13 @@ export const simpleAuth = {
       
       localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
       localStorage.setItem(STORAGE_KEYS.USAGE_DATA, JSON.stringify(usage));
+      
+      // Update user registry
+      const userRegistry = JSON.parse(localStorage.getItem('acepaste_user_registry') || '{}');
+      if (userRegistry[user.email]) {
+        userRegistry[user.email] = updatedUser;
+        localStorage.setItem('acepaste_user_registry', JSON.stringify(userRegistry));
+      }
       
       return true;
     } catch {

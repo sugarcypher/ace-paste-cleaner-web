@@ -531,11 +531,11 @@ function AppContent() {
         onUpgrade={(tierId) => {
           // Redirect to Gumroad sales page for the selected tier
           const gumroadUrls = {
-            'monthly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-monthly?wanted=true',
-            'quarterly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-quarterly?wanted=true', 
-            'six_months': 'https://thinkwelllabs.gumroad.com/l/ace-paste-six_months?wanted=true',
-            'yearly': 'https://thinkwelllabs.gumroad.com/l/ace-paste-yearly?wanted=true',
-            'two_years': 'https://thinkwelllabs.gumroad.com/l/ace-paste-two_years?wanted=true'
+            'monthly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=monthly&wanted=true',
+            'quarterly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=quarterly&wanted=true', 
+            'six_months': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=six-months&wanted=true',
+            'yearly': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=yearly&wanted=true',
+            'two_years': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=two-years&wanted=true'
           };
           
           const gumroadUrl = gumroadUrls[tierId as keyof typeof gumroadUrls];
@@ -549,10 +549,10 @@ function AppContent() {
         onAddUpsell={(upsellId) => {
           // Redirect to Gumroad sales page for upsell features
           const upsellUrls = {
-            'team_license': 'https://thinkwelllabs.gumroad.com/l/ace-paste-team_license?wanted=true',
-            'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/ace-paste-pro_preset_pack?wanted=true',
-            'writers_toolkit': 'https://thinkwelllabs.gumroad.com/l/ace-paste-writers_toolkit?wanted=true',
-            'dev_mode': 'https://thinkwelllabs.gumroad.com/l/ace-paste-dev_mode?wanted=true'
+            'team_license': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=team-license&wanted=true',
+            'pro_preset_pack': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=pro-preset-pack&wanted=true',
+            'writers_toolkit': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=writers-toolkit&wanted=true',
+            'dev_mode': 'https://thinkwelllabs.gumroad.com/l/kcrps?option=dev-mode&wanted=true'
           };
           
           const upsellUrl = upsellUrls[upsellId as keyof typeof upsellUrls];
@@ -599,21 +599,21 @@ function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
   const enabledCount = options.filter(opt => opts[opt.key]).length;
 
   return (
-    <div className="relative">
+    <div className="relative animate-slide-in">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600/50 transition-all duration-200 backdrop-blur-sm hover:bg-slate-800/70"
+        className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-slate-700/50 hover:border-emerald-500/50 hover:bg-slate-700/50 transition-all duration-300 shadow-lg hover:shadow-xl group"
       >
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white">{title}</span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-semibold text-white group-hover:text-emerald-300 transition-colors">{title}</span>
           {enabledCount > 0 && (
-            <span className="px-2 py-1 text-xs bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30">
+            <span className="px-2 py-1 text-xs bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full animate-pulse-soft shadow-lg">
               {enabledCount}
             </span>
           )}
         </div>
         <svg 
-          className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
+          className={`w-5 h-5 text-slate-400 group-hover:text-emerald-400 transition-all duration-300 ${isOpen ? 'rotate-180' : ''}`} 
           fill="none" 
           stroke="currentColor" 
           viewBox="0 0 24 24"
@@ -623,24 +623,33 @@ function OptionGroup({ title, options, opts, toggle }: OptionGroupProps) {
       </button>
       
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 p-3 bg-slate-800/90 border border-slate-700/50 rounded-xl shadow-xl z-10 max-h-64 overflow-y-auto backdrop-blur-sm">
-          {options.map((option) => {
-            const value = opts[option.key];
-            const isBoolean = typeof value === 'boolean';
-            
-            return (
-              <label key={option.key} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-700/50 cursor-pointer select-none transition-colors duration-200">
-                <input 
-                  type="checkbox" 
-                  className="size-4 accent-emerald-500 rounded" 
-                  checked={isBoolean ? value : false}
-                  onChange={() => isBoolean ? toggle(option.key) : undefined}
-                  disabled={!isBoolean}
-                />
-                <span className="text-sm text-slate-200">{option.label}</span>
-              </label>
-            );
-          })}
+        <div className="absolute top-full left-0 right-0 mt-3 p-3 glass-dark rounded-2xl shadow-2xl z-20 max-h-72 overflow-y-auto animate-slide-in border border-slate-600/30">
+          <div className="space-y-2">
+            {options.map((option) => {
+              const value = opts[option.key];
+              const isBoolean = typeof value === 'boolean';
+              
+              return (
+                <label key={option.key} className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer select-none transition-all duration-200 group">
+                  <div className="relative">
+                    <input 
+                      type="checkbox" 
+                      className="w-5 h-5 rounded border-2 border-slate-500 bg-transparent checked:bg-gradient-to-r checked:from-emerald-500 checked:to-teal-500 checked:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 focus:outline-none transition-all duration-200" 
+                      checked={isBoolean ? value : false}
+                      onChange={() => isBoolean ? toggle(option.key) : undefined}
+                      disabled={!isBoolean}
+                    />
+                    {isBoolean && value && (
+                      <svg className="absolute inset-0 w-5 h-5 text-white pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="text-sm text-slate-200 group-hover:text-white transition-colors">{option.label}</span>
+                </label>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -932,18 +941,24 @@ function RemovedItem({ item }: RemovedItemProps) {
   };
 
   return (
-    <div className={`rounded-xl border p-4 ${getColorClasses(item.type)} cursor-pointer hover:opacity-80 transition-all duration-200 backdrop-blur-sm hover:scale-105`}
+    <div className={`rounded-2xl border p-4 ${getColorClasses(item.type)} cursor-pointer hover:scale-[1.02] transition-all duration-300 shadow-lg hover:shadow-xl backdrop-blur-sm`}
          onClick={() => setIsExpanded(!isExpanded)}>
       <div className="flex items-center gap-3">
-        <span className="text-xl">{getIcon(item.type)}</span>
-        <div className="flex-1">
-          <div className="text-sm font-semibold">{item.label}</div>
-          <div className="text-xs opacity-75">{item.count} {item.count === 1 ? 'item' : 'items'} removed</div>
+        <div className="flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-black/10 flex items-center justify-center">
+            <span className="text-xl">{getIcon(item.type)}</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-semibold truncate">{item.label}</div>
+          <div className="text-xs opacity-75">
+            {item.count} {item.count === 1 ? 'item' : 'items'} removed
+          </div>
+        </div>
+        <div className="flex items-center gap-3 flex-shrink-0">
           <div className="text-xl font-bold">{item.count}</div>
           <svg 
-            className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} 
+            className={`w-5 h-5 transition-all duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -954,11 +969,11 @@ function RemovedItem({ item }: RemovedItemProps) {
       </div>
       
       {isExpanded && item.details && item.details.length > 0 && (
-        <div className="mt-4 pt-4 border-t border-current/20">
-          <div className="text-xs font-medium mb-3 opacity-90">Details:</div>
+        <div className="mt-4 pt-4 border-t border-current/20 animate-slide-in">
+          <div className="text-xs font-semibold mb-3 opacity-90 uppercase tracking-wider">Details:</div>
           <div className="space-y-2">
             {item.details.map((detail, index) => (
-              <div key={index} className="text-xs opacity-75 bg-black/20 rounded-lg px-3 py-2 font-mono">
+              <div key={index} className="text-xs opacity-80 bg-black/20 rounded-lg px-3 py-2 font-mono border border-current/10">
                 {detail}
               </div>
             ))}
