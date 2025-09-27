@@ -207,51 +207,120 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white">
-      <div className="mx-auto max-w-6xl px-6 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-3 mb-6">
-            <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-blue-500 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Ace Paste Cleaner
-              </h1>
-              <p className="text-slate-300 text-lg">Clean, normalize & de-junk your text in one click</p>
-            </div>
+    <div className="min-h-screen w-full relative overflow-hidden">
+      {/* Revolutionary Hero Section */}
+      <div className="relative">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-20 left-10 w-72 h-72 animate-morph-float" style={{animationDelay: '0s'}}>
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-400/20 to-purple-600/20 blur-3xl"></div>
           </div>
+          <div className="absolute top-40 right-20 w-96 h-96 animate-morph-float" style={{animationDelay: '2s'}}>
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-pink-400/20 to-red-600/20 blur-3xl"></div>
+          </div>
+          <div className="absolute bottom-40 left-1/4 w-80 h-80 animate-morph-float" style={{animationDelay: '4s'}}>
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-emerald-400/20 to-cyan-600/20 blur-3xl"></div>
+          </div>
+        </div>
+        
+        <div className="relative z-10 mx-auto max-w-7xl px-6 py-16">
+          {/* Revolutionary Hero */}
+          <div className="text-center mb-20 animate-slide-scale">
+            <div className="inline-flex items-center justify-center mb-8">
+              <div className="relative">
+                <div className="w-24 h-24 animate-liquid-glow rounded-3xl flex items-center justify-center">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center animate-morph-float">
+                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-emerald-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            
+            <h1 className="text-6xl md:text-7xl lg:text-8xl font-black mb-6 animate-shimmer">
+              <span className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 bg-clip-text text-transparent">
+                ACE PASTE
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                CLEANER
+              </span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Transform messy text into pristine content with our revolutionary AI-powered cleaning engine. 
+              <span className="font-semibold text-blue-600">Clean • Normalize • Perfect</span>
+            </p>
+            
+            <div className="flex flex-wrap justify-center gap-4 mb-12">
           
-          <div className="flex flex-wrap justify-center gap-3">
-            {!hasAcceptedTerms && (
+              {!hasAcceptedTerms && (
+                <button
+                  onClick={() => setShowPrivacyAgreement(true)}
+                  className="btn-neo flex items-center gap-3"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                  Accept Privacy Terms
+                </button>
+              )}
+              
               <button
-                onClick={() => setShowPrivacyAgreement(true)}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:scale-105"
+                onClick={pasteFromClipboard}
+                className="btn-glow flex items-center gap-3"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
-                Privacy Agreement
+                Quick Paste
               </button>
-            )}
-            <button
-              onClick={pasteFromClipboard}
-              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-medium hover:from-amber-600 hover:to-orange-600 transition-all duration-200 shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 hover:scale-105"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              Paste
-            </button>
-            <button
-              onClick={copyToClipboard}
-              className="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-green-500 text-white font-medium hover:from-emerald-600 hover:to-green-600 transition-all duration-200 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-105"
-            >
-              Copy cleaned
-            </button>
+              
+              <button
+                onClick={copyToClipboard}
+                className="btn-ultra flex items-center gap-3"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                Copy Clean Text
+              </button>
+            </div>
+            
+            {/* Revolutionary Feature Showcase */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
+              <div className="card-glow text-center" style={{'--delay': '0s'}}>
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Lightning Fast</h3>
+                <p className="text-gray-600">Clean thousands of characters in milliseconds with our optimized engine</p>
+              </div>
+              
+              <div className="card-glow text-center" style={{'--delay': '0.2s'}}>
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Smart Detection</h3>
+                <p className="text-gray-600">Automatically identifies and removes invisible characters, formatting, and junk</p>
+              </div>
+              
+              <div className="card-glow text-center" style={{'--delay': '0.4s'}}>
+                <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-500 to-red-600 rounded-2xl flex items-center justify-center">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Privacy First</h3>
+                <p className="text-gray-600">Your text never leaves your browser. 100% client-side processing</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -372,13 +441,18 @@ function AppContent() {
           </div>
         </div>
 
-        {/* Text Processing Section */}
-        <div className="space-y-8">
-          {/* Input Section */}
-          <div className="bg-slate-800/30 backdrop-blur-sm rounded-2xl p-6 border border-slate-700/50">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <h3 className="text-lg font-semibold text-white">Input Text</h3>
+          {/* Revolutionary Text Processing Interface */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            {/* Input Section */}
+            <div className="card-ultra animate-slide-scale" style={{animationDelay: '0.2s'}}>
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800">Input Text</h3>
                 {user && (
                   <div className="text-sm">
                     {user.tier === 'admin' ? (
